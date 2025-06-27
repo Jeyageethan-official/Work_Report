@@ -9,9 +9,6 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
-
 
     <style>
         /* Mobile Responsive Slide Menu Styles */
@@ -72,11 +69,6 @@
             right: 15px;
             z-index: 1100;
         }
-        /* Force time input to left align in iOS Safari */
-input[type="time"]::-webkit-date-and-time-value {
-    text-align: left !important;
-}
-
     </style>
     <style>
 
@@ -271,25 +263,6 @@ select {
 
 
 
-/* iPhone-style time picker enhancements */
-.custom-time-picker {
-    appearance: none; /* Remove native browser styles */
-    -webkit-appearance: none;
-    background-color: #ffffff;
-    font-size: 1rem;
-
-    padding: 10px;
-    border-radius: 8px;
-    border: 1px solid #e0e0e0;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    cursor: pointer;
-}
-
-.custom-time-picker:focus {
-    border-color: #2f6df7; /* Highlight border on focus */
-    box-shadow: 0 0 0 4px rgba(47, 109, 247, 0.2);
-    outline: none;
-}
 
 
 
@@ -678,24 +651,15 @@ if (dayData.leaveReason) {
             // Append export modal to the body
             document.body.appendChild(exportModal);
             document.getElementById('saveAsPdfBtn').addEventListener('click', function() {
-    const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF();
-    
-    pdf.text("Work Report", 10, 10); // Add a title to the PDF
-    pdf.text("Generated on: " + new Date().toLocaleDateString(), 10, 20);
-    
-    // Fetch the table content
-    const table = document.querySelector("#exportTableContainer table");
-    
-    if (table) {
-        pdf.autoTable({ html: table, startY: 30 });
+    if (typeof html2canvas === 'undefined') {
+        var script = document.createElement('script');
+        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+        script.onload = loadJsPDF;
+        document.head.appendChild(script);
     } else {
-        pdf.text("No data available.", 10, 30);
+        loadJsPDF();
     }
-
-    pdf.save("Work_Report.pdf");
 });
-
 
 
 
@@ -1180,20 +1144,21 @@ ${dayData.leaveStatus === "Yes" ?
 
         // Create Input Field with Placeholder
         function createInputField(label, field, value, placeholder, dateKey, type = "text") {
-    if (type === "time") {
-        return `
-            <div class="flex flex-col">
-                <label class="font-medium mb-1">${label}</label>
-                <input 
-                    type="time" 
-                    class="p-2 border rounded custom-time-picker"
-                    placeholder="${placeholder}"
-                    value="${value}" 
-                    onchange="updateWorkData('${dateKey}', '${field}', this.value)"
-                />
-            </div>
-        `;
-    }
+            if (type === "time") {
+    return `
+        <div class="flex flex-col">
+            <label class="font-medium mb-1">${label}</label>
+            <input 
+                type="time" 
+                class="p-2 border rounded"
+                placeholder="${placeholder}"
+                value="${value}" 
+                onchange="updateWorkData('${dateKey}', '${field}', this.value)"
+            />
+        </div>
+    `;
+}
+
     return `
         <div class="flex flex-col">
             <label class="font-medium mb-1">${label}</label>
