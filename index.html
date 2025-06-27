@@ -173,6 +173,10 @@
     border-color: #2f6df7;
     box-shadow: 0 0 0 3px rgba(47, 109, 247, 0.1);
 }
+.custom-time-picker::-webkit-date-and-time-value {
+  text-align: left !important;
+}
+
 
 
     .hidden {
@@ -269,11 +273,10 @@ select {
 
 /* iPhone-style time picker enhancements */
 .custom-time-picker {
-    appearance: none; /* Remove native browser styles */
+    appearance: none;
     -webkit-appearance: none;
     background-color: #ffffff;
     font-size: 1rem;
-    text-align: center;
     padding: 10px;
     border-radius: 8px;
     border: 1px solid #e0e0e0;
@@ -281,10 +284,8 @@ select {
     cursor: pointer;
 }
 
-.custom-time-picker:focus {
-    border-color: #2f6df7; /* Highlight border on focus */
-    box-shadow: 0 0 0 4px rgba(47, 109, 247, 0.2);
-    outline: none;
+.custom-time-picker::-webkit-date-and-time-value {
+    text-align: left !important;
 }
 
 
