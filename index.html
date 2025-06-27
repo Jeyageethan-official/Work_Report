@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Work Report</title>
@@ -11,7 +10,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
 
 
     <style>
@@ -73,6 +72,11 @@
             right: 15px;
             z-index: 1100;
         }
+        /* Force time input to left align in iOS Safari */
+input[type="time"]::-webkit-date-and-time-value {
+    text-align: left !important;
+}
+
     </style>
     <style>
 
@@ -173,10 +177,6 @@
     border-color: #2f6df7;
     box-shadow: 0 0 0 3px rgba(47, 109, 247, 0.1);
 }
-.custom-time-picker::-webkit-date-and-time-value {
-  text-align: left !important;
-}
-
 
 
     .hidden {
@@ -223,7 +223,7 @@
 
 .edit-pencil:hover {
     transform: scale(1.1); /* Slight zoom on hover */
-    border-color: #ca0505; /* Change border color on hover */
+    border-color: #2f6df7; /* Change border color on hover */
 }
 
 .edit-pencil svg {
@@ -273,10 +273,11 @@ select {
 
 /* iPhone-style time picker enhancements */
 .custom-time-picker {
-    appearance: none;
+    appearance: none; /* Remove native browser styles */
     -webkit-appearance: none;
     background-color: #ffffff;
     font-size: 1rem;
+
     padding: 10px;
     border-radius: 8px;
     border: 1px solid #e0e0e0;
@@ -284,8 +285,10 @@ select {
     cursor: pointer;
 }
 
-.custom-time-picker::-webkit-date-and-time-value {
-    text-align: left !important;
+.custom-time-picker:focus {
+    border-color: #2f6df7; /* Highlight border on focus */
+    box-shadow: 0 0 0 4px rgba(47, 109, 247, 0.2);
+    outline: none;
 }
 
 
@@ -323,47 +326,6 @@ td {
 
 
 
-#dateSearchBtn {
-    position: relative; /* Default position inside the rectangle box */
-    transition: all 0.3s ease-in-out;
-}
-
-.fixed-date-search {
-    position: fixed !important;
-    bottom: 9.5rem; /* Positioned above the up-arrow button */
-    right: 1rem;
-    z-index: 100;
-    background-color: #1a1a1a;
-    color: white;
-    padding: 10px;
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-}
-
-.fixed-date-search:hover {
-    transform: scale(1);
-    background-color: #333;
-}
-
-table {
-    border-collapse: collapse;
-    width: 100%;
-    border: 0.5px solid rgba(0, 0, 0, 0.358); /* Thinner but bold outer border */
-}
-
-th, td {
-    border: 0.5px solid rgba(0, 0, 0, 0.319); /* Thinner but bold inner borders */
-    padding: 8px;
-    text-align: left;
-}
-
-th {
-    background-color: #f2f2f2; /* Optional: Header background */
-}
 
 
 </style>   
@@ -371,12 +333,11 @@ th {
 
 
 
-    
 
 
 
 <div class="max-w-7xl mx-auto p-4">
-    <h1 class="text-2xl font-bold text-center text-black mb-6">Work Report Tracker</h1>
+    <h1 class="text-2xl font-bold text-center text-black mb-6">My Work Detailed Report</h1>
  
     <!-- Month and Year Selection -->
     <div class="flex justify-between items-center mb-6">
@@ -399,35 +360,12 @@ th {
                     <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>
                 </svg>
             </button>
-            <!-- Date Search Button -->
-<button id="dateSearchBtn" class="p-2 hover:bg-gray-300 rounded-full">
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="11" cy="11" r="8"/>
-        <path d="m21 21-4.3-4.3"/>
-    </svg>
-    
-</button>
-
-<!-- Date Picker Modal -->
-<div id="dateSearchModal" class="hidden fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center z-70">
-    <div class="bg-white rounded-lg shadow-lg w-80 max-h-[90vh] overflow-y-auto p-4">
-        <h2 class="text-lg font-bold mb-2">Select Date</h2>
-
-        
-
-        <!-- Week and Day Selection -->
-        <div class="grid grid-cols-4 gap-2 mb-4" id="datesGrid"></div>
-        
-        <!-- Close Button -->
-        <button id="closeDatePicker" class="w-full p-2 bg-red-500 text-white rounded">Close</button>
-        <script>
-            document.getElementById("closeDatePicker").addEventListener("click", function(event) {
-                event.stopPropagation(); // Prevent event from closing the container
-            });
-            </script>
-    </div>
-</div>
-
+            <button id="dateSearchBtn" class="p-2 hover:bg-gray-300 rounded-full">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"/>
+                    <path d="m21 21-4.3-4.3"/>
+                </svg>
+            </button>
             <button id="shareButton" class="p-2 hover:bg-gray-300 rounded-full">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="18" cy="5" r="3"/>
@@ -441,7 +379,6 @@ th {
     </div>
 
     <script>
-        
         document.addEventListener("deviceready", function () {
             document.getElementById("downloadBtn").addEventListener("click", downloadFile);
         });
@@ -462,98 +399,13 @@ th {
                 }
             );
         }
-
-
-
-        window.addEventListener("scroll", () => {
-        const dateSearchBtn = document.getElementById("dateSearchBtn");
-        const referenceBox = document.querySelector(".flex.items-center.space-x-2.bg-gray-100"); // The rectangular box
-
-        const rect = referenceBox.getBoundingClientRect();
-        const scrollPosition = window.scrollY;
-
-        if (scrollPosition > rect.bottom + 100) {
-            dateSearchBtn.classList.add("fixed-date-search"); // Move to bottom-right above up arrow
-        } else {
-            dateSearchBtn.classList.remove("fixed-date-search"); // Stay in the rectangle
-        }
-    });
     </script>
-
-    
     
 
 
 
     
     <script>
-        
-
-
-
-
-
-
-
-        document.getElementById("closeDatePicker").addEventListener("click", function() {
-    document.getElementById("dateSearchModal").classList.add("hidden"); // Remove or comment out this line
-});
-
-        document.addEventListener("DOMContentLoaded", function () {
-    const shareButton = document.getElementById("shareButton");
-
-    if (shareButton) {
-        shareButton.addEventListener("click", function () {
-            openShareModal();
-        });
-    } else {
-        console.error("Share button not found!");
-    }
-});
-
-function openShareModal() {
-    let shareModal = document.getElementById("shareExportModal");
-
-    // If modal doesn't exist, create it
-    if (!shareModal) {
-        shareModal = document.createElement("div");
-        shareModal.id = "shareExportModal";
-        shareModal.className = "fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center z-50";
-        shareModal.innerHTML = `
-            <div class="bg-white rounded-lg shadow-lg w-11/12 max-w-md p-6">
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-xl font-bold">Share Options</h2>
-                    <button id="closeShareModal" class="text-gray-500 hover:text-gray-700">
-                        ✖
-                    </button>
-                </div>
-                <div class="grid grid-cols-1 gap-4">
-                    <button id="shareTextBtn" class="p-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
-                        Share as Text
-                    </button>
-                    <button id="exportDataBtn" class="p-3 bg-green-500 text-white rounded-lg hover:bg-green-600">
-                        Export Data as PDF
-                    </button>
-                    <button id="exportSelectedMonthBtn" class="p-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700">
-    Export Selected Month
-</button>
-
-                </div>
-            </div>
-        `;
-        document.body.appendChild(shareModal);
-
-        // Close modal functionality
-        document.getElementById("closeShareModal").addEventListener("click", function () {
-            document.body.removeChild(shareModal);
-        });
-
-        // Event Listeners
-        document.getElementById("exportDataBtn").addEventListener("click", generatePDF);
-        document.getElementById("shareTextBtn").addEventListener("click", shareText);
-    }
-}
-
         // Replace the existing share button click event handler with this new one
     document.getElementById('shareButton').addEventListener('click', function() {
         // Create the popup modal for sharing and exporting
@@ -626,20 +478,46 @@ function openShareModal() {
         });
         
         // Share as text functionality
-        document.getElementById('shareTextBtn').addEventListener('click', function() {
+        document.getElementById("shareTextBtn").addEventListener("click", function () {
+    // Fetch summary data
+    const monthName = months[currentDate.getMonth()];
+    const year = currentDate.getFullYear();
     const summaryText = `Work Summary Report for ${monthName} ${year}:\n` +
         `- Regular Leaves: ${document.getElementById("regularLeaves").textContent}\n` +
         `- Special Days: ${document.getElementById("specialDays").textContent}\n` +
         `- Weekend Leaves: ${document.getElementById("weekendLeaveDays").textContent}\n` +
-        `- Total OT Hours: ${document.getElementById("totalOtHours").textContent} hours`;
+        `- Total OT Hours: ${document.getElementById("totalOtHours").textContent} hours\n\n` +
+        `Shared via Work Report App`;
 
-    navigator.clipboard.writeText(summaryText).then(() => {
-        alert("Summary copied to clipboard!");
-    }).catch(err => {
-        console.error("Failed to copy text: ", err);
-        alert("Failed to copy. Please try again.");
-    });
+    // Choose sharing method
+    if (navigator.share) {
+        // Use Web Share API (if supported)
+        navigator.share({
+            title: "Work Summary Report",
+            text: summaryText
+        }).then(() => console.log("Shared successfully"))
+        .catch(err => console.error("Error sharing:", err));
+    } else {
+        // Fallback - open share options manually
+        const encodedText = encodeURIComponent(summaryText);
+        const whatsappURL = `https://wa.me/?text=${encodedText}`;
+        const smsURL = `sms:?body=${encodedText}`;
+        const emailURL = `mailto:?subject=Work Summary Report&body=${encodedText}`;
+
+        // Show prompt to choose platform
+        const shareOption = prompt("Choose sharing platform:\n1 - WhatsApp\n2 - SMS\n3 - Email", "1");
+        if (shareOption === "1") {
+            window.open(whatsappURL, "_blank");
+        } else if (shareOption === "2") {
+            window.open(smsURL, "_blank");
+        } else if (shareOption === "3") {
+            window.open(emailURL, "_blank");
+        } else {
+            alert("Sharing cancelled.");
+        }
+    }
 });
+
 
         
         // Export data functionality
@@ -697,21 +575,24 @@ if (dayData.leaveReason) {
 
         tableRows += `
             <tr class="border-b">
-        <td class="p-2 border-r ${isWeekend(currentDate.getFullYear(), currentDate.getMonth(), day) ? 'text-red-500 font-bold' : ''}">${formattedDate}</td>
-        <td class="p-2 border-r">${dayData.inTime || '-'}</td>
-        <td class="p-2 border-r">${dayData.outTime || '-'}</td>
-        <td class="p-2 border-r">${dayData.movementOut || '-'}</td>
-        <td class="p-2 border-r">${dayData.movementIn || '-'}</td>
-        <td class="p-2 border-r">${dayData.teamMembers || '-'}</td>
-        <td class="p-2 border-r">${dayData.workLocation || '-'}</td>
-        <td class="p-2 border-r">${dayData.vehicleNumber || '-'}</td>
-        <td class="p-2 border-r">${dayData.km || '-'}</td>
-        <td class="p-2 border-r" ${specialDayClass}>${dayData.specialDays || '-'}</td>
-        <td class="p-2 border-r" style="${dayData.leaveStatus === 'Yes' ? 'color: #1E90FF; font-weight: bold;' : ''}">
-            ${dayData.leaveStatus || '-'}
-        </td>
-        <td class="p-2 border-r">${leaveReasonText}</td>
-    </tr>
+                <td class="p-2 border-r ${isWeekend(currentDate.getFullYear(), currentDate.getMonth(), day) ? 'text-red-500 font-bold' : ''}">${formattedDate}</td>
+
+
+                <td class="p-2 border-r">${dayData.inTime || '-'}</td>
+                <td class="p-2 border-r">${dayData.outTime || '-'}</td>
+                <td class="p-2 border-r">${dayData.movementOut || '-'}</td>
+                <td class="p-2 border-r">${dayData.movementIn || '-'}</td>
+                <td class="p-2 border-r">${dayData.teamMembers || '-'}</td>
+                <td class="p-2 border-r">${dayData.workLocation || '-'}</td>
+                <td class="p-2 border-r">${dayData.vehicleNumber || '-'}</td>
+                <td class="p-2 border-r">${dayData.km  || '-'}</td>
+                
+               <td class="p-2 border-r" ${specialDayClass}>${dayData.specialDays || '-'}</td>
+                <td class="p-2 border-r">${dayData.leaveStatus || '-'}</td>
+                <td class="p-2 border-r">${leaveReasonText}</td>
+
+                
+            </tr>
         `;
     }
 
@@ -780,33 +661,42 @@ if (dayData.leaveReason) {
 
             `;
             
+
+
+
+
+
+
+
+
+
+
+
+
+
+            
             // Append export modal to the body
             document.body.appendChild(exportModal);
             document.getElementById('saveAsPdfBtn').addEventListener('click', function() {
-    if (typeof html2canvas === 'undefined') {
-        var script = document.createElement('script');
-        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
-        script.onload = loadJsPDF;
-        document.head.appendChild(script);
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF();
+    
+    pdf.text("Work Report", 10, 10); // Add a title to the PDF
+    pdf.text("Generated on: " + new Date().toLocaleDateString(), 10, 20);
+    
+    // Fetch the table content
+    const table = document.querySelector("#exportTableContainer table");
+    
+    if (table) {
+        pdf.autoTable({ html: table, startY: 30 });
     } else {
-        loadJsPDF();
+        pdf.text("No data available.", 10, 30);
     }
+
+    pdf.save("Work_Report.pdf");
 });
 
-function updateExportTableHeader() {
-    const monthNames = [
-        "January", "February", "March", "April", "May", "June",
-        "July", "August", "September", "October", "November", "December"
-    ];
-    
-    const selectedMonth = currentDate.getMonth();
-    const selectedYear = currentDate.getFullYear();
-    
-    document.getElementById("exportMonthYear").textContent = `${monthNames[selectedMonth]} ${selectedYear}`;
-}
 
-// Call this function when the export table is displayed
-updateExportTableHeader();
 
 
 
@@ -1229,15 +1119,7 @@ document.getElementById("restoreFileInput").addEventListener("change", function 
 
     for (let day = 1; day <= daysInMonth; day++) {
         const dateKey = `${currentDate.getFullYear()}-${currentDate.getMonth()}-${day}`;
-        let dayData = workData[dateKey] || {};
-
-// Set default leaveStatus to "No" if it's not defined
-if (dayData.leaveStatus === undefined || dayData.leaveStatus === "") {
-    dayData.leaveStatus = "No";
-    workData[dateKey] = dayData;
-    localStorage.setItem("workData", JSON.stringify(workData));
-}
-
+        const dayData = workData[dateKey] || {};
         const dayDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
         const dayName = dayDate.toLocaleDateString("en-US", { weekday: "long" });
         const isWeekendDay = isWeekend(currentDate.getFullYear(), currentDate.getMonth(), day);
