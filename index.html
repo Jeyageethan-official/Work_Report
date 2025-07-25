@@ -173,10 +173,6 @@
     border-color: #2f6df7;
     box-shadow: 0 0 0 3px rgba(47, 109, 247, 0.1);
 }
-.custom-time-picker::-webkit-date-and-time-value {
-  text-align: left !important;
-}
-
 
 
     .hidden {
@@ -260,7 +256,7 @@ input[type="number"],
 input[type="time"],
 textarea,
 select {
-    color: #e16c29; /* Set text color to blue */
+    color: #cf5b18; /* Set text color to blue */
 }
 
 
@@ -273,19 +269,22 @@ select {
 
 /* iPhone-style time picker enhancements */
 .custom-time-picker {
-    appearance: none;
+    appearance: none; /* Remove native browser styles */
     -webkit-appearance: none;
     background-color: #ffffff;
     font-size: 1rem;
+    text-align: center;
     padding: 10px;
     border-radius: 8px;
-    border: 1px solid #e0e0e0;
+    border: 1px solid #000000;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     cursor: pointer;
 }
 
-.custom-time-picker::-webkit-date-and-time-value {
-    text-align: left !important;
+.custom-time-picker:focus {
+    border-color: #2f6df7; /* Highlight border on focus */
+    box-shadow: 0 0 0 4px rgba(47, 109, 247, 0.2);
+    outline: none;
 }
 
 
@@ -363,6 +362,234 @@ th, td {
 
 th {
     background-color: #f2f2f2; /* Optional: Header background */
+}
+
+
+#shareExportModal .bg-white {
+    background-color: #121212 !important; /* Dark background */
+    color: white !important;
+}
+
+#shareExportModal h2,
+#shareExportModal pre,
+#shareExportModal p {
+    color: white !important;
+}
+
+#shareExportModal button {
+    background-color: #0f5cae !important;
+    color: white !important;
+    border: none;
+}
+
+#shareExportModal button:hover {
+    background-color: #1b75d0 !important;
+}
+
+
+/* new style */
+
+
+/* === Dark Mode Premium Theme with Glossy Glass Effect === */
+body {
+    background-color: #0a0a0a !important;
+    color: rgb(0, 0, 0) !important;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+/* Make all black → white, and white → black (for dark mode readability) */
+* {
+    color: rgb(255, 255, 255) !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Override only buttons and active elements with blue */
+button, .bg-blue-500, .hover\:bg-blue-600 {
+    background-color: #0f5cae !important;
+    color: white !important;
+    border: none !important;
+}
+
+button:hover {
+    background-color: #1670e0 !important;
+}
+
+/* Premium Glassy Effect for Day Boxes */
+.day-box {
+    background: rgba(15, 92, 174, 0.1) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    backdrop-filter: blur(10px) saturate(120%);
+    -webkit-backdrop-filter: blur(10px) saturate(120%);
+    border-radius: 16px !important;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3) !important;
+    color: white !important;
+}
+
+/* Glass Effect for Modals */
+#reminderModal .bg-white,
+#shareExportModal .bg-white,
+#dateSearchModal .bg-white,
+#reminderContent,
+#confirmationModal .bg-white {
+    background: rgba(30, 30, 30, 0.85) !important;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    color: white !important;
+    border-radius: 16px;
+    z-index: 99999 !important;
+    position: relative;
+}
+
+/* Fix inputs and selects */
+input, select, textarea {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    color: rgb(255, 255, 255) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+}
+
+
+
+/* Month & Year Dropdown Container */
+.bg-gray-100 {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+/* Fix border visuals inside tables */
+table, th, td {
+    border-color: rgba(0, 0, 0, 0.2) !important;
+}
+
+th {
+    background-color: rgba(255, 0, 0, 0.08) !important;
+}
+
+td {
+    color: white !important;
+}
+
+/* Scroll buttons */
+.scroll-button,
+#scrollUpButton,
+#scrollDownButton,
+.fixed-date-search {
+    background-color: #0f5cae !important;
+    color: rgb(255, 255, 255) !important;
+    box-shadow: 0 0 10px rgba(15, 92, 174, 0.6) !important;
+}
+
+.scroll-button:hover,
+#scrollUpButton:hover,
+#scrollDownButton:hover {
+    background-color: #1670e0 !important;
+}
+
+
+/* Monthly Summary dark mode fix */
+.bg-white.rounded-lg.shadow-lg,
+.bg-white.shadow-md.p-4 {
+    background-color: #121212 !important;
+    color: white !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Also fix buttons inside */
+.bg-red-100 {
+    background-color: rgba(255, 0, 0, 0.1) !important;
+    color: #ff4d4d !important;
+}
+
+.bg-red-100:hover {
+    background-color: rgba(255, 0, 0, 0.2) !important;
+}
+
+/* Fix backup/restore buttons */
+#backupButton, #restoreButton {
+    background-color: #0f5cae !important;
+    color: white !important;
+}
+
+#backupButton:hover, #restoreButton:hover {
+    background-color: #1670e0 !important;
+}
+
+/* Always show modals above all content */
+#reminderModal,
+#dateSearchModal {
+    z-index: 9999 !important;
+}
+
+/* Make inner modal box appear in front */
+#reminderContent,
+#dateSearchModal .bg-white {
+    z-index: 10000 !important;
+    position: relative;
+}
+
+/* Change only user input fields and other dropdowns */
+input[type="text"],
+input[type="number"],
+input[type="time"],
+textarea,
+select:not(#monthDropdown):not(#yearDropdown) {
+    color: #e87902 !important;
+}
+
+/* Optional: placeholder color lighter */
+input::placeholder,
+textarea::placeholder {
+    color: rgba(255, 255, 255, 0.4) !important;
+}
+
+/* Ensure month/year dropdowns stay white */
+#monthDropdown,
+#yearDropdown {
+    color: white !important;
+}
+
+/* Share & Export Modals - Dark, Glossy Premium Style */
+#shareExportModal .bg-white,
+#dataExportModal .bg-white {
+    background: rgba(10, 10, 10, 0.9) !important;
+    color: white !important;
+    border-radius: 16px;
+    backdrop-filter: blur(12px) saturate(120%);
+    -webkit-backdrop-filter: blur(12px) saturate(120%);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+}
+
+/* Modal text styles */
+#shareExportModal h2,
+#shareExportModal p,
+#shareExportModal pre,
+#dataExportModal h2 {
+    color: white !important;
+}
+
+/* Export summary box */
+#shareExportModal .bg-gray-100 {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    border-radius: 12px;
+}
+
+/* Buttons in modal: primary blue glossy */
+#shareExportModal button,
+#dataExportModal button,
+#saveAsPdfBtn {
+    background-color: #0f5cae !important;
+    color: white !important;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 16px;
+    font-weight: bold;
+    box-shadow: 0 4px 12px rgba(15, 92, 174, 0.6);
+    transition: all 0.3s ease;
+}
+
+#shareExportModal button:hover,
+#dataExportModal button:hover,
+#saveAsPdfBtn:hover {
+    background-color: #1670e0 !important;
+    transform: scale(1.03);
 }
 
 
