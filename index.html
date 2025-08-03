@@ -15,7 +15,234 @@
 
 
     <style>
-        /* Mobile Responsive Slide Menu Styles */
+/* Dark Mode Base Theme */
+.theme-dark {
+  background: #000000 !important;
+  color: #ffffff;
+}
+
+/* Dark Mode Container */
+.theme-dark .max-w-7xl {
+  background-color: #000000 !important;
+}
+
+/* Dark Mode Headers */
+.theme-dark h1,
+.theme-dark h2,
+.theme-dark h3,
+.theme-dark .text-black {
+  color: #ffffff !important;
+}
+
+/* Dark Mode Dropdowns */
+.theme-dark select#monthDropdown,
+.theme-dark select#yearDropdown {
+  color: #ffffff !important;
+  background: #000000 !important;
+  border: 1px solid #333333;
+}
+
+/* Dark Mode Day Box */
+.theme-dark .day-box {
+  background: rgba(18, 18, 18, 0.7) !important;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(75, 85, 99, 0.2);
+  border-top: 3px solid #1a365d;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+.theme-dark .day-box:hover {
+  background: rgba(28, 28, 28, 0.8) !important;
+  border-top-color: #1559b3;
+}
+
+/* Dark Mode Buttons */
+.theme-dark button:not(.btn-premium) {
+  background: #1559b3 !important;
+  color: white !important;
+}
+
+.theme-dark button:not(.btn-premium):hover {
+  background: #1a365d !important;
+}
+
+/* Dark Mode Input Fields */
+.theme-dark input,
+.theme-dark select,
+.theme-dark textarea {
+  background: #121212 !important;
+  color: #ffffff !important;
+  border: 1px solid #333333;
+}
+
+.theme-dark input:focus,
+.theme-dark select:focus,
+.theme-dark textarea:focus {
+  border-color: #1559b3;
+  box-shadow: 0 0 0 2px rgba(30, 64, 175, 0.2);
+}
+
+/* Dark Mode Navigation Buttons */
+.theme-dark #prevMonth,
+.theme-dark #nextMonth {
+  color: #ffffff;
+}
+
+/* Dark Mode Modal */
+.theme-dark .modal-container {
+  background: rgba(0, 0, 0, 0.9);
+}
+
+.theme-dark .modal-glass {
+  background: #121212;
+  border: 1px solid #333333;
+}
+
+/* Dark Mode Text Colors */
+.theme-dark .text-gray-600,
+.theme-dark .text-gray-700,
+.theme-dark .text-gray-800,
+.theme-dark .text-gray-900 {
+  color: #ffffff !important;
+}
+
+/* Dark Mode Border Colors */
+.theme-dark .border,
+.theme-dark .border-t,
+.theme-dark .border-b,
+.theme-dark .border-l,
+.theme-dark .border-r {
+  border-color: #333333 !important;
+}
+
+/* Dark Mode Hover States */
+.theme-dark .hover\:bg-gray-100:hover {
+  background-color: #1a1a1a !important;
+}
+
+/* Professional Glass Effect for Modals */
+.modal-container {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(10px);
+}
+
+.modal-glass {
+  background: linear-gradient(145deg, rgba(17, 17, 17, 0.95), rgba(28, 28, 28, 0.95));
+  border: 1px solid rgba(75, 85, 99, 0.3);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  border-radius: 16px;
+  padding: 2rem;
+  max-width: 90%;
+  width: 500px;
+  position: relative;
+  overflow: hidden;
+}
+
+.modal-glass::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #1559b3, transparent);
+}
+
+/* Premium Modal Content Styling */
+.theme-dark .modal-glass h2,
+.theme-dark .modal-glass h3 {
+  color: #fff;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+}
+
+.theme-dark .modal-glass p {
+  color: #94a3b8;
+  margin-bottom: 1.5rem;
+}
+
+/* Premium Button Styling */
+.theme-dark .modal-glass button {
+  background: linear-gradient(145deg, #165ebd, #1559b3);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  border: none;
+  box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+}
+
+.theme-dark .modal-glass button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 12px -1px rgba(37, 99, 235, 0.3);
+  background: linear-gradient(145deg, #165ebd, #1559b3);
+}
+
+/* Cancel Button Styling */
+.theme-dark .modal-glass button.cancel-btn {
+  background: linear-gradient(145deg, #374151, #1f2937);
+  color: #e2e8f0;
+}
+
+.theme-dark .modal-glass button.cancel-btn:hover {
+  background: linear-gradient(145deg, #1f2937, #111827);
+}
+
+/* Modal Close Button */
+.theme-dark .modal-glass .close-btn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(75, 85, 99, 0.2);
+  color: #e2e8f0;
+  transition: all 0.2s ease;
+}
+
+.theme-dark .modal-glass .close-btn:hover {
+  background: rgba(75, 85, 99, 0.4);
+  transform: rotate(90deg);
+}
+
+/* Dark Mode Input Fields */
+.theme-dark input,
+.theme-dark select,
+.theme-dark textarea {
+  background: #1a1a1a !important;
+  border: 1px solid rgba(75, 85, 99, 0.3);
+  color: #e2e8f0;
+}
+
+.theme-dark input:focus,
+.theme-dark select:focus,
+.theme-dark textarea:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+/* Fixed Position Elements */
+.fixed-date-search,
+.scroll-button {
+  background: var(--glass-bg);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--premium-shadow);
+}
+
+/* Mobile Responsive Slide Menu Styles */
         #mobileMenu {
             position: fixed;
             top: 0;
@@ -137,15 +364,20 @@
 
 
 .day-box {
-    background: linear-gradient(135deg, #ffffff, #f8f9fc);
-    border: 1px solid #e0e0e0;
+    border-top: 3px solid #1559b3;
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(8px);
     border-radius: 12px;
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     padding: 20px;
     margin: 15px 10px;
-    
     overflow: hidden;
-    border-top: 4px solid #0563a7; /* Add a specific blue top border */
+    transition: all 0.3s ease;
+}
+
+.day-box:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
 .day-box::before {
@@ -155,7 +387,7 @@
     left: 0;
     width: 100%;
     height: 4px;
-    background-color: #2f6df7; /* Remove previous gradient */
+    background-color: #1559b3; /* Remove previous gradient */
     display: none; /* Hide the previous pseudo-element */
 }
 
@@ -170,7 +402,7 @@
 
 .day-box input:focus, 
 .day-box select:focus {
-    border-color: #2f6df7;
+    border-color: #1559b3;
     box-shadow: 0 0 0 3px rgba(47, 109, 247, 0.1);
 }
 .custom-time-picker::-webkit-date-and-time-value {
@@ -366,6 +598,280 @@ th {
 }
 
 
+
+
+#reminderModal {
+  z-index: 99999 !important;
+}
+#reminderContent {
+  z-index: 100000 !important;
+  position: relative;
+}
+#reminderContent {
+  background-color: black;
+  color: white;
+  padding: 2rem;
+  border-radius: 0.75rem;
+  width: 90%;
+  max-width: 500px;
+  max-height: 80%;
+  overflow-y: auto;
+
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); /* center fix */
+  z-index: 100000;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+}
+
+
+button.btn-primary {
+  background-color: #1559b3; /* Primary blue */
+  color: white;
+  transition: background 0.3s ease;
+}
+
+button.btn-primary:hover {
+  background-color: black;
+}
+
+
+/* DARK MODE: Change all black buttons to mild blue */
+.theme-dark button,
+.theme-dark button.bg-black,
+.theme-dark button.p-2,
+.theme-dark button.rounded-full,
+.theme-dark button.text-white {
+  background-color: #1559b3 !important; /* Mild blue */
+  color: white !important;
+  border: none !important;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+/* DARK MODE Hover effect: darker blue or black */
+.theme-dark button:hover {
+  background-color: #1559b3 !important; /* Darker blue */
+  color: white !important;
+}
+
+/* Base: Turn all black buttons into mild blue */
+button,
+button.bg-black,
+button.p-2,
+button.rounded-full,
+button.text-white {
+  background-color: #000000d7 !important; /* Mild blue */
+  color: rgb(255, 255, 255) !important;
+  border: none !important;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+/* On Hover: Dark blue or black */
+button:hover {
+  background-color: #1559b3 !important; /* darker blue */
+  color: white !important;
+}
+
+
+
+/* DARK MODE: Make all user input text orange */
+.theme-dark input,
+.theme-dark textarea,
+.theme-dark select {
+  color: #d66b00 !important; /* Bright orange */
+  caret-color: #d66b00 !important; /* Orange blinking cursor */
+}
+
+
+
+/* Dark mode: Rectangle box around reminder, date search, and share buttons */
+.theme-dark .flex.items-center.space-x-2.bg-gray-100 {
+  background-color: #000000 !important;
+  border: 1px solid #333 !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+}
+
+
+
+
+
+
+
+
+
+
+
+/* DARK MODE: Monthly Summary background change to black */
+.theme-dark .mt-8.p-6.bg-white.rounded-lg.shadow-lg {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+  border: 1px solid #333333;
+}
+
+/* DARK MODE: Share Options Popup modal box (white → black) */
+.theme-dark #shareExportModal .bg-white {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+  border: 1px solid #333333;
+}
+
+/* DARK MODE: Text inside Share Options modal */
+.theme-dark #shareExportModal h2,
+.theme-dark #shareExportModal p,
+.theme-dark #shareExportModal pre,
+.theme-dark #shareExportModal button {
+  color: #ffffff !important;
+}
+
+/* DARK MODE: Buttons inside Share Options modal */
+.theme-dark #shareExportModal button {
+  background-color: #1a1a1a !important;
+  border: 1px solid #444 !important;
+}
+
+.theme-dark #shareExportModal button:hover {
+  background-color: #333333 !important;
+}
+
+
+
+
+/* Optional: Make summary box background lighter if needed */
+.theme-dark #shareExportModal .bg-gray-100 {
+  background-color: #262626 !important;
+}
+
+/* DARK MODE: Fix bottom Backup & Restore container background */
+.theme-dark .sticky.bottom-0.left-0.w-full.bg-white.shadow-md.p-4 {
+  background-color: #000000 !important;
+  color: #000000 !important;
+  border-top: 1px solid #444444;
+}
+
+/* DARK MODE: Ensure text in buttons is white */
+.theme-dark .sticky.bottom-0 button {
+  color: #ffffff !important;
+}
+
+/* DARK MODE: Button background and hover (optional for consistency) */
+.theme-dark .sticky.bottom-0 button.bg-blue-500,
+.theme-dark .sticky.bottom-0 button.bg-green-500 {
+  background-color: #1a1a1a !important;
+  border: 1px solid #333 !important;
+}
+
+.theme-dark .sticky.bottom-0 button:hover {
+  background-color: #333333 !important;
+}
+
+
+
+/* DARK MODE: Export Data Modal popup background black */
+.theme-dark #dataExportModal .bg-white {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+  border: 1px solid #333333;
+}
+
+/* DARK MODE: Export Data Modal - header text color */
+.theme-dark #dataExportModal h2,
+.theme-dark #dataExportModal h3,
+.theme-dark #dataExportModal p {
+  color: #ffffff !important;
+}
+
+/* DARK MODE: Export Data Modal - table text and background */
+.theme-dark #dataExportModal table {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+  border-color: #444444 !important;
+}
+
+.theme-dark #dataExportModal th,
+.theme-dark #dataExportModal td {
+  border: 1px solid #444444 !important;
+}
+
+/* DARK MODE: Export Data Modal - Close button color */
+.theme-dark #dataExportModal button {
+  background-color: #1559b3!important;
+  color: #ffffff !important;
+  border: 1px solid #444444 !important;
+}
+
+.theme-dark #dataExportModal button:hover {
+  background-color: #333333 !important;
+}
+
+
+
+/* DARK MODE: Clean dropdowns for Month and Year */
+.theme-dark select#monthDropdown,
+.theme-dark select#yearDropdown {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+  border: 1px solid #444444 !important;
+  outline: none !important;
+  box-shadow: none !important;
+  transition: none !important;
+}
+
+/* DARK MODE: Remove hover/focus effects */
+.theme-dark select#monthDropdown:hover,
+.theme-dark select#yearDropdown:hover,
+.theme-dark select#monthDropdown:focus,
+.theme-dark select#yearDropdown:focus {
+  background-color: #000000 !important;
+  border: 1px solid #444444 !important;
+  color: #ffffff !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* DARK MODE: Clean input/select/textarea inside .day-box (no glow, no orange/blue borders) */
+.theme-dark .day-box input,
+.theme-dark .day-box select,
+.theme-dark .day-box textarea {
+  background-color: #1a1a1a !important;
+  color: #ffffff !important;
+  border: 1px solid #444444 !important;
+  outline: none !important;
+  box-shadow: none !important;
+  transition: none !important;
+}
+
+/* DARK MODE: Remove hover/focus glow */
+.theme-dark .day-box input:hover,
+.theme-dark .day-box select:hover,
+.theme-dark .day-box textarea:hover,
+.theme-dark .day-box input:focus,
+.theme-dark .day-box select:focus,
+.theme-dark .day-box textarea:focus {
+  border: 1px solid #444444 !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+
+
+/* DARK MODE: Make all user-typed input text orange */
+.theme-dark input,
+.theme-dark textarea,
+.theme-dark select {
+  color: #ff8c00 !important; /* Deep orange */
+  caret-color: #ff8c00 !important; /* Orange blinking cursor */
+}
+
+/* DARK MODE: Also apply to inputs inside .day-box */
+.theme-dark .day-box input,
+.theme-dark .day-box textarea,
+.theme-dark .day-box select {
+  color: #ff8c00 !important;
+  caret-color: #ff8c00 !important;
+}
+
+
 </style>   
 </head>
 
@@ -393,6 +899,12 @@ th {
     <!-- New rectangular box for buttons -->
     <div class="flex justify-center mb-6">
         <div class="flex items-center space-x-2 bg-gray-100 p-2 rounded-lg">
+            <!-- Dark Mode Toggle Button -->
+            <button id="darkModeToggle" class="dark-mode-toggle p-2 hover:bg-gray-300 rounded-full">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                </svg>
+            </button>
             <button id="reminderButton" class="p-2 hover:bg-gray-300 rounded-full">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/>
@@ -400,34 +912,20 @@ th {
                 </svg>
             </button>
             <!-- Date Search Button -->
-<button id="dateSearchBtn" class="p-2 hover:bg-gray-300 rounded-full">
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="11" cy="11" r="8"/>
-        <path d="m21 21-4.3-4.3"/>
-    </svg>
-    
-</button>
+            <button id="dateSearchBtn" class="p-2 hover:bg-gray-300 rounded-full">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"/>
+                    <path d="m21 21-4.3-4.3"/>
+                </svg>
+                <input type="date" id="nativeDatePicker" class="hidden">
 
-<!-- Date Picker Modal -->
-<div id="dateSearchModal" class="hidden fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center z-70">
-    <div class="bg-white rounded-lg shadow-lg w-80 max-h-[90vh] overflow-y-auto p-4">
-        <h2 class="text-lg font-bold mb-2">Select Date</h2>
+            </button>
 
-        
+           
 
-        <!-- Week and Day Selection -->
-        <div class="grid grid-cols-4 gap-2 mb-4" id="datesGrid"></div>
-        
-        <!-- Close Button -->
-        <button id="closeDatePicker" class="w-full p-2 bg-red-500 text-white rounded">Close</button>
-        <script>
-            document.getElementById("closeDatePicker").addEventListener("click", function(event) {
-                event.stopPropagation(); // Prevent event from closing the container
-            });
-            </script>
-    </div>
-</div>
-
+            
+            
+            <!-- Share Button -->
             <button id="shareButton" class="p-2 hover:bg-gray-300 rounded-full">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="18" cy="5" r="3"/>
@@ -437,8 +935,25 @@ th {
                     <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
                 </svg>
             </button>
-        </div>
+            
+
+<!-- Date Picker Modal -->
+<div id="dateSearchModal" class="modal-container hidden">
+    <div class="modal-glass w-11/12 max-w-md">
+        <h2 class="text-xl font-semibold mb-4">Select Date</h2>
+        <div class="grid grid-cols-4 gap-3 mb-4" id="datesGrid"></div>
+        <button id="closeDatePicker" class="btn-premium w-full">Close</button>
     </div>
+</div>
+        <script>
+            document.getElementById("closeDatePicker").addEventListener("click", function(event) {
+                event.stopPropagation(); // Prevent event from closing the container
+            });
+            </script>
+    </div>
+</div>
+
+            
 
     <script>
         
@@ -541,7 +1056,8 @@ function openShareModal() {
                 </div>
             </div>
         `;
-        document.body.appendChild(shareModal);
+        document.getElementById("exportTableContainer").appendChild(shareButton);
+
 
         // Close modal functionality
         document.getElementById("closeShareModal").addEventListener("click", function () {
@@ -825,66 +1341,76 @@ function loadJsPDF() {
 function generateTablePDF() {
     const { jsPDF } = window.jspdf;
     const tableContainer = document.getElementById('exportTableContainer');
+    const body = document.body;
+    const wasDark = body.classList.contains("theme-dark");
 
     if (!tableContainer) {
-        alert("Error: Table not found.");
+        alert("Table not found.");
         return;
     }
 
-    // Make table visible before capture
-    tableContainer.style.opacity = '1';
-    tableContainer.style.height = 'auto';
-    tableContainer.style.overflow = 'visible';
-    tableContainer.style.position = 'relative';
-
-    // Reduce font size and padding for mobile screens
-    if (window.innerWidth < 778) {
-        document.querySelectorAll("#exportTableContainer th, #exportTableContainer td").forEach(el => {
-            el.style.padding = "4px";  
-            el.style.fontSize = "10px"; 
-        });
+    // 🔁 Switch to light-mode-export style
+    if (wasDark) {
+        body.classList.remove("theme-dark");
+        body.classList.add("light-export-mode");
     }
 
-    html2canvas(tableContainer, {
-        scale: 3,  // High resolution
-        useCORS: true,
-        scrollX: 0,
-        scrollY: 0,
-        backgroundColor: '#FFFFFF' // Keeps background color
-    }).then(canvas => {
-        const imgData = canvas.toDataURL('image/png');
-        const pdf = new jsPDF({
-            orientation: 'portrait',  // Keep A4 portrait format
-            unit: 'mm',
-            format: 'a4'
+    setTimeout(() => {
+        tableContainer.style.opacity = '1';
+        tableContainer.style.height = 'auto';
+        tableContainer.style.overflow = 'visible';
+        tableContainer.style.position = 'relative';
+
+        html2canvas(tableContainer, {
+            scale: 3,
+            useCORS: true,
+            scrollX: 0,
+            scrollY: 0,
+            backgroundColor: '#FFFFFF'
+        }).then(canvas => {
+            const imgData = canvas.toDataURL('image/png');
+            const pdf = new jsPDF({
+                orientation: 'portrait',
+                unit: 'mm',
+                format: 'a4'
+            });
+
+            const pageWidth = 210;
+            const pageHeight = 297;
+            const imgWidth = pageWidth - 10;
+            const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+            if (imgHeight > pageHeight - 20) {
+                const scaleFactor = (pageHeight - 20) / imgHeight;
+                pdf.addImage(imgData, 'PNG', 8, 10, imgWidth * scaleFactor, imgHeight * scaleFactor);
+            } else {
+                pdf.addImage(imgData, 'PNG', 5, 10, imgWidth, imgHeight);
+            }
+
+            pdf.save('Work_Report_A4.pdf');
+
+            // Hide export table again
+            tableContainer.style.opacity = '0';
+            tableContainer.style.height = '0';
+            tableContainer.style.overflow = 'hidden';
+            tableContainer.style.position = 'absolute';
+            tableContainer.style.left = '-9999px';
+
+            // 🔁 Restore dark mode
+            if (wasDark) {
+                body.classList.remove("light-export-mode");
+                body.classList.add("theme-dark");
+            }
+        }).catch(err => {
+            alert("PDF failed.");
+            if (wasDark) {
+                body.classList.remove("light-export-mode");
+                body.classList.add("theme-dark");
+            }
         });
-
-        const pageWidth = 210;  // A4 width in mm (portrait)
-        const pageHeight = 297; // A4 height in mm (portrait)
-        const imgWidth = pageWidth - 10; // Leave some padding
-        const imgHeight = (canvas.height * imgWidth) / canvas.width; // Scale height proportionally
-
-        // If the table is too tall, scale it down to fit within A4
-        if (imgHeight > pageHeight - 20) {
-            const scaleFactor = (pageHeight - 20) / imgHeight;
-            pdf.addImage(imgData, 'PNG', 8, 10, imgWidth * scaleFactor, imgHeight * scaleFactor);
-        } else {
-            pdf.addImage(imgData, 'PNG', 5, 10, imgWidth, imgHeight);
-        }
-
-        pdf.save('Work_Report_A4.pdf');
-
-        // Hide the table again after capturing
-        tableContainer.style.opacity = '0';
-        tableContainer.style.height = '0';
-        tableContainer.style.overflow = 'hidden';
-        tableContainer.style.position = 'absolute';
-        tableContainer.style.left = '-9999px';
-    }).catch(err => {
-        console.error("html2canvas error:", err);
-        alert("Failed to save PDF.");
-    });
+    }, 200);
 }
+
 
 
 
@@ -1246,7 +1772,7 @@ if (dayData.leaveStatus === undefined || dayData.leaveStatus === "") {
         const formattedDay = formatDayDisplay(day, currentDate.getMonth(), currentDate.getFullYear(), dayName);
 
         const card = document.createElement("div");
-card.className = "day-box"; /* Apply the premium style class */
+card.className = "day-box p-4 rounded-lg mb-4"; /* Apply the premium style class */
 card.setAttribute('data-day', day);
 
 
@@ -1852,38 +2378,50 @@ scrollDownButton.addEventListener("click", () => {
         calculateSummary();
         renderDays();
     </script>
-    <div id="confirmationModal" class="hidden fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center z-50">
-        <div class="bg-white rounded-lg shadow-lg w-11/12 max-w-sm p-4">
-            <div class="text-lg font-medium text-center mb-4">Are you sure?</div>
-            <div class="text-sm text-gray-600 text-center mb-6">
-                This action will clear all data for this day and cannot be undone.
-            </div>
-            <div class="flex justify-around">
-                <button id="cancelButton" class="px-4 py-2 rounded bg-gray-200 text-gray-800 hover:bg-gray-300">
-                    Cancel
-                </button>
-                <button id="confirmButton" class="px-4 py-2 rounded bg-red-500 text-white hover:bg-red-600">
-                    Confirm
-                </button>
-            </div>
+    <!-- Update modal container -->
+    <div id="confirmationModal" class="modal-container hidden">
+    <div class="modal-glass w-11/12 max-w-md">
+        <h3 class="text-xl font-semibold mb-4" id="modalTitle">Confirm Action</h3>
+        <p class="text-gray-300 mb-6" id="modalMessage">Are you sure you want to proceed?</p>
+        <div class="flex justify-end space-x-4">
+            <button id="cancelButton" class="btn-premium bg-opacity-50">Cancel</button>
+            <button id="confirmButton" class="btn-premium bg-red-600 hover:bg-red-700">Confirm</button>
         </div>
     </div>
+</div>
 
-    <div id="confirmationModal" class="hidden fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center z-50">
-        <div class="bg-white rounded-lg shadow-lg w-11/12 max-w-sm p-4">
-            <div id="modalTitle" class="text-lg font-medium text-center mb-4">Are you sure?</div>
-            <div id="modalMessage" class="text-sm text-gray-600 text-center mb-6">
-                This action cannot be undone.
-            </div>
-            <div class="flex justify-around">
-                <button id="cancelButton" class="px-4 py-2 rounded bg-gray-200 text-gray-800 hover:bg-gray-300">
-                    Cancel
-                </button>
-                <button id="confirmButton" class="px-4 py-2 rounded bg-red-500 text-white hover:bg-red-600">
-                    Confirm
-                </button>
-            </div>
-        </div>
-    </div>
+    <!-- Dark Mode Toggle Script -->
+    <script>
+        // Dark Mode Toggle Functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const darkModeToggle = document.getElementById('darkModeToggle');
+            
+            // Check for saved theme preference or use preferred color scheme
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.body.classList.add('theme-dark');
+                updateDarkModeIcon(true);
+            }
+            
+            // Toggle dark mode on button click
+            darkModeToggle.addEventListener('click', function() {
+                const isDarkMode = document.body.classList.toggle('theme-dark');
+                localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+                updateDarkModeIcon(isDarkMode);
+            });
+            
+            // Update the icon based on current mode
+            function updateDarkModeIcon(isDarkMode) {
+                const iconPath = darkModeToggle.querySelector('svg path');
+                if (isDarkMode) {
+                    // Sun icon for when in dark mode (clicking will switch to light)
+                    iconPath.setAttribute('d', 'M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z');
+                } else {
+                    // Moon icon for when in light mode (clicking will switch to dark)
+                    iconPath.setAttribute('d', 'M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z');
+                }
+            }
+        });
+    </script>
 </body>
 </html>
