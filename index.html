@@ -1069,10 +1069,6 @@ button:hover {
   // Sign out
   signOutBtn?.addEventListener('click', async () => {
     await auth.signOut();
-    localStorage.removeItem("workData");
-alert("You have been signed out. Local data cleared.");
-location.reload();
-
     // UI cleanup handled in onAuthStateChanged below
   });
 
@@ -1139,18 +1135,16 @@ location.reload();
         });
       }
 
-
-
-// real-time listener to get data from cloud
-unsubscribeUserDoc = userDocRef.onSnapshot(doc => {
-  if (doc.exists && doc.data().workData) {
-    workData = doc.data().workData;
-    localStorage.setItem("workData", JSON.stringify(workData));
-    renderDays(); // refresh UI
-    console.log("✅ Data restored from Firebase");
-  }
-});
-
+      // realtime listener -> updates UI automatically across devices
+      unsubscribeUserDoc = userDocRef.onSnapshot(doc => {
+        if (!doc.exists) return;
+        const data = doc.data();
+        if (data.photoURL && data.photoURL !== profileAvatar.src) {
+          profileAvatar.src = data.photoURL;
+        }
+        if (data.name) userNameEl.textContent = data.name;
+        if (data.email) userEmailEl.textContent = data.email;
+      });
 
       // Show small menu on hover/click
       profileMenu.classList.add('hidden'); // keep hidden until clicked
@@ -1177,112 +1171,7 @@ unsubscribeUserDoc = userDocRef.onSnapshot(doc => {
     }
   }
   // If your file already defines loginWithGoogle(), you can skip redeclaring it.
-
-
-
-  auth.onAuthStateChanged(async (user) => {
-  if (user) {
-    console.log("✅ Logged in as", user.email);
-
-    const userDocRef = db.collection("users").doc(user.uid);
-
-    // --- Wait for snapshot once (first load) ---
-    const snap = await userDocRef.get();
-    if (snap.exists && snap.data().workData) {
-      workData = snap.data().workData;
-      localStorage.setItem("workData", JSON.stringify(workData));
-      renderDays(); // refresh UI
-      console.log("✅ Data restored from Firestore (first load)");
-    } else {
-      console.log("ℹ️ No existing data for this user");
-    }
-
-    // --- Keep listening realtime (for second device sync) ---
-    userDocRef.onSnapshot(doc => {
-      if (doc.exists && doc.data().workData) {
-        workData = doc.data().workData;
-        localStorage.setItem("workData", JSON.stringify(workData));
-        renderDays();
-        console.log("🔁 Data updated from Firestore realtime");
-      }
-    });
-
-  } else {
-    console.log("🚪 User signed out → clearing local data");
-    localStorage.removeItem("workData");
-  }
-});
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  function syncToFirebase() {
-  const user = auth.currentUser;
-  if (!user) return; // only if logged in
-
-  const userDoc = db.collection("users").doc(user.uid);
-  userDoc.set({
-    workData: workData,
-    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-  }, { merge: true });
-}
-
-
-unsubscribeUserDoc = userDoc
-  .collection("months")
-  .doc(`${currentDate.getFullYear()}-${currentDate.getMonth()+1}`)
-  .onSnapshot(doc => {
-    if (doc.exists && doc.data().workData) {
-      workData = doc.data().workData;
-      localStorage.setItem("workData", JSON.stringify(workData));
-      syncToFirebase();
-      renderDays();
-    }
-  });
-
-
-
-  function syncToFirebase() {
-  const user = auth.currentUser;
-  if (!user) return;
-
-  const userDoc = db.collection("users").doc(user.uid);
-
-  // upload all local workData to Firestore
-  userDoc.set({
-    workData: workData,
-    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-  }, { merge: true })
-  .then(() => console.log("✅ Data synced to Firebase"))
-  .catch(err => console.error("❌ Sync failed:", err));
-}
-
   </script>
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 <script>
@@ -1987,8 +1876,6 @@ document.getElementById("restoreFileInput").addEventListener("change", function 
             const restoredData = JSON.parse(e.target.result);
             Object.assign(workData, restoredData);
             localStorage.setItem("workData", JSON.stringify(workData));
-            syncToFirebase();
-
             calculateSummary();
             renderDays();
             alert("Backup restored successfully.");
@@ -2088,8 +1975,6 @@ if (dayData.leaveStatus === undefined || dayData.leaveStatus === "") {
     dayData.leaveStatus = "No";
     workData[dateKey] = dayData;
     localStorage.setItem("workData", JSON.stringify(workData));
-    syncToFirebase();
-
 }
 
         const dayDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
@@ -2483,8 +2368,6 @@ function editReminder(index) {
             workData[dateKey] = workData[dateKey] || {};
             workData[dateKey][field] = value;
             localStorage.setItem("workData", JSON.stringify(workData));
-            syncToFirebase();
-
             calculateSummary();
             renderDays();
         }
@@ -2522,8 +2405,6 @@ function clearDayData(dateKey) {
     confirmButton.onclick = () => {
         delete workData[dateKey];
         localStorage.setItem("workData", JSON.stringify(workData));
-        syncToFirebase();
-
         calculateSummary();
         renderDays();
         modal.classList.add("hidden"); // Hide the modal after clearing
@@ -2647,8 +2528,6 @@ clearAllButton.addEventListener("click", () => {
             if (key.startsWith(monthPrefix)) delete workData[key];
         });
         localStorage.setItem("workData", JSON.stringify(workData));
-        syncToFirebase();
-
         calculateSummary();
         renderDays();
         modal.classList.add("hidden"); // Hide the modal after clearing
