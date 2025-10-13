@@ -1082,6 +1082,9 @@ button:hover {
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-analytics-compat.js"></script>
 
 <script>
+
+
+
     
     const firebaseConfig = {
       apiKey: "AIzaSyDzaAqT7NRAyQhTNDh8GsMKlTKNmttzIWo",
@@ -1400,6 +1403,12 @@ async function syncToFirebase() {
     firebaseSyncInProgress = false;
   }
 }
+
+
+
+
+
+
 
 
 
@@ -1925,6 +1934,64 @@ function captureFullTableAsImage() {
 
 
     
+// === POPUP BUTTON HANDLERS ===
+
+// Email sign in
+document.getElementById('emailSignInBtn').addEventListener('click', async () => {
+  const email = document.getElementById('emailInput').value.trim();
+  const password = document.getElementById('passwordInput').value.trim();
+  if (!email || !password) return alert("Enter email and password");
+
+  try {
+    await auth.signInWithEmailAndPassword(email, password);
+    alert("✅ Logged in!");
+    hideLoginModal();
+  } catch (error) {
+    alert(error.message);
+  }
+});
+
+// Register new user
+document.getElementById('emailRegisterBtn').addEventListener('click', async () => {
+  const email = document.getElementById('emailInput').value.trim();
+  const password = document.getElementById('passwordInput').value.trim();
+  if (!email || !password) return alert("Enter email and password");
+
+  try {
+    await auth.createUserWithEmailAndPassword(email, password);
+    alert("✅ Account created!");
+    hideLoginModal();
+  } catch (error) {
+    alert(error.message);
+  }
+});
+
+// Google sign-in
+document.getElementById('googleSignInBtn').addEventListener('click', async () => {
+  const provider = new firebase.auth.GoogleAuthProvider();
+  try {
+    await auth.signInWithPopup(provider);
+    alert("✅ Google login successful!");
+    hideLoginModal();
+  } catch (error) {
+    alert(error.message);
+  }
+});
+
+
+document.getElementById('forgotPwdBtn').addEventListener('click', async () => {
+  const email = document.getElementById('emailInput').value.trim();
+  if (!email) return alert("Enter your email first!");
+  try {
+    await auth.sendPasswordResetEmail(email);
+    alert("📧 Password reset email sent!");
+  } catch (error) {
+    alert(error.message);
+  }
+});
+
+
+
 
 
 
