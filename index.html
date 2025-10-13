@@ -1069,6 +1069,10 @@ button:hover {
   // Sign out
   signOutBtn?.addEventListener('click', async () => {
     await auth.signOut();
+    localStorage.removeItem("workData");
+alert("You have been signed out. Local data cleared.");
+location.reload();
+
     // UI cleanup handled in onAuthStateChanged below
   });
 
@@ -1171,7 +1175,50 @@ button:hover {
     }
   }
   // If your file already defines loginWithGoogle(), you can skip redeclaring it.
+
+
+
+
+
+
+
+  function syncToFirebase() {
+  const user = auth.currentUser;
+  if (!user) return; // only if logged in
+
+  const userDoc = db.collection("users").doc(user.uid);
+  userDoc.set({
+    workData: workData,
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+  }, { merge: true });
+}
+
+
+unsubscribeUserDoc = userDoc
+  .collection("months")
+  .doc(`${currentDate.getFullYear()}-${currentDate.getMonth()+1}`)
+  .onSnapshot(doc => {
+    if (doc.exists && doc.data().workData) {
+      workData = doc.data().workData;
+      localStorage.setItem("workData", JSON.stringify(workData));
+      renderDays();
+    }
+  });
+
   </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 <script>
@@ -1876,6 +1923,8 @@ document.getElementById("restoreFileInput").addEventListener("change", function 
             const restoredData = JSON.parse(e.target.result);
             Object.assign(workData, restoredData);
             localStorage.setItem("workData", JSON.stringify(workData));
+            syncToFirebase();
+
             calculateSummary();
             renderDays();
             alert("Backup restored successfully.");
@@ -1975,6 +2024,8 @@ if (dayData.leaveStatus === undefined || dayData.leaveStatus === "") {
     dayData.leaveStatus = "No";
     workData[dateKey] = dayData;
     localStorage.setItem("workData", JSON.stringify(workData));
+    syncToFirebase();
+
 }
 
         const dayDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
@@ -2368,6 +2419,8 @@ function editReminder(index) {
             workData[dateKey] = workData[dateKey] || {};
             workData[dateKey][field] = value;
             localStorage.setItem("workData", JSON.stringify(workData));
+            syncToFirebase();
+
             calculateSummary();
             renderDays();
         }
@@ -2405,6 +2458,8 @@ function clearDayData(dateKey) {
     confirmButton.onclick = () => {
         delete workData[dateKey];
         localStorage.setItem("workData", JSON.stringify(workData));
+        syncToFirebase();
+
         calculateSummary();
         renderDays();
         modal.classList.add("hidden"); // Hide the modal after clearing
@@ -2528,6 +2583,8 @@ clearAllButton.addEventListener("click", () => {
             if (key.startsWith(monthPrefix)) delete workData[key];
         });
         localStorage.setItem("workData", JSON.stringify(workData));
+        syncToFirebase();
+
         calculateSummary();
         renderDays();
         modal.classList.add("hidden"); // Hide the modal after clearing
