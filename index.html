@@ -1207,6 +1207,11 @@ auth.onAuthStateChanged(async (user) => {
 
 
 
+input.addEventListener('change', function () {
+    workData[dateKey].inTime = this.value;
+    localStorage.setItem("workData", JSON.stringify(workData));
+    autoSyncWorkData(); // 🔁 live save to Firebase
+});
 
 
 
@@ -1979,6 +1984,16 @@ document.getElementById("restoreFileInput").addEventListener("change", function 
 
 
 
+// 🔁 Auto-sync workData to Firebase every time data changes
+let autoSyncTimeout = null;
+
+function autoSyncWorkData() {
+  if (!auth.currentUser) return; // login check
+  if (autoSyncTimeout) clearTimeout(autoSyncTimeout);
+  autoSyncTimeout = setTimeout(() => {
+    syncToFirebase(); // un existing sync function
+  }, 2000); // user stop typing 2 sec later sync pannum
+}
 
 
 
