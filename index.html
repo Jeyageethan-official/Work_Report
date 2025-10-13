@@ -1022,6 +1022,39 @@ button:hover {
   </script>
 
 
+<script>
+    // Initialize Firebase (already done above)
+    const auth = firebase.auth();
+  
+    // Google login function
+    function loginWithGoogle() {
+      const provider = new firebase.auth.GoogleAuthProvider();
+  
+      auth.signInWithPopup(provider)
+        .then((result) => {
+          const user = result.user;
+          alert(`Welcome ${user.displayName}!`);
+          // ✅ After login, hide login button and show your dashboard
+          document.querySelector('button[onclick="loginWithGoogle()"]').style.display = 'none';
+          // You can redirect or show dashboard content here
+        })
+        .catch((error) => {
+          console.error("Login Error:", error);
+          alert("Login failed: " + error.message);
+        });
+    }
+  
+    // Optional: auto-detect if user is already logged in
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        console.log("User logged in:", user.displayName);
+        document.querySelector('button[onclick="loginWithGoogle()"]').style.display = 'none';
+        // show dashboard if needed
+      }
+    });
+  </script>
+  
+
 
     
     <script>
@@ -2438,7 +2471,7 @@ scrollDownButton.addEventListener("click", () => {
                 updateDarkModeIcon(isDarkMode);
             });
             
-            // Update the icon based on current mode 
+            // Update the icon based on current mode
             function updateDarkModeIcon(isDarkMode) {
                 const iconPath = darkModeToggle.querySelector('svg path');
                 if (isDarkMode) {
