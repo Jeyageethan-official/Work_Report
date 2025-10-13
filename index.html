@@ -877,6 +877,65 @@ button:hover {
 }
 
 
+
+/* ===== Glass Popup Style ===== */
+
+
+/* inner box – frosted glass look */
+#loginModal > div {
+  background: rgba(255, 255, 255, 0.12); /* transparent white */
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  padding: 2rem;
+  width: 380px;
+  color: #fff;
+  position: relative;
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* fade-in animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* input fields inside glass modal */
+#loginModal input {
+  width: 100%;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+  border: none;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  font-size: 15px;
+  outline: none;
+}
+
+#loginModal input::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* buttons look */
+#loginModal button {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+#loginModal button:hover {
+  transform: scale(1.03);
+  opacity: 0.9;
+}
+
+
+
+
+
+
+
 </style>   
 </head>
 
@@ -892,28 +951,28 @@ button:hover {
         </div>
         <button id="nextMonth" class="p-2 hover:bg-gray-100 rounded-full text-lg">→</button>
      </div>
+     <div id="loginModal" class="hidden fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
+        <div class="bg-white rounded-2xl shadow-lg p-6 w-96">
+          <h2 class="text-2xl font-bold mb-4 text-center">Sign In</h2>
+          <input id="emailInput" type="email" placeholder="Email" class="w-full p-2 mb-3 border rounded">
+          <input id="passwordInput" type="password" placeholder="Password" class="w-full p-2 mb-3 border rounded">
+          <div class="flex gap-2 mb-3">
+            <button id="emailSignInBtn" class="flex-1 p-2 bg-blue-600 text-white rounded">Login</button>
+            <button id="emailRegisterBtn" class="flex-1 p-2 border rounded">Register</button>
+          </div>
+          <div class="flex justify-between mb-2">
+            <button id="googleSignInBtn" class="p-2 border rounded">Sign in with Google</button>
+            <button id="forgotPwdBtn" class="text-blue-600 text-sm">Forgot?</button>
+          </div>
+          <button id="closeLoginModal" onclick="hideLoginModal()" class="mt-3 w-full p-2 border rounded">Close</button>
 
-     <!-- AUTH UI (paste near the top-right area) -->
-<div id="authContainer" class="flex items-center space-x-3">
-    <input id="profileFileInput" type="file" accept="image/*" class="hidden" />
-    <!-- Avatar button -->
-    <button id="profileBtn" class="flex items-center space-x-2 p-1 rounded-full" style="background:transparent;border:0;">
-      <img id="profileAvatar" src="" alt="avatar" class="w-10 h-10 rounded-full object-cover border-2 border-white shadow-lg" style="display:none;">
-      <div id="authButtons" class="flex items-center space-x-2">
-        <button id="loginBtn" onclick="loginWithGoogle()" class="px-3 py-1 rounded-md btn-primary">Login</button>
+        </div>
       </div>
-    </button>
-    <div id="profileMenu" class="hidden bg-white dark:bg-gray-900 shadow-lg rounded-md p-3 text-sm" style="min-width:200px">
-      <p id="userName" class="font-semibold"></p>
-      <p id="userEmail" class="text-xs text-gray-600"></p>
-      <div class="mt-2 flex gap-2">
-        <button id="uploadPhotoBtn" class="px-3 py-1 rounded bg-blue-600 text-white">Change Photo</button>
-        <button id="signOutBtn" class="px-3 py-1 rounded border">Sign out</button>
-      </div>
-    </div>
-  </div>
-  
-
+      
+      <button id="loginBtn" onclick="showLoginModal()" class="p-2 px-4 bg-blue-600 text-white rounded">
+        Login
+      </button>
+      
   
 
 
@@ -1067,10 +1126,19 @@ button:hover {
   document.addEventListener('click', () => profileMenu.classList.add('hidden'));
 
   // Sign out
-  signOutBtn?.addEventListener('click', async () => {
+document.getElementById('signOutBtn').addEventListener('click', async () => {
+  try {
+    if (userSnapshotUnsub) { userSnapshotUnsub(); userSnapshotUnsub = null; }
     await auth.signOut();
-    // UI cleanup handled in onAuthStateChanged below
-  });
+    localStorage.removeItem("workData");
+    workData = {};
+    renderDays();
+    alert("Signed out successfully!");
+  } catch (err) {
+    console.error(err);
+    alert("Sign out failed: " + err.message);
+  }
+});
 
   // Choose file when clicking Change Photo
   uploadPhotoBtn.addEventListener('click', () => profileFileInput.click());
@@ -1135,16 +1203,18 @@ button:hover {
         });
       }
 
-      // realtime listener -> updates UI automatically across devices
-      unsubscribeUserDoc = userDocRef.onSnapshot(doc => {
-        if (!doc.exists) return;
-        const data = doc.data();
-        if (data.photoURL && data.photoURL !== profileAvatar.src) {
-          profileAvatar.src = data.photoURL;
-        }
-        if (data.name) userNameEl.textContent = data.name;
-        if (data.email) userEmailEl.textContent = data.email;
-      });
+
+
+// real-time listener to get data from cloud
+unsubscribeUserDoc = userDocRef.onSnapshot(doc => {
+  if (doc.exists && doc.data().workData) {
+    workData = doc.data().workData;
+    localStorage.setItem("workData", JSON.stringify(workData));
+    renderDays(); // refresh UI
+    console.log("✅ Data restored from Firebase");
+  }
+});
+
 
       // Show small menu on hover/click
       profileMenu.classList.add('hidden'); // keep hidden until clicked
@@ -1157,21 +1227,122 @@ button:hover {
     }
   });
 
-  // OPTIONAL: If you already have loginWithGoogle(), you can keep it.
-  // But if you want the full flow here, ensure loginWithGoogle() uses the same auth object.
-  // Example (you already have similar in your file):
-  async function loginWithGoogle() {
-    const provider = new firebase.auth.GoogleAuthProvider();
-    try {
-      const result = await auth.signInWithPopup(provider);
-      // login success handled by onAuthStateChanged
-    } catch (err) {
-      alert('Login failed: ' + err.message);
-      console.error(err);
+
+
+
+  let userSnapshotUnsub = null;
+
+auth.onAuthStateChanged(async (user) => {
+  if (userSnapshotUnsub) { userSnapshotUnsub(); userSnapshotUnsub = null; }
+
+  if (user) {
+    const userDocRef = db.collection("users").doc(user.uid);
+    const snap = await userDocRef.get();
+    if (snap.exists && snap.data().workData) {
+      workData = snap.data().workData;
+      localStorage.setItem("workData", JSON.stringify(workData));
+      renderDays();
+      console.log("✅ Data restored from Firestore");
     }
+
+    // Realtime listener
+    userSnapshotUnsub = userDocRef.onSnapshot(doc => {
+      if (doc.exists && doc.data().workData) {
+        workData = doc.data().workData;
+        localStorage.setItem("workData", JSON.stringify(workData));
+        renderDays();
+        console.log("🔁 Live update applied");
+      }
+    });
+
+  } else {
+    console.log("User signed out → clearing data");
+    localStorage.removeItem("workData");
+    workData = {};
+    if (userSnapshotUnsub) { userSnapshotUnsub(); userSnapshotUnsub = null; }
+    renderDays();
   }
-  // If your file already defines loginWithGoogle(), you can skip redeclaring it.
+});
+
+
+
+
+function showLoginModal() { document.getElementById('loginModal').classList.remove('hidden'); }
+function hideLoginModal() { document.getElementById('loginModal').classList.add('hidden'); }
+
+document.getElementById('emailSignInBtn').addEventListener('click', async () => {
+  const email = document.getElementById('emailInput').value;
+  const pwd = document.getElementById('passwordInput').value;
+  try {
+    await auth.signInWithEmailAndPassword(email, pwd);
+    hideLoginModal();
+  } catch (err) {
+    alert(err.message);
+  }
+});
+
+document.getElementById('emailRegisterBtn').addEventListener('click', async () => {
+  const email = document.getElementById('emailInput').value;
+  const pwd = document.getElementById('passwordInput').value;
+  try {
+    await auth.createUserWithEmailAndPassword(email, pwd);
+    alert("Account created!");
+    hideLoginModal();
+  } catch (err) {
+    alert(err.message);
+  }
+});
+
+document.getElementById('forgotPwdBtn').addEventListener('click', async () => {
+  const email = document.getElementById('emailInput').value;
+  if (!email) return alert("Enter email first");
+  await auth.sendPasswordResetEmail(email);
+  alert("Reset link sent!");
+});
+
+document.getElementById('googleSignInBtn').addEventListener('click', loginWithGoogle);
+document.getElementById('closeLoginModal').addEventListener('click', hideLoginModal);
+
+
+function showLoginModal() {
+    document.getElementById('loginModal').classList.remove('hidden');
+  }
+  function hideLoginModal() {
+    document.getElementById('loginModal').classList.add('hidden');
+  }
+
+  // listener add only after modal exists in DOM
+  document.addEventListener("DOMContentLoaded", () => {
+    document.getElementById('closeLoginModal')
+      .addEventListener('click', hideLoginModal);
+  });
+
+
+
+
+
+
+
+
+
+
+
+
+
   </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 <script>
@@ -1204,18 +1375,41 @@ button:hover {
         // show dashboard if needed
       }
     });
+
+
+
+    let firebaseSyncInProgress = false;
+
+async function syncToFirebase() {
+  const user = auth.currentUser;
+  if (!user) return console.warn("Not logged in, skipping sync.");
+
+  if (firebaseSyncInProgress) return;
+  firebaseSyncInProgress = true;
+
+  try {
+    const userDocRef = db.collection("users").doc(user.uid);
+    await userDocRef.set({
+      workData: workData,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
+    console.log("✅ Data synced to Firebase");
+  } catch (err) {
+    console.error("❌ syncToFirebase failed:", err);
+  } finally {
+    firebaseSyncInProgress = false;
+  }
+}
+
+
+
+    
   </script>
   
 
 
     
     <script>
-
-        
-        
-
-
-
 
 
 
@@ -1876,6 +2070,8 @@ document.getElementById("restoreFileInput").addEventListener("change", function 
             const restoredData = JSON.parse(e.target.result);
             Object.assign(workData, restoredData);
             localStorage.setItem("workData", JSON.stringify(workData));
+            syncToFirebase();
+
             calculateSummary();
             renderDays();
             alert("Backup restored successfully.");
@@ -1975,6 +2171,8 @@ if (dayData.leaveStatus === undefined || dayData.leaveStatus === "") {
     dayData.leaveStatus = "No";
     workData[dateKey] = dayData;
     localStorage.setItem("workData", JSON.stringify(workData));
+    syncToFirebase();
+
 }
 
         const dayDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
@@ -2365,12 +2563,14 @@ function editReminder(index) {
 
         // Update Work Data
         function updateWorkData(dateKey, field, value) {
-            workData[dateKey] = workData[dateKey] || {};
-            workData[dateKey][field] = value;
-            localStorage.setItem("workData", JSON.stringify(workData));
-            calculateSummary();
-            renderDays();
-        }
+  workData[dateKey] = workData[dateKey] || {};
+  workData[dateKey][field] = value;
+  localStorage.setItem("workData", JSON.stringify(workData));
+  syncToFirebase();
+  calculateSummary();
+  renderDays();
+}
+
 
         function scrollToCurrentDateBox() {
     const today = new Date();
@@ -2405,6 +2605,8 @@ function clearDayData(dateKey) {
     confirmButton.onclick = () => {
         delete workData[dateKey];
         localStorage.setItem("workData", JSON.stringify(workData));
+        syncToFirebase();
+
         calculateSummary();
         renderDays();
         modal.classList.add("hidden"); // Hide the modal after clearing
@@ -2528,6 +2730,8 @@ clearAllButton.addEventListener("click", () => {
             if (key.startsWith(monthPrefix)) delete workData[key];
         });
         localStorage.setItem("workData", JSON.stringify(workData));
+        syncToFirebase();
+
         calculateSummary();
         renderDays();
         modal.classList.add("hidden"); // Hide the modal after clearing
