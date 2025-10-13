@@ -978,6 +978,47 @@ button:hover {
 
     <script>
 
+let userDocRef = null;
+let userDocUnsubscribe = null;
+let syncWriteTimer = null;
+const SYNC_DELAY = 700;
+
+async function startUserSync(user) {
+  userDocRef = db.collection("users").doc(user.uid).collection("data").doc("workData");
+
+  const snap = await userDocRef.get();
+  if (!snap.exists) {
+    await userDocRef.set({ workData: {} });
+  }
+
+  // Real-time listener
+  userDocUnsubscribe = userDocRef.onSnapshot((docSnap) => {
+    if (!docSnap.exists) return;
+    const remoteData = docSnap.data().workData || {};
+
+    // merge remote data with local
+    workData = { ...workData, ...remoteData };
+    localStorage.setItem("workData", JSON.stringify(workData));
+
+    calculateSummary();
+    renderDays();
+  });
+}
+
+function stopUserSyncAndCleanup() {
+  if (userDocUnsubscribe) userDocUnsubscribe();
+  userDocUnsubscribe = null;
+  userDocRef = null;
+
+  workData = {};
+  localStorage.removeItem("workData");
+
+  calculateSummary();
+  renderDays();
+}
+
+
+
 
 
 
@@ -1108,6 +1149,13 @@ button:hover {
 
   // When user signs in/out -> sync UI and start listening to Firestore user doc
   auth.onAuthStateChanged(async (user) => {
+  if (user) {
+    await startUserSync(user); // user login aana
+  } else {
+    stopUserSyncAndCleanup(); // user logout aana
+  }
+});
+
     // unsubscribe previous listener
     if (unsubscribeUserDoc) { unsubscribeUserDoc(); unsubscribeUserDoc = null; }
 
@@ -1155,7 +1203,7 @@ button:hover {
       userNameEl.textContent = '';
       userEmailEl.textContent = '';
     }
-  });
+
 
   // OPTIONAL: If you already have loginWithGoogle(), you can keep it.
   // But if you want the full flow here, ensure loginWithGoogle() uses the same auth object.
@@ -2365,22 +2413,26 @@ function editReminder(index) {
 
         // Update Work Data
         function updateWorkData(dateKey, field, value) {
-            workData[dateKey] = workData[dateKey] || {};
-            workData[dateKey][field] = value;
-            localStorage.setItem("workData", JSON.stringify(workData));
-            calculateSummary();
-            renderDays();
-        }
+  workData[dateKey] = workData[dateKey] || {};
+  workData[dateKey][field] = value;
 
-        function scrollToCurrentDateBox() {
-    const today = new Date();
-    const currentDay = today.getDate();
-    const dayElement = document.querySelector(`[data-day="${currentDay}"]`);
-    
-    if (dayElement) {
-        dayElement.scrollIntoView({ behavior: 'smooth' });
-    }
+  localStorage.setItem("workData", JSON.stringify(workData));
+  calculateSummary();
+  renderDays();
+
+  // Firestore sync
+  if (auth.currentUser && userDocRef) {
+    if (syncWriteTimer) clearTimeout(syncWriteTimer);
+    syncWriteTimer = setTimeout(async () => {
+      try {
+        await userDocRef.set({ workData }, { merge: true });
+      } catch (err) {
+        console.error("Sync failed:", err);
+      }
+    }, SYNC_DELAY);
+  }
 }
+
 
 // Add this to the initial render section
 populateDropdowns();
