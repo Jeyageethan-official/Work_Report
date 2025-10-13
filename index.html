@@ -8,11 +8,9 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
   
 
-<!-- Firebase Core + Services (Compat versions) -->
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
 
 
 
@@ -877,6 +875,8 @@ button:hover {
 }
 
 
+
+
 </style>   
 </head>
 
@@ -893,28 +893,24 @@ button:hover {
         <button id="nextMonth" class="p-2 hover:bg-gray-100 rounded-full text-lg">→</button>
      </div>
 
-     <!-- AUTH UI (paste near the top-right area) -->
-<div id="authContainer" class="flex items-center space-x-3">
-    <input id="profileFileInput" type="file" accept="image/*" class="hidden" />
-    <!-- Avatar button -->
-    <button id="profileBtn" class="flex items-center space-x-2 p-1 rounded-full" style="background:transparent;border:0;">
-      <img id="profileAvatar" src="" alt="avatar" class="w-10 h-10 rounded-full object-cover border-2 border-white shadow-lg" style="display:none;">
-      <div id="authButtons" class="flex items-center space-x-2">
-        <button id="loginBtn" onclick="loginWithGoogle()" class="px-3 py-1 rounded-md btn-primary">Login</button>
-      </div>
-    </button>
-    <div id="profileMenu" class="hidden bg-white dark:bg-gray-900 shadow-lg rounded-md p-3 text-sm" style="min-width:200px">
-      <p id="userName" class="font-semibold"></p>
-      <p id="userEmail" class="text-xs text-gray-600"></p>
-      <div class="mt-2 flex gap-2">
-        <button id="uploadPhotoBtn" class="px-3 py-1 rounded bg-blue-600 text-white">Change Photo</button>
-        <button id="signOutBtn" class="px-3 py-1 rounded border">Sign out</button>
-      </div>
+     
+<!-- HAMBURGER + PROFILE (paste near top of body) -->
+<!-- Uses existing #mobileMenu styles already present in your file. -->
+<button id="menuToggle" class="md:hidden fixed top-4 left-4 z-120 text-2xl" aria-label="Open menu">☰</button>
+
+<!-- Mobile Menu (it exists in CSS as #mobileMenu; if you already have it, keep existing) -->
+<div id="mobileMenu" class="">
+  <button id="mobileClose" class="absolute right-3 top-3 text-xl">✕</button>
+  <div class="mt-8 px-4">
+    
+    <hr class="my-3">
+    <div id="mobileAuthArea" class="space-y-2">
+      <button id="mobileLoginBtn" class="w-full py-2 rounded">Login / Signup</button>
+      <img id="mobileProfileAvatar" class="w-12 h-12 rounded-full hidden mx-auto" alt="profile">
+      <button id="mobileLogoutBtn" class="w-full py-2 rounded hidden">Logout</button>
     </div>
   </div>
-  
-
-  
+</div>
 
 
     <!-- New rectangular box for buttons -->
@@ -978,9 +974,6 @@ button:hover {
 
     <script>
 
-
-
-
         
         document.addEventListener("deviceready", function () {
             document.getElementById("downloadBtn").addEventListener("click", downloadFile);
@@ -1036,141 +1029,186 @@ button:hover {
   
     // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
-    // make sure firebase is initialized already (you have firebase.initializeApp above)
-                 // you already have this
-  const db = firebase.firestore();                // Firestore (compat)
-  const storage = firebase.storage();             // Storage (compat)
+    /* ----------  USER-SCOPED LOCAL STORAGE + FIRESTORE SYNC ----------
+   Behavior:
+   - Local storage key per-user: workData_<uid>
+   - On login: load local (if exists), load cloud (if exists), MERGE (cloud ⟵ local missing), save merged to both local & cloud
+   - On logout: clear UI but keep localStorage intact
+   - Mobile menu toggle + show/hide profile avatar both desktop & mobile
+*/
 
-  // UI refs
-  const profileAvatar = document.getElementById('profileAvatar');
-  const profileBtn = document.getElementById('profileBtn');
-  const profileMenu = document.getElementById('profileMenu');
-  const userNameEl = document.getElementById('userName');
-  const userEmailEl = document.getElementById('userEmail');
-  const loginBtn = document.getElementById('loginBtn');
-  const signOutBtn = document.getElementById('signOutBtn');
-  const uploadPhotoBtn = document.getElementById('uploadPhotoBtn');
-  const profileFileInput = document.getElementById('profileFileInput');
-  const authButtons = document.getElementById('authButtons');
+// ensure auth, db, storage already defined (your file has them)
+const menuToggle = document.getElementById('menuToggle');
+const mobileMenu = document.getElementById('mobileMenu');
+const mobileClose = document.getElementById('mobileClose');
+const mobileLoginBtn = document.getElementById('mobileLoginBtn');
+const mobileLogoutBtn = document.getElementById('mobileLogoutBtn');
+const mobileProfileAvatar = document.getElementById('mobileProfileAvatar');
 
-  let unsubscribeUserDoc = null; // firestore listener
+const desktopAvatar = document.getElementById('profileAvatar'); // exists in your file
+const loginBtn = document.getElementById('loginBtn');          // exists in your file
+const signOutBtn = document.getElementById('signOutBtn');      // exists in your file
 
-  // Show/hide menu when avatar or button clicked
-  profileBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    // toggle only if signed in
-    if (auth.currentUser) {
-      profileMenu.classList.toggle('hidden');
-    }
-  });
-  // close menu on outside click
-  document.addEventListener('click', () => profileMenu.classList.add('hidden'));
+let currentUserUid = null;
+let workDataKey = 'workData_guest'; // default key if not logged in
 
-  // Sign out
-  signOutBtn?.addEventListener('click', async () => {
-    await auth.signOut();
-    // UI cleanup handled in onAuthStateChanged below
-  });
-
-  // Choose file when clicking Change Photo
-  uploadPhotoBtn.addEventListener('click', () => profileFileInput.click());
-
-  // Upload selected photo
-  profileFileInput.addEventListener('change', async (e) => {
-    const file = e.target.files[0];
-    if (!file) return alert('No file selected.');
-    const user = auth.currentUser;
-    if (!user) return alert('Please login first.');
-
-    try {
-      const path = `users/${user.uid}/profile.jpg`;
-      const ref = storage.ref().child(path);
-      // upload
-      const snapshot = await ref.put(file, { contentType: file.type });
-      const downloadURL = await snapshot.ref.getDownloadURL();
-
-      // Save to Firestore user doc
-      await db.collection('users').doc(user.uid).set({
-        photoURL: downloadURL,
-        name: user.displayName || '',
-        email: user.email || ''
-      }, { merge: true });
-
-      // Optional: update FirebaseAuth profile photoURL (keeps auth.user.photoURL in sync)
-      await user.updateProfile({ photoURL: downloadURL });
-
-      alert('Profile photo updated and synced.');
-    } catch (err) {
-      console.error('Upload error', err);
-      alert('Photo upload failed: ' + err.message);
-    }
-  });
-
-  // When user signs in/out -> sync UI and start listening to Firestore user doc
-  auth.onAuthStateChanged(async (user) => {
-    // unsubscribe previous listener
-    if (unsubscribeUserDoc) { unsubscribeUserDoc(); unsubscribeUserDoc = null; }
-
-    if (user) {
-      // hide login button
-      if (loginBtn) loginBtn.style.display = 'none';
-      // show avatar (use auth photoURL as fallback)
-      profileAvatar.style.display = 'inline-block';
-      profileAvatar.src = user.photoURL || 'https://www.gravatar.com/avatar/?d=mp&s=200';
-
-      // show name/email in menu
-      userNameEl.textContent = user.displayName || 'User';
-      userEmailEl.textContent = user.email || '';
-
-      // ensure user doc exists and start real-time listener
-      const userDocRef = db.collection('users').doc(user.uid);
-
-      // If user doc missing, create it with basic fields
-      const snap = await userDocRef.get();
-      if (!snap.exists) {
-        await userDocRef.set({
-          name: user.displayName || '',
-          email: user.email || '',
-          photoURL: user.photoURL || ''
-        });
-      }
-
-      // realtime listener -> updates UI automatically across devices
-      unsubscribeUserDoc = userDocRef.onSnapshot(doc => {
-        if (!doc.exists) return;
-        const data = doc.data();
-        if (data.photoURL && data.photoURL !== profileAvatar.src) {
-          profileAvatar.src = data.photoURL;
-        }
-        if (data.name) userNameEl.textContent = data.name;
-        if (data.email) userEmailEl.textContent = data.email;
-      });
-
-      // Show small menu on hover/click
-      profileMenu.classList.add('hidden'); // keep hidden until clicked
-    } else {
-      // signed out - show login
-      if (loginBtn) loginBtn.style.display = 'inline-block';
-      profileAvatar.style.display = 'none';
-      userNameEl.textContent = '';
-      userEmailEl.textContent = '';
-    }
-  });
-
-  // OPTIONAL: If you already have loginWithGoogle(), you can keep it.
-  // But if you want the full flow here, ensure loginWithGoogle() uses the same auth object.
-  // Example (you already have similar in your file):
-  async function loginWithGoogle() {
-    const provider = new firebase.auth.GoogleAuthProvider();
-    try {
-      const result = await auth.signInWithPopup(provider);
-      // login success handled by onAuthStateChanged
-    } catch (err) {
-      alert('Login failed: ' + err.message);
-      console.error(err);
-    }
+// Helper: read local per-user data
+function loadLocalWorkData() {
+  try {
+    const raw = localStorage.getItem(workDataKey);
+    return raw ? JSON.parse(raw) : {};
+  } catch (e) {
+    console.error('Local parse error', e);
+    return {};
   }
-  // If your file already defines loginWithGoogle(), you can skip redeclaring it.
+}
+function saveLocalWorkData(obj) {
+  localStorage.setItem(workDataKey, JSON.stringify(obj || {}));
+}
+
+// Helper: cloud read/write (document per-user)
+async function readCloudWorkData(uid) {
+  try {
+    const doc = await db.collection('userdata').doc(uid).get();
+    return doc.exists && doc.data().workData ? doc.data().workData : {};
+  } catch (e) {
+    console.error('Cloud read fail', e);
+    return {};
+  }
+}
+async function writeCloudWorkData(uid, data) {
+  try {
+    await db.collection('userdata').doc(uid).set({ workData: data }, { merge: true });
+  } catch (e) {
+    console.error('Cloud write fail', e);
+  }
+}
+
+// Merge: cloud + local -> prefer local values when key present
+function mergeData(cloudObj, localObj) {
+  return { ...cloudObj, ...localObj };
+}
+
+// MENU TOGGLE handlers (mobile)
+if (menuToggle && mobileMenu) {
+  menuToggle.addEventListener('click', () => mobileMenu.classList.add('open'));
+}
+if (mobileClose && mobileMenu) {
+  mobileClose.addEventListener('click', () => mobileMenu.classList.remove('open'));
+}
+document.addEventListener('click', (e) => {
+  // close mobile menu when clicking overlay area (if you add overlay later)
+});
+
+// LOGIN and LOGOUT wiring for mobile button(s)
+if (mobileLoginBtn) mobileLoginBtn.addEventListener('click', () => loginWithGoogle());
+if (loginBtn) loginBtn.addEventListener('click', () => loginWithGoogle());
+if (mobileLogoutBtn) mobileLogoutBtn.addEventListener('click', () => logoutUser());
+if (signOutBtn) signOutBtn.addEventListener('click', () => logoutUser());
+
+// LOGIN function uses your existing auth, but add post-login sync logic
+async function onUserLoggedIn(user) {
+  if (!user) return;
+  currentUserUid = user.uid;
+  workDataKey = 'workData_' + user.uid;
+
+  // 1) load local / cloud
+  const local = loadLocalWorkData();
+  const cloud = await readCloudWorkData(user.uid);
+
+  // 2) merge: cloud <- local for any missing keys (local values take precedence)
+  const merged = mergeData(cloud || {}, local || {});
+
+  // 3) Save merged to both local & cloud (keeps everything consistent)
+  saveLocalWorkData(merged);
+  await writeCloudWorkData(user.uid, merged);
+
+  // 4) Update UI: show avatars, hide login
+  if (desktopAvatar) { desktopAvatar.src = user.photoURL || desktopAvatar.src || 'https://www.gravatar.com/avatar/?d=mp&s=200'; desktopAvatar.style.display='inline-block'; }
+  if (mobileProfileAvatar) { mobileProfileAvatar.src = user.photoURL || mobileProfileAvatar.src || 'https://www.gravatar.com/avatar/?d=mp&s=200'; mobileProfileAvatar.classList.remove('hidden'); }
+  if (loginBtn) loginBtn.style.display = 'none';
+  if (mobileLoginBtn) mobileLoginBtn.style.display = 'none';
+  if (mobileLogoutBtn) mobileLogoutBtn.classList.remove('hidden');
+  if (signOutBtn) signOutBtn.style.display = 'inline-block';
+
+  // 5) Load merged data into app state (your app stores workData global variable)
+  // If your app uses a global `workData` object (it does), replace/merge it:
+  if (typeof workData !== 'undefined') {
+    workData = merged;
+    localStorage.setItem('workData', JSON.stringify(workData)); // keep compatibility
+    // call your functions to re-render UI
+    if (typeof calculateSummary === 'function') calculateSummary();
+    if (typeof renderDays === 'function') renderDays();
+  }
+}
+
+// LOGOUT: clear UI but keep localStorage intact
+async function logoutUser() {
+  try {
+    await auth.signOut();
+    currentUserUid = null;
+    workDataKey = 'workData_guest';
+
+    // Hide avatars, show login buttons
+    if (desktopAvatar) desktopAvatar.style.display = 'none';
+    if (mobileProfileAvatar) mobileProfileAvatar.classList.add('hidden');
+    if (loginBtn) loginBtn.style.display = 'inline-block';
+    if (mobileLoginBtn) mobileLoginBtn.style.display = 'inline-block';
+    if (mobileLogoutBtn) mobileLogoutBtn.classList.add('hidden');
+    if (signOutBtn) signOutBtn.style.display = 'none';
+
+    // Make UI clean: show empty month view but keep localStorage data saved under user key
+    if (typeof workData !== 'undefined') {
+      // Clear UI state for safety
+      workData = {}; 
+      if (typeof calculateSummary === 'function') calculateSummary();
+      if (typeof renderDays === 'function') renderDays();
+    }
+  } catch (e) {
+    console.error('Signout failed', e);
+  }
+}
+
+// Listen auth changes and call onUserLoggedIn / logout flow
+auth.onAuthStateChanged(async (user) => {
+  if (user) {
+    await onUserLoggedIn(user);
+  } else {
+    // user is null -> already handled by logoutUser, but ensure fallback
+    currentUserUid = null;
+    workDataKey = 'workData_guest';
+  }
+});
+
+/* OPTIONAL: functions to upload / download a month to cloud using current user scope.
+   I noticed your HTML has buttons for Upload/Download to Cloud — reuse them with per-user keys:
+   - Upload: get local (workData or workDataKey) and write to db.collection('userdata').doc(uid)
+   - Download: read from db and replace localStorage
+*/
+async function uploadMonthToCloud(year, month) {
+  if (!auth.currentUser) return alert('Login first to upload');
+  const uid = auth.currentUser.uid;
+  const key = 'workData_' + uid;
+  const local = JSON.parse(localStorage.getItem(key) || '{}');
+  // optionally limit to requested month before writing
+  await writeCloudWorkData(uid, local);
+  alert('Uploaded to cloud for this user');
+}
+async function downloadMonthFromCloud(year, month) {
+  if (!auth.currentUser) return alert('Login first to download');
+  const uid = auth.currentUser.uid;
+  const cloud = await readCloudWorkData(uid);
+  if (!cloud || Object.keys(cloud).length === 0) return alert('No cloud data found');
+  // Save cloud to local
+  localStorage.setItem('workData_' + uid, JSON.stringify(cloud));
+  // Replace app state & render
+  if (typeof workData !== 'undefined') {
+    workData = cloud;
+    if (typeof calculateSummary === 'function') calculateSummary();
+    if (typeof renderDays === 'function') renderDays();
+  }
+  alert('Downloaded cloud data and applied locally');
+}
   </script>
 
 
