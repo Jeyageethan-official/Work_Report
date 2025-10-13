@@ -1180,6 +1180,50 @@ unsubscribeUserDoc = userDocRef.onSnapshot(doc => {
 
 
 
+  auth.onAuthStateChanged(async (user) => {
+  if (user) {
+    console.log("✅ Logged in as", user.email);
+
+    const userDocRef = db.collection("users").doc(user.uid);
+
+    // --- Wait for snapshot once (first load) ---
+    const snap = await userDocRef.get();
+    if (snap.exists && snap.data().workData) {
+      workData = snap.data().workData;
+      localStorage.setItem("workData", JSON.stringify(workData));
+      renderDays(); // refresh UI
+      console.log("✅ Data restored from Firestore (first load)");
+    } else {
+      console.log("ℹ️ No existing data for this user");
+    }
+
+    // --- Keep listening realtime (for second device sync) ---
+    userDocRef.onSnapshot(doc => {
+      if (doc.exists && doc.data().workData) {
+        workData = doc.data().workData;
+        localStorage.setItem("workData", JSON.stringify(workData));
+        renderDays();
+        console.log("🔁 Data updated from Firestore realtime");
+      }
+    });
+
+  } else {
+    console.log("🚪 User signed out → clearing local data");
+    localStorage.removeItem("workData");
+  }
+});
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
