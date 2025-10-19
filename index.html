@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -52,10 +53,10 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #a8b8d0;
         }
-        html.dark ::webkit-scrollbar-track {
+        html.dark ::-webkit-scrollbar-track {
             background: #111827;
         }
-        html.dark ::webkit-scrollbar-thumb {
+        html.dark ::-webkit-scrollbar-thumb {
             background: #374151;
         }
         html.dark ::-webkit-scrollbar-thumb:hover {
@@ -166,6 +167,7 @@
             word-break: break-word;
         }
     </style>
+<link rel="stylesheet" href="/index.css">
 <script type="importmap">
 {
   "imports": {
@@ -176,7 +178,6 @@
   }
 }
 </script>
-<link rel="stylesheet" href="/index.css">
 </head>
 <body class="bg-gray-50 dark:bg-gray-950">
 
@@ -918,9 +919,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const leaveStatusText = dayData.leaveStatus || 'No';
             const weekend = isWeekend(year, month, day);
 
-            let rowClass = 'border-b border-gray-200 dark:border-gray-700';
+            let rowClass = 'border-b border-gray-200';
              if (leaveStatusText === 'Yes') {
-                rowClass += ' bg-blue-50 dark:bg-blue-900/20';
+                rowClass += ' bg-blue-50';
             }
             
             const dateClass = weekend ? 'text-red-500 font-bold' : '';
@@ -930,50 +931,48 @@ document.addEventListener('DOMContentLoaded', () => {
 
             return `
                 <tr class="${rowClass}">
-                    <td class="p-2 border-x border-gray-200 dark:border-gray-700 ${dateClass}">${formattedDate}</td>
-                    <td class="p-2 border-x border-gray-200 dark:border-gray-700">${dayData.inTime || '-'}</td>
-                    <td class="p-2 border-x border-gray-200 dark:border-gray-700">${dayData.outTime || '-'}</td>
-                    <td class="p-2 border-x border-gray-200 dark:border-gray-700">${dayData.movementOut || '-'}</td>
-                    <td class="p-2 border-x border-gray-200 dark:border-gray-700">${dayData.movementIn || '-'}</td>
-                    <td class="p-2 border-x border-gray-200 dark:border-gray-700 break-words">${dayData.teamMembers || '-'}</td>
-                    <td class="p-2 border-x border-gray-200 dark:border-gray-700 break-words">${dayData.workLocation || '-'}</td>
-                    <td class="p-2 border-x border-gray-200 dark:border-gray-700">${dayData.vehicleNumber || '-'}</td>
-                    <td class="p-2 border-x border-gray-200 dark:border-gray-700">${dayData.km || '-'}</td>
-                    <td class="p-2 border-x border-gray-200 dark:border-gray-700">${dayData.specialDays || '-'}</td>
-                    <td class="p-2 border-x border-gray-200 dark:border-gray-700">${leaveStatusHTML}</td>
-                    <td class="p-2 border-x border-gray-200 dark:border-gray-700 break-words">${dayData.leaveReason || '-'}</td>
+                    <td class="p-2 border-x border-gray-200 ${dateClass}">${formattedDate}</td>
+                    <td class="p-2 border-x border-gray-200">${dayData.inTime || '-'}</td>
+                    <td class="p-2 border-x border-gray-200">${dayData.outTime || '-'}</td>
+                    <td class="p-2 border-x border-gray-200">${dayData.movementOut || '-'}</td>
+                    <td class="p-2 border-x border-gray-200">${dayData.movementIn || '-'}</td>
+                    <td class="p-2 border-x border-gray-200 break-words">${dayData.teamMembers || '-'}</td>
+                    <td class="p-2 border-x border-gray-200 break-words">${dayData.workLocation || '-'}</td>
+                    <td class="p-2 border-x border-gray-200">${dayData.vehicleNumber || '-'}</td>
+                    <td class="p-2 border-x border-gray-200">${dayData.km || '-'}</td>
+                    <td class="p-2 border-x border-gray-200">${dayData.specialDays || '-'}</td>
+                    <td class="p-2 border-x border-gray-200">${leaveStatusHTML}</td>
+                    <td class="p-2 border-x border-gray-200 break-words">${dayData.leaveReason || '-'}</td>
                 </tr>`;
         }).join('');
 
         const previewHTML = `
             <div class="fixed inset-0 bg-gray-900 bg-opacity-70 flex justify-center items-center z-50 p-4 overflow-auto modal-bg-animate" data-dismiss="modal">
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-2xl w-full max-w-4xl transform transition-all modal-content-animate flex flex-col" style="max-height: 90vh;" onclick="event.stopPropagation()">
-                    <div class="p-4 sm:p-6 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 z-10 flex flex-col sm:flex-row justify-between items-center gap-3">
-                        <h2 class="text-xl font-bold text-center sm:text-left text-gray-900 dark:text-gray-100">Export Preview: ${months[month]} ${year}</h2>
+                <div class="bg-white rounded-lg shadow-2xl w-full max-w-4xl transform transition-all modal-content-animate" onclick="event.stopPropagation()">
+                    <div class="p-4 sm:p-6 sticky top-0 bg-white border-b z-10 flex flex-col sm:flex-row justify-between items-center gap-3">
+                        <h2 class="text-xl font-bold text-center sm:text-left">Export Preview: ${months[month]} ${year}</h2>
                         <div class="flex gap-3">
                             <button id="generate-pdf-btn" class="px-5 py-2.5 rounded-lg font-semibold text-sm shadow-sm transition-all bg-blue-600 text-white hover:bg-blue-700">Download as PDF</button>
-                            <button data-dismiss="modal" class="px-5 py-2.5 rounded-lg font-semibold text-sm shadow-sm transition-all bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600">Close</button>
+                            <button data-dismiss="modal" class="px-5 py-2.5 rounded-lg font-semibold text-sm shadow-sm transition-all bg-white text-gray-800 border border-gray-300 hover:bg-gray-100">Close</button>
                         </div>
                     </div>
-                    <div class="overflow-auto">
-                        <div id="export-content" class="p-4 bg-white text-black dark:bg-gray-900 dark:text-white" style="font-size: 11px;">
-                            <div class="text-center mb-4" style="font-size: 12px;">
-                                <h2 class="text-xl font-bold">Work Data Sheet</h2>
-                                <p class="text-md font-semibold">Name: T.Jeyaraman | Service No: 016696</p>
-                                <h3 class="text-lg font-semibold">${months[month]} ${year}</h3>
-                            </div>
-                            <div class="overflow-x-auto">
-                                <table class="w-full border-collapse border border-gray-200 dark:border-gray-700">
-                                    <thead class="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200">
-                                        <tr>
-                                            ${['Day', 'In', 'Out', 'Mov Out', 'Mov In', 'Team', 'Location', 'Vehicle', 'KM', 'Special', 'Leave', 'Reason'].map(h => 
-                                                `<th class="p-2 border-x border-gray-200 dark:border-gray-700 font-semibold">${h}</th>`
-                                            ).join('')}
-                                        </tr>
-                                    </thead>
-                                    <tbody class="text-black dark:text-gray-300 text-center">${tableRows}</tbody>
-                                </table>
-                            </div>
+                    <div id="export-content" class="p-4 bg-white text-black" style="font-size: 13px;">
+                        <div class="text-center mb-4" style="font-size: 14px;">
+                            <h2 class="text-xl font-bold">Work Data Sheet</h2>
+                            <p class="text-md font-semibold">Name: T.Jeyaraman | Service No: 016696</p>
+                            <h3 class="text-lg font-semibold">${months[month]} ${year}</h3>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full border-collapse border-y border-gray-200">
+                                <thead class="bg-gray-100 text-gray-700">
+                                    <tr>
+                                        ${['Day', 'In', 'Out', 'Mov Out', 'Mov In', 'Team', 'Location', 'Vehicle', 'KM', 'Special', 'Leave', 'Reason'].map(h => 
+                                            `<th class="p-2 border-x border-gray-200 font-semibold">${h}</th>`
+                                        ).join('')}
+                                    </tr>
+                                </thead>
+                                <tbody class="text-black text-center">${tableRows}</tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -981,68 +980,42 @@ document.addEventListener('DOMContentLoaded', () => {
         openModal(previewHTML);
 
         document.getElementById('generate-pdf-btn').addEventListener('click', () => {
+            const el = document.getElementById('export-content');
             const spinner = document.getElementById('loading-spinner');
             spinner.style.display = 'flex';
 
-            const originalEl = document.getElementById('export-content');
-            
-            // Create a clone to render off-screen with a fixed width
-            const cloneEl = originalEl.cloneNode(true);
-            
-            // Style the clone for off-screen rendering at a desktop-like width
-            cloneEl.style.position = 'absolute';
-            cloneEl.style.top = '0';
-            cloneEl.style.left = '-9999px'; // Move it out of view
-            cloneEl.style.width = '1240px'; // A fixed width that ensures desktop layout
-            cloneEl.style.height = 'auto';
-            cloneEl.style.display = 'block';
+            html2canvas(el, { scale: 3, useCORS: true, backgroundColor: '#ffffff' }).then(canvas => {
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+                
+                const imgData = canvas.toDataURL('image/png');
+                const pdfWidth = pdf.internal.pageSize.getWidth();
+                const pdfHeight = pdf.internal.pageSize.getHeight();
+                
+                const canvasWidth = canvas.width;
+                const canvasHeight = canvas.height;
+                const canvasRatio = canvasWidth / canvasHeight;
 
-            // Increase font size and cell padding on the clone to make it taller
-            cloneEl.style.fontSize = '13px';
-            cloneEl.querySelectorAll('td, th').forEach(cell => {
-                cell.style.padding = '12px';
+                let finalImgWidth = pdfWidth;
+                let finalImgHeight = pdfWidth / canvasRatio;
+
+                if (finalImgHeight > pdfHeight) {
+                    finalImgHeight = pdfHeight;
+                    finalImgWidth = pdfHeight * canvasRatio;
+                }
+
+                const x = (pdfWidth - finalImgWidth) / 2;
+                const y = (pdfHeight - finalImgHeight) / 2;
+                
+                pdf.addImage(imgData, 'PNG', x, y, finalImgWidth, finalImgHeight);
+                pdf.save(`Work_Report_${year}_${month + 1}.pdf`);
+                spinner.style.display = 'none';
+
+            }).catch(err => {
+                console.error('PDF generation failed:', err);
+                alert('Sorry, there was an error generating the PDF.');
+                spinner.style.display = 'none';
             });
-            
-            // If the app is in dark mode, we need to remove the dark class from the clone
-            // so html2canvas renders it with a white background, as intended for the PDF.
-            if (document.documentElement.classList.contains('dark')) {
-                cloneEl.classList.remove('dark');
-                cloneEl.querySelectorAll('.dark').forEach(el => el.classList.remove('dark'));
-            }
-
-            document.body.appendChild(cloneEl);
-
-            // Use a small delay to ensure the clone is rendered in the DOM before capturing
-            setTimeout(() => {
-                html2canvas(cloneEl, { scale: 3, useCORS: true, backgroundColor: '#ffffff' }).then(canvas => {
-                    const { jsPDF } = window.jspdf;
-                    const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-                    
-                    const imgData = canvas.toDataURL('image/png');
-                    const pdfWidth = pdf.internal.pageSize.getWidth();
-                    
-                    const canvasWidth = canvas.width;
-                    const canvasHeight = canvas.height;
-                    const canvasRatio = canvasWidth / canvasHeight;
-
-                    // Calculate the height of the image in the PDF to maintain its aspect ratio
-                    const finalImgHeight = pdfWidth / canvasRatio;
-
-                    // Add the image, filling the page width and letting the height adjust proportionally.
-                    // This prevents the text and content from being stretched or distorted.
-                    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, finalImgHeight);
-                    
-                    pdf.save(`Work_Report_${year}_${month + 1}.pdf`);
-
-                }).catch(err => {
-                    console.error('PDF generation failed:', err);
-                    alert('Sorry, there was an error generating the PDF.');
-                }).finally(() => {
-                    // Cleanup: remove the clone and hide the spinner
-                    document.body.removeChild(cloneEl);
-                    spinner.style.display = 'none';
-                });
-            }, 100); // 100ms delay to allow render
         });
     };
     
