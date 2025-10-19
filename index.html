@@ -167,7 +167,16 @@
             word-break: break-word;
         }
     </style>
-<link rel="stylesheet" href="/index.css">
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "firebase/": "https://aistudiocdn.com/firebase@^12.4.0/"
+  }
+}
+</script>
 </head>
 <body class="bg-gray-50 dark:bg-gray-950">
 
@@ -946,7 +955,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <button data-dismiss="modal" class="px-5 py-2.5 rounded-lg font-semibold text-sm shadow-sm transition-all bg-white text-gray-800 border border-gray-300 hover:bg-gray-100">Close</button>
                         </div>
                     </div>
-                    <div id="export-content" class="p-4 bg-white text-black" style="font-size: 9px;">
+                    <div id="export-content" class="p-4 bg-white text-black" style="font-size: 11px;">
                         <div class="text-center mb-4" style="font-size: 12px;">
                             <h2 class="text-xl font-bold">Work Data Sheet</h2>
                             <p class="text-md font-semibold">Name: T.Jeyaraman | Service No: 016696</p>
@@ -1097,6 +1106,5 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 </script>
-<script type="module" src="/index.tsx"></script>
 </body>
 </html>
