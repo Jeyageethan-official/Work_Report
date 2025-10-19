@@ -964,9 +964,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             
             const dateClass = weekend ? 'text-red-500 font-bold' : '';
-            const leaveStatusHTML = leaveStatusText === 'Yes' 
-                ? `<span class="font-bold text-blue-700">${leaveStatusText}</span>`
-                : leaveStatusText;
 
             return `
                 <tr class="${rowClass}">
@@ -980,7 +977,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <td class="p-2 border-x border-gray-200">${dayData.vehicleNumber || '-'}</td>
                     <td class="p-2 border-x border-gray-200">${dayData.km || '-'}</td>
                     <td class="p-2 border-x border-gray-200">${dayData.specialDays || '-'}</td>
-                    <td class="p-2 border-x border-gray-200">${leaveStatusHTML}</td>
+                    <td class="p-2 border-x border-gray-200">${leaveStatusText}</td>
                     <td class="p-2 border-x border-gray-200 break-words">${dayData.leaveReason || '-'}</td>
                 </tr>`;
         }).join('');
@@ -1019,11 +1016,41 @@ document.addEventListener('DOMContentLoaded', () => {
         openModal(previewHTML);
 
         document.getElementById('generate-pdf-btn').addEventListener('click', () => {
-            const el = document.getElementById('export-content');
+            const originalElement = document.getElementById('export-content');
             const spinner = document.getElementById('loading-spinner');
             spinner.style.display = 'flex';
 
-            html2canvas(el, { scale: 3, useCORS: true, backgroundColor: '#ffffff' }).then(canvas => {
+            // 1. Clone the element for consistent rendering
+            const clone = originalElement.cloneNode(true);
+            clone.id = 'export-clone';
+
+            // 2. Style the clone to be off-screen and have a fixed width for consistency
+            clone.style.position = 'absolute';
+            clone.style.top = '0';
+            clone.style.left = '-9999px';
+            clone.style.width = '1024px'; // A fixed desktop-like width
+            clone.style.height = 'auto';
+
+            // 3. Apply PDF-only styles to the clone
+            const cells = clone.querySelectorAll('tbody td');
+            cells.forEach(cell => {
+                // Apply blue color for 'Yes' in the Leave column
+                if (cell.cellIndex === 10 && cell.textContent.trim() === 'Yes') {
+                    cell.innerHTML = '<span style="color: #0000FF; font-weight: bold;">Yes</span>';
+                }
+                // Force user-entered data to a single line
+                if ([5, 6, 11].includes(cell.cellIndex)) { // Team, Location, Reason
+                    cell.style.whiteSpace = 'nowrap';
+                    cell.style.overflow = 'hidden';
+                    cell.style.textOverflow = 'ellipsis';
+                }
+            });
+            
+            // 4. Append clone to body to be rendered by html2canvas
+            document.body.appendChild(clone);
+            
+            // 5. Render the CLONE
+            html2canvas(clone, { scale: 3, useCORS: true, backgroundColor: '#ffffff' }).then(canvas => {
                 const { jsPDF } = window.jspdf;
                 const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
                 
@@ -1049,11 +1076,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 pdf.addImage(imgData, 'PNG', x, y, finalImgWidth, finalImgHeight);
                 pdf.save(`Work_Report_${year}_${month + 1}.pdf`);
                 spinner.style.display = 'none';
+                
+                // 6. IMPORTANT: Remove the clone
+                document.body.removeChild(clone);
 
             }).catch(err => {
                 console.error('PDF generation failed:', err);
                 alert('Sorry, there was an error generating the PDF.');
                 spinner.style.display = 'none';
+                // Ensure clone is removed on error
+                if (document.getElementById('export-clone')) {
+                    document.body.removeChild(document.getElementById('export-clone'));
+                }
             });
         });
     };
