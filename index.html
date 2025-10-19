@@ -956,8 +956,8 @@ document.addEventListener('DOMContentLoaded', () => {
                             <button data-dismiss="modal" class="px-5 py-2.5 rounded-lg font-semibold text-sm shadow-sm transition-all bg-white text-gray-800 border border-gray-300 hover:bg-gray-100">Close</button>
                         </div>
                     </div>
-                    <div id="export-content" class="p-4 bg-white text-black" style="font-size: 13px;">
-                        <div class="text-center mb-4" style="font-size: 14px;">
+                    <div id="export-content" class="p-4 bg-white text-black" style="font-size: 15px;">
+                        <div class="text-center mb-4" style="font-size: 16px;">
                             <h2 class="text-xl font-bold">Work Data Sheet</h2>
                             <p class="text-md font-semibold">Name: T.Jeyaraman | Service No: 016696</p>
                             <h3 class="text-lg font-semibold">${months[month]} ${year}</h3>
@@ -984,8 +984,17 @@ document.addEventListener('DOMContentLoaded', () => {
             const spinner = document.getElementById('loading-spinner');
             spinner.style.display = 'flex';
 
+            // To ensure consistent rendering across devices, especially on mobile where the table might
+            // render very wide, we temporarily set a fixed width before capturing with html2canvas.
+            const originalWidth = el.style.width;
+            el.style.width = '1200px';
+
             html2canvas(el, { scale: 3, useCORS: true, backgroundColor: '#ffffff' }).then(canvas => {
+                // Restore the original width after capture
+                el.style.width = originalWidth;
+
                 const { jsPDF } = window.jspdf;
+                // Explicitly create a portrait A4 document
                 const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
                 
                 const imgData = canvas.toDataURL('image/png');
@@ -999,11 +1008,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 let finalImgWidth = pdfWidth;
                 let finalImgHeight = pdfWidth / canvasRatio;
 
+                // If the image is too tall for the page, scale it down to fit the height instead.
+                // This ensures the entire table is visible, though it might be small.
                 if (finalImgHeight > pdfHeight) {
                     finalImgHeight = pdfHeight;
                     finalImgWidth = pdfHeight * canvasRatio;
                 }
 
+                // Center the image on the page
                 const x = (pdfWidth - finalImgWidth) / 2;
                 const y = (pdfHeight - finalImgHeight) / 2;
                 
@@ -1012,6 +1024,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 spinner.style.display = 'none';
 
             }).catch(err => {
+                el.style.width = originalWidth; // Also restore on error
                 console.error('PDF generation failed:', err);
                 alert('Sorry, there was an error generating the PDF.');
                 spinner.style.display = 'none';
