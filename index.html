@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -167,10 +166,12 @@
             word-break: break-word;
         }
 
-        /* Custom Context Menu for Long Press */
-        .custom-context-menu {
+        /* Kebab menu styles */
+        .day-card-menu-dropdown {
             position: absolute;
-            z-index: 1000;
+            top: 100%;
+            right: 0;
+            z-index: 10;
             background: white;
             border-radius: 8px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
@@ -179,12 +180,12 @@
             animation: fadeIn 0.1s ease-out;
             border: 1px solid #e5e7eb;
         }
-        html.dark .custom-context-menu {
-            background: #1f2937; /* gray-800 */
-            border-color: #374151; /* gray-700 */
+         html.dark .day-card-menu-dropdown {
+            background: #1f2937;
+            border-color: #374151;
         }
-        .context-menu-item {
-            padding: 8px 12px;
+        .day-card-menu-item {
+             padding: 8px 12px;
             cursor: pointer;
             border-radius: 4px;
             font-size: 14px;
@@ -192,11 +193,11 @@
             align-items: center;
             gap: 8px;
         }
-        .context-menu-item:hover {
-            background: #f1f5f9; /* slate-100 */
+        .day-card-menu-item:hover {
+             background: #f1f5f9;
         }
-        html.dark .context-menu-item:hover {
-            background: #374151; /* gray-700 */
+        html.dark .day-card-menu-item:hover {
+             background: #374151;
         }
     </style>
 <link rel="stylesheet" href="/index.css">
@@ -440,7 +441,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
         return `
             <div data-day="${day}" class="day-box bg-white dark:bg-gray-900 rounded-2xl p-5 shadow-lg dark:shadow-black/20 border border-gray-200/50 dark:border-gray-800/50 border-b-4 border-b-blue-500 transition-all duration-300 hover:shadow-2xl hover:-translate-y-1">
-                <h3 class="text-lg font-semibold ${weekend ? 'text-red-500 dark:text-red-400' : 'text-gray-900 dark:text-gray-100'} mb-4 pb-4 border-b border-gray-200 dark:border-gray-800">${dayName}, ${months[month]} ${day}, ${year}</h3>
+                <div class="flex justify-between items-center mb-4 pb-4 border-b border-gray-200 dark:border-gray-800">
+                    <h3 class="text-lg font-semibold ${weekend ? 'text-red-500 dark:text-red-400' : 'text-gray-900 dark:text-gray-100'}">${dayName}, ${months[month]} ${day}, ${year}</h3>
+                    <div class="relative">
+                        <button class="day-card-menu-btn p-1 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+                        </button>
+                        <div class="day-card-menu-dropdown hidden">
+                            <div class="day-card-menu-item clear-all-btn">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 2.5a.5.5 0 0 0 0 1h1.841l1.643 3.594a.5.5 0 0 0 .445.306h10.122a.5.5 0 0 0 .445-.306l1.643-3.594H20.5a.5.5 0 0 0 0-1H2.5Z"/><path d="M5.625 7.5 7.5 20h9l1.875-12.5H5.625Z"/></svg>
+                                <span>Clear All</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 
                 <div class="space-y-5">
                     <!-- Time Tracking Section -->
@@ -614,144 +628,46 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const addDayCardEventListeners = () => {
-        // --- START OF LONG PRESS LOGIC ---
-        let longPressTimer;
-        const longPressDuration = 500;
-        let startX, startY;
+        daysContainer.querySelectorAll('.day-box').forEach(dayBox => {
+            const day = dayBox.dataset.day;
 
-        const handlePressStart = (e) => {
-            const target = e.target;
-            const dayBox = target.closest('.day-box');
-            if (!dayBox) return;
+            // Kebab menu logic
+            const menuBtn = dayBox.querySelector('.day-card-menu-btn');
+            const dropdown = dayBox.querySelector('.day-card-menu-dropdown');
+            menuBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                // Close all other menus first
+                document.querySelectorAll('.day-card-menu-dropdown').forEach(d => {
+                    if (d !== dropdown) d.classList.add('hidden');
+                });
+                dropdown.classList.toggle('hidden');
+            });
 
-            startX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
-            startY = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
-
-            longPressTimer = setTimeout(() => {
-                e.preventDefault(); // Prevent default context menu
-                showCustomContextMenuForElement(target, dayBox, startX, startY);
-            }, longPressDuration);
-        };
-
-        const handlePressEnd = () => {
-            clearTimeout(longPressTimer);
-        };
-
-        const handlePressMove = (e) => {
-            if (!longPressTimer) return;
-            const currentX = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
-            const currentY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
-            // If user moves more than 10px, cancel the long press (treat as scroll)
-            if (Math.abs(currentX - startX) > 10 || Math.abs(currentY - startY) > 10) {
-                clearTimeout(longPressTimer);
-            }
-        };
-
-        daysContainer.addEventListener('mousedown', handlePressStart);
-        daysContainer.addEventListener('touchstart', handlePressStart, { passive: false });
-        daysContainer.addEventListener('mouseup', handlePressEnd);
-        daysContainer.addEventListener('mouseleave', handlePressEnd);
-        daysContainer.addEventListener('touchend', handlePressEnd);
-        daysContainer.addEventListener('touchcancel', handlePressEnd);
-        daysContainer.addEventListener('mousemove', handlePressMove);
-        daysContainer.addEventListener('touchmove', handlePressMove);
-        // Explicitly prevent context menu on right-click to allow long-press to take over
-        daysContainer.addEventListener('contextmenu', (e) => {
-            const dayBox = e.target.closest('.day-box');
-            if (dayBox) e.preventDefault();
+            // "Clear All" button logic
+            const clearAllBtn = dayBox.querySelector('.clear-all-btn');
+            clearAllBtn.addEventListener('click', () => {
+                if (confirm('Are you sure you want to clear all data for this day?')) {
+                    clearDayData(day);
+                }
+                dropdown.classList.add('hidden');
+            });
         });
-        // --- END OF LONG PRESS LOGIC ---
 
-        // Regular change event listeners
+        // Add change listeners for all inputs/selects
         daysContainer.querySelectorAll('input, select').forEach(el => {
             el.addEventListener('change', (e) => {
                 const { key, field } = e.target.dataset;
                 updateWorkData(key, field, e.target.value);
             });
         });
-    };
-    
-    // --- START OF CUSTOM CONTEXT MENU LOGIC ---
-    const closeCustomContextMenu = () => {
-        const menu = document.getElementById('custom-context-menu');
-        if (menu) {
-            menu.remove();
-        }
-        window.removeEventListener('click', closeCustomContextMenu);
-        window.removeEventListener('scroll', closeCustomContextMenu);
-    };
 
-    const showCustomContextMenu = (x, y, options) => {
-        closeCustomContextMenu(); // Close any existing menu
-
-        const menu = document.createElement('div');
-        menu.id = 'custom-context-menu';
-        menu.className = 'custom-context-menu';
-
-        options.forEach(option => {
-            const item = document.createElement('div');
-            item.className = 'context-menu-item';
-            item.innerHTML = option.icon + `<span>${option.label}</span>`;
-            item.onclick = () => {
-                option.action();
-                closeCustomContextMenu();
-            };
-            menu.appendChild(item);
-        });
-
-        document.body.appendChild(menu);
-
-        // Position the menu, ensuring it doesn't go off-screen
-        const menuWidth = menu.offsetWidth;
-        const menuHeight = menu.offsetHeight;
-        let finalX = x;
-        let finalY = y;
-        if (x + menuWidth > window.innerWidth) {
-            finalX = window.innerWidth - menuWidth - 10;
-        }
-        if (y + menuHeight > window.innerHeight) {
-            finalY = window.innerHeight - menuHeight - 10;
-        }
-        menu.style.left = `${finalX}px`;
-        menu.style.top = `${finalY}px`;
-
-        // Add listeners to close the menu
-        setTimeout(() => {
-            window.addEventListener('click', closeCustomContextMenu);
-            window.addEventListener('scroll', closeCustomContextMenu);
-        }, 0);
-    };
-
-    const showCustomContextMenuForElement = (target, dayBox, x, y) => {
-        const isInteractiveElement = target.matches('input, select');
-        let options = [];
-
-        if (isInteractiveElement) {
-            options.push({
-                label: 'Clear Field',
-                icon: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5H9.5a2.5 2.5 0 0 0 0 5h.09a2.5 2.5 0 0 1 0 5H9.5a2.5 2.5 0 0 1 0-5H12"/><path d="M16 5h-3a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h3"/></svg>',
-                action: () => {
-                    const { key, field } = target.dataset;
-                    target.value = '';
-                    updateWorkData(key, field, '');
-                }
-            });
-        }
-        
-        options.push({
-            label: 'Clear All Fields',
-            icon: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 2.5a.5.5 0 0 0 0 1h1.841l1.643 3.594a.5.5 0 0 0 .445.306h10.122a.5.5 0 0 0 .445-.306l1.643-3.594H20.5a.5.5 0 0 0 0-1H2.5Z"/><path d="M5.625 7.5 7.5 20h9l1.875-12.5H5.625Z"/></svg>',
-            action: () => {
-                if(confirm('Are you sure you want to clear all data for this day?')) {
-                    clearDayData(dayBox.dataset.day);
-                }
+        // Global click listener to close open menus
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.day-card-menu-btn')) {
+                document.querySelectorAll('.day-card-menu-dropdown').forEach(d => d.classList.add('hidden'));
             }
         });
-
-        showCustomContextMenu(x, y, options);
     };
-    // --- END OF CUSTOM CONTEXT MENU LOGIC ---
-
 
     const addSummaryEventListeners = () => {
         document.getElementById('clear-month-btn').addEventListener('click', handleClearMonthData);
