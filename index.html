@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -931,18 +930,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
             return `
                 <tr class="${rowClass}">
-                    <td class="p-2 border-x border-gray-200 ${dateClass}">${formattedDate}</td>
-                    <td class="p-2 border-x border-gray-200">${dayData.inTime || '-'}</td>
-                    <td class="p-2 border-x border-gray-200">${dayData.outTime || '-'}</td>
-                    <td class="p-2 border-x border-gray-200">${dayData.movementOut || '-'}</td>
-                    <td class="p-2 border-x border-gray-200">${dayData.movementIn || '-'}</td>
-                    <td class="p-2 border-x border-gray-200 break-words">${dayData.teamMembers || '-'}</td>
-                    <td class="p-2 border-x border-gray-200 break-words">${dayData.workLocation || '-'}</td>
-                    <td class="p-2 border-x border-gray-200">${dayData.vehicleNumber || '-'}</td>
-                    <td class="p-2 border-x border-gray-200">${dayData.km || '-'}</td>
-                    <td class="p-2 border-x border-gray-200">${dayData.specialDays || '-'}</td>
-                    <td class="p-2 border-x border-gray-200">${leaveStatusHTML}</td>
-                    <td class="p-2 border-x border-gray-200 break-words">${dayData.leaveReason || '-'}</td>
+                    <td class="p-3 border-x border-gray-200 ${dateClass}">${formattedDate}</td>
+                    <td class="p-3 border-x border-gray-200">${dayData.inTime || '-'}</td>
+                    <td class="p-3 border-x border-gray-200">${dayData.outTime || '-'}</td>
+                    <td class="p-3 border-x border-gray-200">${dayData.movementOut || '-'}</td>
+                    <td class="p-3 border-x border-gray-200">${dayData.movementIn || '-'}</td>
+                    <td class="p-3 border-x border-gray-200 break-words">${dayData.teamMembers || '-'}</td>
+                    <td class="p-3 border-x border-gray-200 break-words">${dayData.workLocation || '-'}</td>
+                    <td class="p-3 border-x border-gray-200">${dayData.vehicleNumber || '-'}</td>
+                    <td class="p-3 border-x border-gray-200">${dayData.km || '-'}</td>
+                    <td class="p-3 border-x border-gray-200">${dayData.specialDays || '-'}</td>
+                    <td class="p-3 border-x border-gray-200">${leaveStatusHTML}</td>
+                    <td class="p-3 border-x border-gray-200 break-words">${dayData.leaveReason || '-'}</td>
                 </tr>`;
         }).join('');
 
@@ -956,8 +955,8 @@ document.addEventListener('DOMContentLoaded', () => {
                             <button data-dismiss="modal" class="px-5 py-2.5 rounded-lg font-semibold text-sm shadow-sm transition-all bg-white text-gray-800 border border-gray-300 hover:bg-gray-100">Close</button>
                         </div>
                     </div>
-                    <div id="export-content" class="p-4 bg-white text-black" style="font-size: 15px;">
-                        <div class="text-center mb-4" style="font-size: 16px;">
+                    <div id="export-content" class="p-4 bg-white text-black" style="font-size: 18px;">
+                        <div class="text-center mb-4" style="font-size: 20px;">
                             <h2 class="text-xl font-bold">Work Data Sheet</h2>
                             <p class="text-md font-semibold">Name: T.Jeyaraman | Service No: 016696</p>
                             <h3 class="text-lg font-semibold">${months[month]} ${year}</h3>
@@ -967,7 +966,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <thead class="bg-gray-100 text-gray-700">
                                     <tr>
                                         ${['Day', 'In', 'Out', 'Mov Out', 'Mov In', 'Team', 'Location', 'Vehicle', 'KM', 'Special', 'Leave', 'Reason'].map(h => 
-                                            `<th class="p-2 border-x border-gray-200 font-semibold">${h}</th>`
+                                            `<th class="p-3 border-x border-gray-200 font-semibold">${h}</th>`
                                         ).join('')}
                                     </tr>
                                 </thead>
@@ -1001,25 +1000,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 const pdfWidth = pdf.internal.pageSize.getWidth();
                 const pdfHeight = pdf.internal.pageSize.getHeight();
                 
-                const canvasWidth = canvas.width;
-                const canvasHeight = canvas.height;
-                const canvasRatio = canvasWidth / canvasHeight;
-
-                let finalImgWidth = pdfWidth;
-                let finalImgHeight = pdfWidth / canvasRatio;
-
-                // If the image is too tall for the page, scale it down to fit the height instead.
-                // This ensures the entire table is visible, though it might be small.
-                if (finalImgHeight > pdfHeight) {
-                    finalImgHeight = pdfHeight;
-                    finalImgWidth = pdfHeight * canvasRatio;
-                }
-
-                // Center the image on the page
-                const x = (pdfWidth - finalImgWidth) / 2;
-                const y = (pdfHeight - finalImgHeight) / 2;
-                
-                pdf.addImage(imgData, 'PNG', x, y, finalImgWidth, finalImgHeight);
+                // Add the image to fill the entire page, which will remove vertical gaps
+                // but may stretch the content slightly. This fulfills the user request.
+                pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
                 pdf.save(`Work_Report_${year}_${month + 1}.pdf`);
                 spinner.style.display = 'none';
 
