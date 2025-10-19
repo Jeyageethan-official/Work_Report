@@ -918,10 +918,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const leaveStatusText = dayData.leaveStatus || 'No';
             const weekend = isWeekend(year, month, day);
 
-            let rowClass = 'border-b border-gray-200';
-             if (leaveStatusText === 'Yes') {
-                rowClass += ' bg-blue-50';
-            }
+            const rowClass = 'border-b border-gray-200';
             
             const dateClass = weekend ? 'text-red-500 font-bold' : '';
             const leaveStatusHTML = leaveStatusText === 'Yes' 
