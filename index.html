@@ -206,12 +206,6 @@
         </div>
     </div>
 
-    <!-- Custom Context Menu -->
-    <div id="custom-context-menu" class="hidden fixed bg-white dark:bg-gray-800 shadow-xl rounded-lg border border-gray-200 dark:border-gray-700 p-2 z-50 text-sm">
-        <button id="context-menu-clear-all" class="w-full text-left px-3 py-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md text-gray-700 dark:text-gray-200">Clear All Data</button>
-        <button id="context-menu-clear-field" class="w-full text-left px-3 py-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md text-gray-700 dark:text-gray-200">Clear This Field</button>
-    </div>
-
 
 <script>
 // ===================================================================================
@@ -274,12 +268,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const scrollUpButton = document.getElementById('scrollUpButton');
     const scrollDownButton = document.getElementById('scrollDownButton');
     const floatingDatePickerBtn = document.getElementById('floating-date-picker-btn');
-    const contextMenu = document.getElementById('custom-context-menu');
-    const contextMenuClearAll = document.getElementById('context-menu-clear-all');
-    const contextMenuClearField = document.getElementById('context-menu-clear-field');
-
-    let longPressTimer = null;
-    let contextTarget = null;
 
     // -----------------------------------------------------------------------------
     // ALL FUNCTION DEFINITIONS
@@ -656,44 +644,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // MODAL & CONTEXT MENU LOGIC
-    const hideContextMenu = () => {
-        if (contextMenu) {
-            contextMenu.classList.add('hidden');
-        }
-        contextTarget = null;
-    };
-
-    const showContextMenu = (event, targetElement) => {
-        event.preventDefault(); // Prevent default right-click menu
-        contextTarget = targetElement; // Store the element that was clicked/pressed
-
-        const isField = contextTarget.tagName === 'INPUT' || contextTarget.tagName === 'SELECT';
-        const dayBox = contextTarget.closest('.day-box');
-
-        if (!dayBox) {
-            hideContextMenu();
-            return;
-        }
-
-        contextMenuClearAll.style.display = 'block';
-        contextMenuClearField.style.display = isField ? 'block' : 'none';
-
-        // Get coordinates for positioning
-        let x, y;
-        if (event.touches) {
-            x = event.touches[0].clientX;
-            y = event.touches[0].clientY;
-        } else {
-            x = event.clientX;
-            y = event.clientY;
-        }
-
-        contextMenu.style.left = `${x}px`;
-        contextMenu.style.top = `${y}px`;
-        contextMenu.classList.remove('hidden');
-    };
-
+    // MODAL CONTENT AND LOGIC
     const showAuthModal = () => {
         const content = `
             <div class="space-y-4">
@@ -964,6 +915,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             
             const dateClass = weekend ? 'text-red-500 font-bold' : '';
+            const leaveStatusHTML = leaveStatusText === 'Yes' 
+                ? `<span class="font-bold text-blue-700">${leaveStatusText}</span>`
+                : leaveStatusText;
 
             return `
                 <tr class="${rowClass}">
@@ -977,7 +931,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <td class="p-2 border-x border-gray-200">${dayData.vehicleNumber || '-'}</td>
                     <td class="p-2 border-x border-gray-200">${dayData.km || '-'}</td>
                     <td class="p-2 border-x border-gray-200">${dayData.specialDays || '-'}</td>
-                    <td class="p-2 border-x border-gray-200">${leaveStatusText}</td>
+                    <td class="p-2 border-x border-gray-200">${leaveStatusHTML}</td>
                     <td class="p-2 border-x border-gray-200 break-words">${dayData.leaveReason || '-'}</td>
                 </tr>`;
         }).join('');
@@ -992,7 +946,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <button data-dismiss="modal" class="px-5 py-2.5 rounded-lg font-semibold text-sm shadow-sm transition-all bg-white text-gray-800 border border-gray-300 hover:bg-gray-100">Close</button>
                         </div>
                     </div>
-                    <div id="export-content" class="p-4 bg-white text-black" style="font-size: 8px;">
+                    <div id="export-content" class="p-4 bg-white text-black" style="font-size: 9px;">
                         <div class="text-center mb-4" style="font-size: 12px;">
                             <h2 class="text-xl font-bold">Work Data Sheet</h2>
                             <p class="text-md font-semibold">Name: T.Jeyaraman | Service No: 016696</p>
@@ -1016,41 +970,11 @@ document.addEventListener('DOMContentLoaded', () => {
         openModal(previewHTML);
 
         document.getElementById('generate-pdf-btn').addEventListener('click', () => {
-            const originalElement = document.getElementById('export-content');
+            const el = document.getElementById('export-content');
             const spinner = document.getElementById('loading-spinner');
             spinner.style.display = 'flex';
 
-            // 1. Clone the element for consistent rendering
-            const clone = originalElement.cloneNode(true);
-            clone.id = 'export-clone';
-
-            // 2. Style the clone to be off-screen and have a fixed width for consistency
-            clone.style.position = 'absolute';
-            clone.style.top = '0';
-            clone.style.left = '-9999px';
-            clone.style.width = '1024px'; // A fixed desktop-like width
-            clone.style.height = 'auto';
-
-            // 3. Apply PDF-only styles to the clone
-            const cells = clone.querySelectorAll('tbody td');
-            cells.forEach(cell => {
-                // Apply blue color for 'Yes' in the Leave column
-                if (cell.cellIndex === 10 && cell.textContent.trim() === 'Yes') {
-                    cell.innerHTML = '<span style="color: #0000FF; font-weight: bold;">Yes</span>';
-                }
-                // Force user-entered data to a single line
-                if ([5, 6, 11].includes(cell.cellIndex)) { // Team, Location, Reason
-                    cell.style.whiteSpace = 'nowrap';
-                    cell.style.overflow = 'hidden';
-                    cell.style.textOverflow = 'ellipsis';
-                }
-            });
-            
-            // 4. Append clone to body to be rendered by html2canvas
-            document.body.appendChild(clone);
-            
-            // 5. Render the CLONE
-            html2canvas(clone, { scale: 3, useCORS: true, backgroundColor: '#ffffff' }).then(canvas => {
+            html2canvas(el, { scale: 3, useCORS: true, backgroundColor: '#ffffff' }).then(canvas => {
                 const { jsPDF } = window.jspdf;
                 const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
                 
@@ -1076,18 +1000,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 pdf.addImage(imgData, 'PNG', x, y, finalImgWidth, finalImgHeight);
                 pdf.save(`Work_Report_${year}_${month + 1}.pdf`);
                 spinner.style.display = 'none';
-                
-                // 6. IMPORTANT: Remove the clone
-                document.body.removeChild(clone);
 
             }).catch(err => {
                 console.error('PDF generation failed:', err);
                 alert('Sorry, there was an error generating the PDF.');
                 spinner.style.display = 'none';
-                // Ensure clone is removed on error
-                if (document.getElementById('export-clone')) {
-                    document.body.removeChild(document.getElementById('export-clone'));
-                }
             });
         });
     };
@@ -1134,65 +1051,6 @@ document.addEventListener('DOMContentLoaded', () => {
     scrollUpButton.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
     scrollDownButton.addEventListener('click', () => window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'smooth' }));
     floatingDatePickerBtn.addEventListener('click', showDatePickerModal);
-
-    // Listeners for Custom Context Menu
-    daysContainer.addEventListener('contextmenu', (e) => {
-        showContextMenu(e, e.target);
-    });
-
-    daysContainer.addEventListener('touchstart', (e) => {
-        longPressTimer = setTimeout(() => {
-            showContextMenu(e, e.target);
-            longPressTimer = null;
-        }, 700);
-    });
-
-    const cancelLongPress = () => {
-        if (longPressTimer) {
-            clearTimeout(longPressTimer);
-            longPressTimer = null;
-        }
-    };
-
-    daysContainer.addEventListener('touchend', cancelLongPress);
-    daysContainer.addEventListener('touchmove', cancelLongPress);
-
-    document.addEventListener('click', (e) => {
-        if (!contextMenu.contains(e.target)) {
-            hideContextMenu();
-        }
-    });
-
-    contextMenuClearAll.addEventListener('click', () => {
-        if (contextTarget) {
-            const dayBox = contextTarget.closest('.day-box');
-            if (dayBox) {
-                const day = dayBox.dataset.day;
-                const dateKey = `${currentDate.getFullYear()}-${currentDate.getMonth()}-${day}`;
-                if (workData[dateKey]) {
-                    delete workData[dateKey];
-                    saveLocalData();
-                    syncToCloud();
-                    renderAll(); 
-                }
-            }
-        }
-        hideContextMenu();
-    });
-
-    contextMenuClearField.addEventListener('click', () => {
-        if (contextTarget && (contextTarget.tagName === 'INPUT' || contextTarget.tagName === 'SELECT')) {
-            const { key, field } = contextTarget.dataset;
-            if (contextTarget.tagName === 'SELECT') {
-                contextTarget.selectedIndex = 0;
-            } else {
-                contextTarget.value = '';
-            }
-            updateWorkData(key, field, '');
-        }
-        hideContextMenu();
-    });
-
 
     // Firebase setup and authentication handling
     const firebaseConfig = {
