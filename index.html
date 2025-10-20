@@ -533,9 +533,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                 </div>
                 
-                <div class="space-y-5">
+                <div class="space-y-6">
                     <!-- Time Tracking Section -->
-                    <div class="grid grid-cols-2 gap-4">
+                    <div class="grid grid-cols-2 gap-6">
                         <div class="space-y-4">
                             ${createInput('In Time', 'inTime', 'time', '', dayData.inTime)}
                             ${createInput('Out Time', 'outTime', 'time', '', dayData.outTime)}
@@ -574,7 +574,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const daysInMonth = getDaysInMonth(currentDate.getFullYear(), currentDate.getMonth());
         daysContainer.innerHTML = Array.from({ length: daysInMonth }, (_, i) => createDayCardHTML(i + 1)).join('');
         addDayCardEventListeners();
-        scrollToToday();
     };
 
     const renderSummary = () => {
@@ -766,19 +765,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 input.value = '';
                 e.currentTarget.classList.add('hidden');
 
-                if (workData[dateKey]) {
+                if (workData[dateKey] && workData[dateKey][field]) {
                     delete workData[dateKey][field];
-                }
-                saveLocalData();
+                    saveLocalData();
 
-                if (user) {
-                    const userRef = db.collection("users").doc(user.uid);
-                    const fieldPath = `workData.${dateKey}.${field}`;
-                    userRef.update({
-                        [fieldPath]: firebase.firestore.FieldValue.delete()
-                    }).catch(err => {
-                        console.error("Firestore field delete error:", err);
-                    });
+                    if (user) {
+                        const userRef = db.collection("users").doc(user.uid);
+                        const fieldPath = `workData.${dateKey}.${field}`;
+                        userRef.update({
+                            [fieldPath]: firebase.firestore.FieldValue.delete()
+                        }).catch(err => {
+                            console.error("Firestore field delete error:", err);
+                        });
+                    }
                 }
                 renderSummary();
             });
@@ -1409,6 +1408,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const initializeApp = () => {
         reminders = JSON.parse(localStorage.getItem('reminders') || '[]');
         renderAll();
+        scrollToToday();
         loadingSpinner.style.opacity = '0';
         setTimeout(() => {
             loadingSpinner.style.display = 'none';
