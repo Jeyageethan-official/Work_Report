@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -31,6 +30,10 @@
         body {
             font-family: 'Inter', sans-serif;
             transition: background 0.3s ease;
+        }
+        /* Smoother theme transitions */
+        body, .bg-white, .bg-gray-50, .dark .dark\:bg-gray-900, .dark .dark\:bg-gray-950, .premium-input, .premium-select {
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
         }
         html:not(.dark) body {
             background-color: var(--bg-light);
@@ -167,10 +170,12 @@
             word-break: break-word;
         }
 
-        /* Custom Context Menu for Long Press */
-        .custom-context-menu {
+        /* Kebab menu styles */
+        .day-card-menu-dropdown {
             position: absolute;
-            z-index: 1000;
+            top: 100%;
+            right: 0;
+            z-index: 10;
             background: white;
             border-radius: 8px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
@@ -179,37 +184,69 @@
             animation: fadeIn 0.1s ease-out;
             border: 1px solid #e5e7eb;
         }
-        html.dark .custom-context-menu {
-            background: #1f2937; /* gray-800 */
-            border-color: #374151; /* gray-700 */
+         html.dark .day-card-menu-dropdown {
+            background: #1f2937;
+            border-color: #374151;
         }
-        .context-menu-item {
-            padding: 8px 12px;
+        .day-card-menu-item {
+             padding: 8px 12px;
             cursor: pointer;
             border-radius: 4px;
             font-size: 14px;
             display: flex;
             align-items: center;
             gap: 8px;
+            transition: background-color 0.2s;
         }
-        .context-menu-item:hover {
-            background: #f1f5f9; /* slate-100 */
+        .day-card-menu-item:hover {
+             background: #f1f5f9;
         }
-        html.dark .context-menu-item:hover {
-            background: #374151; /* gray-700 */
+        html.dark .day-card-menu-item:hover {
+             background: #374151;
+        }
+
+        /* AI Assistant Button Pulse */
+        @keyframes pulse-glow {
+            0%, 100% {
+                box-shadow: 0 0 0 0 rgba(96, 165, 250, 0.7);
+            }
+            50% {
+                box-shadow: 0 0 0 6px rgba(96, 165, 250, 0);
+            }
+        }
+        .ai-btn-pulse {
+            animation: pulse-glow 2.5s infinite;
+        }
+
+        /* Small inline loader for AI modal */
+        .loader-small {
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #3498db;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        html.dark .loader-small {
+            border-top-color: #60a5fa;
         }
     </style>
-<link rel="stylesheet" href="/index.css">
 <script type="importmap">
 {
   "imports": {
     "react": "https://aistudiocdn.com/react@^19.2.0",
     "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
     "react/": "https://aistudiocdn.com/react@^19.2.0/",
-    "firebase/": "https://aistudiocdn.com/firebase@^12.4.0/"
+    "firebase/": "https://aistudiocdn.com/firebase@^12.4.0/",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^0.14.0"
   }
 }
 </script>
+<link rel="stylesheet" href="/index.css">
 </head>
 <body class="bg-gray-50 dark:bg-gray-950">
 
@@ -234,7 +271,7 @@
     <!-- Scroll Buttons -->
     <div class="fixed bottom-6 right-6 flex flex-col gap-3 z-40">
         <button id="floating-date-picker-btn" title="Go to Date" class="w-12 h-12 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm text-gray-700 dark:text-gray-200 rounded-full shadow-lg flex items-center justify-center hover:bg-white dark:hover:bg-gray-700 hover:text-blue-600 transition-all duration-200 hidden">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
         </button>
         <button id="scrollUpButton" class="w-12 h-12 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm text-gray-700 dark:text-gray-200 rounded-full shadow-lg flex items-center justify-center hover:bg-white dark:hover:bg-gray-700 hover:text-blue-600 transition-all duration-200 hidden">↑</button>
         <button id="scrollDownButton" class="w-12 h-12 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm text-gray-700 dark:text-gray-200 rounded-full shadow-lg flex items-center justify-center hover:bg-white dark:hover:bg-gray-700 hover:text-blue-600 transition-all duration-200">↓</button>
@@ -400,6 +437,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     <button id="next-month-btn" class="p-2 text-gray-500 hover:bg-gray-100 hover:text-blue-600 dark:text-gray-400 dark:hover:bg-gray-800 rounded-md transition-colors">→</button>
                 </div>
                 <div class="flex items-center gap-2 bg-white dark:bg-gray-900 p-2 rounded-full border border-gray-200 dark:border-gray-800 shadow-sm">
+                    <button id="ai-assistant-btn" title="AI Assistant" class="p-2 text-gray-500 hover:bg-gray-100 hover:text-blue-600 dark:text-gray-400 dark:hover:bg-gray-800 rounded-full transition-colors ai-btn-pulse">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/></svg>
+                    </button>
                     <button id="date-picker-btn" title="Go to Date" class="p-2 text-gray-500 hover:bg-gray-100 hover:text-blue-600 dark:text-gray-400 dark:hover:bg-gray-800 rounded-full transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></button>
                     <button id="theme-toggle-btn" title="Toggle Theme" class="p-2 text-gray-500 hover:bg-gray-100 hover:text-blue-600 dark:text-gray-400 dark:hover:bg-gray-800 rounded-full transition-colors">
                         <svg id="theme-icon-sun" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 ${isDarkMode ? '' : 'hidden'}"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
@@ -440,7 +480,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
         return `
             <div data-day="${day}" class="day-box bg-white dark:bg-gray-900 rounded-2xl p-5 shadow-lg dark:shadow-black/20 border border-gray-200/50 dark:border-gray-800/50 border-b-4 border-b-blue-500 transition-all duration-300 hover:shadow-2xl hover:-translate-y-1">
-                <h3 class="text-lg font-semibold ${weekend ? 'text-red-500 dark:text-red-400' : 'text-gray-900 dark:text-gray-100'} mb-4 pb-4 border-b border-gray-200 dark:border-gray-800">${dayName}, ${months[month]} ${day}, ${year}</h3>
+                <div class="flex justify-between items-center mb-4 pb-4 border-b border-gray-200 dark:border-gray-800">
+                    <h3 class="text-lg font-semibold ${weekend ? 'text-red-500 dark:text-red-400' : 'text-gray-900 dark:text-gray-100'}">${dayName}, ${months[month]} ${day}, ${year}</h3>
+                    <div class="relative">
+                        <button class="day-card-menu-btn p-1 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+                        </button>
+                        <div class="day-card-menu-dropdown hidden">
+                            <div class="day-card-menu-item clear-all-btn">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 2.5a.5.5 0 0 0 0 1h1.841l1.643 3.594a.5.5 0 0 0 .445.306h10.122a.5.5 0 0 0 .445-.306l1.643-3.594H20.5a.5.5 0 0 0 0-1H2.5Z"/><path d="M5.625 7.5 7.5 20h9l1.875-12.5H5.625Z"/></svg>
+                                <span>Clear All</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 
                 <div class="space-y-5">
                     <!-- Time Tracking Section -->
@@ -611,147 +664,50 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('reminder-btn').addEventListener('click', showReminderModal);
         document.getElementById('share-btn').addEventListener('click', showShareModal);
         document.getElementById('date-picker-btn').addEventListener('click', showDatePickerModal);
+        document.getElementById('ai-assistant-btn').addEventListener('click', showAiModal);
     };
 
     const addDayCardEventListeners = () => {
-        // --- START OF LONG PRESS LOGIC ---
-        let longPressTimer;
-        const longPressDuration = 500;
-        let startX, startY;
+        daysContainer.querySelectorAll('.day-box').forEach(dayBox => {
+            const day = dayBox.dataset.day;
 
-        const handlePressStart = (e) => {
-            const target = e.target;
-            const dayBox = target.closest('.day-box');
-            if (!dayBox) return;
+            // Kebab menu logic
+            const menuBtn = dayBox.querySelector('.day-card-menu-btn');
+            const dropdown = dayBox.querySelector('.day-card-menu-dropdown');
+            menuBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                // Close all other menus first
+                document.querySelectorAll('.day-card-menu-dropdown').forEach(d => {
+                    if (d !== dropdown) d.classList.add('hidden');
+                });
+                dropdown.classList.toggle('hidden');
+            });
 
-            startX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
-            startY = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
-
-            longPressTimer = setTimeout(() => {
-                e.preventDefault(); // Prevent default context menu
-                showCustomContextMenuForElement(target, dayBox, startX, startY);
-            }, longPressDuration);
-        };
-
-        const handlePressEnd = () => {
-            clearTimeout(longPressTimer);
-        };
-
-        const handlePressMove = (e) => {
-            if (!longPressTimer) return;
-            const currentX = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
-            const currentY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
-            // If user moves more than 10px, cancel the long press (treat as scroll)
-            if (Math.abs(currentX - startX) > 10 || Math.abs(currentY - startY) > 10) {
-                clearTimeout(longPressTimer);
-            }
-        };
-
-        daysContainer.addEventListener('mousedown', handlePressStart);
-        daysContainer.addEventListener('touchstart', handlePressStart, { passive: false });
-        daysContainer.addEventListener('mouseup', handlePressEnd);
-        daysContainer.addEventListener('mouseleave', handlePressEnd);
-        daysContainer.addEventListener('touchend', handlePressEnd);
-        daysContainer.addEventListener('touchcancel', handlePressEnd);
-        daysContainer.addEventListener('mousemove', handlePressMove);
-        daysContainer.addEventListener('touchmove', handlePressMove);
-        // Explicitly prevent context menu on right-click to allow long-press to take over
-        daysContainer.addEventListener('contextmenu', (e) => {
-            const dayBox = e.target.closest('.day-box');
-            if (dayBox) e.preventDefault();
+            // "Clear All" button logic
+            const clearAllBtn = dayBox.querySelector('.clear-all-btn');
+            clearAllBtn.addEventListener('click', () => {
+                if (confirm('Are you sure you want to clear all data for this day?')) {
+                    clearDayData(day);
+                }
+                dropdown.classList.add('hidden');
+            });
         });
-        // --- END OF LONG PRESS LOGIC ---
 
-        // Regular change event listeners
+        // Add change listeners for all inputs/selects
         daysContainer.querySelectorAll('input, select').forEach(el => {
             el.addEventListener('change', (e) => {
                 const { key, field } = e.target.dataset;
                 updateWorkData(key, field, e.target.value);
             });
         });
-    };
-    
-    // --- START OF CUSTOM CONTEXT MENU LOGIC ---
-    const closeCustomContextMenu = () => {
-        const menu = document.getElementById('custom-context-menu');
-        if (menu) {
-            menu.remove();
-        }
-        window.removeEventListener('click', closeCustomContextMenu);
-        window.removeEventListener('scroll', closeCustomContextMenu);
-    };
 
-    const showCustomContextMenu = (x, y, options) => {
-        closeCustomContextMenu(); // Close any existing menu
-
-        const menu = document.createElement('div');
-        menu.id = 'custom-context-menu';
-        menu.className = 'custom-context-menu';
-
-        options.forEach(option => {
-            const item = document.createElement('div');
-            item.className = 'context-menu-item';
-            item.innerHTML = option.icon + `<span>${option.label}</span>`;
-            item.onclick = () => {
-                option.action();
-                closeCustomContextMenu();
-            };
-            menu.appendChild(item);
-        });
-
-        document.body.appendChild(menu);
-
-        // Position the menu, ensuring it doesn't go off-screen
-        const menuWidth = menu.offsetWidth;
-        const menuHeight = menu.offsetHeight;
-        let finalX = x;
-        let finalY = y;
-        if (x + menuWidth > window.innerWidth) {
-            finalX = window.innerWidth - menuWidth - 10;
-        }
-        if (y + menuHeight > window.innerHeight) {
-            finalY = window.innerHeight - menuHeight - 10;
-        }
-        menu.style.left = `${finalX}px`;
-        menu.style.top = `${finalY}px`;
-
-        // Add listeners to close the menu
-        setTimeout(() => {
-            window.addEventListener('click', closeCustomContextMenu);
-            window.addEventListener('scroll', closeCustomContextMenu);
-        }, 0);
-    };
-
-    const showCustomContextMenuForElement = (target, dayBox, x, y) => {
-        const isInteractiveElement = target.matches('input, select');
-        let options = [];
-
-        if (isInteractiveElement) {
-            options.push({
-                label: 'Clear Field',
-                icon: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5H9.5a2.5 2.5 0 0 0 0 5h.09a2.5 2.5 0 0 1 0 5H9.5a2.5 2.5 0 0 1 0-5H12"/><path d="M16 5h-3a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h3"/></svg>',
-                action: () => {
-                    const { key, field } = target.dataset;
-                    target.value = '';
-                    updateWorkData(key, field, '');
-                }
-            });
-        }
-        
-        options.push({
-            label: 'Clear All Fields',
-            icon: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 2.5a.5.5 0 0 0 0 1h1.841l1.643 3.594a.5.5 0 0 0 .445.306h10.122a.5.5 0 0 0 .445-.306l1.643-3.594H20.5a.5.5 0 0 0 0-1H2.5Z"/><path d="M5.625 7.5 7.5 20h9l1.875-12.5H5.625Z"/></svg>',
-            action: () => {
-                if(confirm('Are you sure you want to clear all data for this day?')) {
-                    clearDayData(dayBox.dataset.day);
-                }
+        // Global click listener to close open menus
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.day-card-menu-btn')) {
+                document.querySelectorAll('.day-card-menu-dropdown').forEach(d => d.classList.add('hidden'));
             }
         });
-
-        showCustomContextMenu(x, y, options);
     };
-    // --- END OF CUSTOM CONTEXT MENU LOGIC ---
-
 
     const addSummaryEventListeners = () => {
         document.getElementById('clear-month-btn').addEventListener('click', handleClearMonthData);
@@ -1079,6 +1035,77 @@ document.addEventListener('DOMContentLoaded', () => {
                 .catch(() => alert('Failed to copy summary.'));
         });
         document.getElementById('export-pdf-btn').addEventListener('click', showExportPreview);
+    };
+
+     const showAiModal = () => {
+        const content = `
+            <div class="space-y-4">
+                <p class="text-sm text-gray-600 dark:text-gray-400">
+                    Type your leave reason or message in Tanglish (Tamil + English). The AI will convert it into a professional English message.
+                </p>
+                <div>
+                    <label for="ai-input" class="font-medium text-sm mb-1.5 text-gray-700 dark:text-gray-300">Your Message</label>
+                    <textarea id="ai-input" rows="4" placeholder="e.g., sir naan inniku office varamudiyathu health illa" class="w-full p-2 border border-gray-300 rounded-lg bg-gray-50/50 transition duration-200 premium-input dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200"></textarea>
+                </div>
+                <button id="generate-ai-message-btn" class="w-full flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg font-semibold text-sm shadow-sm transition-all duration-200 transform hover:scale-[1.03] bg-blue-600 text-white hover:bg-blue-700">
+                    <span>Convert to Professional English</span>
+                    <div id="ai-spinner" class="loader-small hidden"></div>
+                </button>
+                <div id="ai-output-container" class="hidden space-y-2 pt-4 border-t border-gray-200 dark:border-gray-700">
+                    <label class="font-medium text-sm text-gray-700 dark:text-gray-300">Generated Message</label>
+                    <div class="relative">
+                        <p id="ai-output" class="p-4 bg-gray-100 dark:bg-gray-800/50 rounded-lg text-gray-800 dark:text-gray-200 whitespace-pre-wrap min-h-[50px]"></p>
+                        <button id="copy-ai-output-btn" title="Copy to clipboard" class="absolute top-2 right-2 p-1.5 text-gray-500 hover:bg-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 rounded-md">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+        openModal(createModal('AI Professional Message Assistant', content));
+        
+        document.getElementById('generate-ai-message-btn').addEventListener('click', async () => {
+            const inputEl = document.getElementById('ai-input');
+            const outputContainer = document.getElementById('ai-output-container');
+            const outputEl = document.getElementById('ai-output');
+            const spinner = document.getElementById('ai-spinner');
+            const button = document.getElementById('generate-ai-message-btn');
+            
+            const userInput = inputEl.value.trim();
+            if (!userInput) {
+                alert('Please enter a message.');
+                return;
+            }
+
+            spinner.classList.remove('hidden');
+            button.disabled = true;
+
+            try {
+                // This function is defined in a module script below and attached to window
+                const result = await window.generateProfessionalMessage(userInput);
+                outputEl.textContent = result;
+                outputContainer.classList.remove('hidden');
+            } catch (error) {
+                console.error(error);
+                outputEl.textContent = 'Sorry, an error occurred. Please try again.';
+                outputContainer.classList.remove('hidden');
+            } finally {
+                spinner.classList.add('hidden');
+                button.disabled = false;
+            }
+        });
+
+        document.querySelector('#modal-root').addEventListener('click', (e) => {
+            const copyBtn = e.target.closest('#copy-ai-output-btn');
+            if (copyBtn) {
+                const textToCopy = document.getElementById('ai-output').textContent;
+                navigator.clipboard.writeText(textToCopy).then(() => {
+                    alert('Copied to clipboard!');
+                }, () => {
+                    alert('Failed to copy.');
+                });
+            }
+        });
     };
 
     const showExportPreview = () => {
