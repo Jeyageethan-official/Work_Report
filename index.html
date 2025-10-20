@@ -259,7 +259,6 @@
   }
 }
 </script>
-<link rel="stylesheet" href="/index.css">
 </head>
 <body class="bg-gray-50 dark:bg-gray-950">
 
@@ -1050,6 +1049,52 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('export-pdf-btn').addEventListener('click', showExportPreview);
     };
 
+    const showPermissionGuidanceModal = () => {
+        const ua = navigator.userAgent;
+        let browserSpecificInstructions = '';
+
+        if (ua.indexOf("Firefox") > -1) {
+            browserSpecificInstructions = `
+                <p class="text-sm">1. Click the 🔒 lock icon in the address bar.</p>
+                <p class="text-sm">2. Find "Microphone" and click the "x" to clear the setting.</p>
+                <p class="text-sm">3. Try the microphone again; it will ask for permission.</p>
+                <img src="https://i.imgur.com/bgyrSjx.png" alt="Firefox microphone permission" class="mt-2 rounded-lg border dark:border-gray-700"/>
+            `;
+        } else if (ua.indexOf("Safari") > -1 && !ua.indexOf("Chrome") > -1) {
+            browserSpecificInstructions = `
+                <p class="text-sm">1. With this page open, go to <span class="font-semibold">Safari > Settings for This Website...</span> in the menu bar.</p>
+                <p class="text-sm">2. Find "Microphone" and set it to <span class="font-semibold">"Allow"</span>.</p>
+                <p class="text-sm">3. Reload the page if needed.</p>
+                 <img src="https://i.imgur.com/LqLg46v.png" alt="Safari microphone permission" class="mt-2 rounded-lg border dark:border-gray-700"/>
+            `;
+        } else { // Default to Chrome-based browsers
+             browserSpecificInstructions = `
+                <p class="text-sm">1. Click the 🔒 lock icon in the address bar.</p>
+                <p class="text-sm">2. Turn on the toggle next to "Microphone".</p>
+                <p class="text-sm">3. You may need to reload the page.</p>
+                <img src="https://i.imgur.com/G526s0y.png" alt="Chrome microphone permission" class="mt-2 rounded-lg border dark:border-gray-700"/>
+            `;
+        }
+
+        const content = `
+            <div class="space-y-4">
+                <p class="text-base font-semibold">Microphone Access is Blocked</p>
+                <div class="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg border dark:border-gray-700 text-gray-700 dark:text-gray-300">
+                    ${browserSpecificInstructions}
+                </div>
+                <p class="text-xs text-gray-500 dark:text-gray-400">After enabling the permission in your browser settings, click the button below to try again.</p>
+                <button id="retry-mic-permission-btn" class="w-full mt-4 px-5 py-2.5 rounded-lg font-semibold text-sm shadow-sm transition-all bg-blue-600 text-white hover:bg-blue-700">I've Enabled It, Try Again</button>
+            </div>
+        `;
+        openModal(createModal('Action Required', content, 'permission-guidance-modal'));
+
+        document.getElementById('retry-mic-permission-btn').addEventListener('click', () => {
+            closeModal();
+            // We find the mic button in the main AI modal and click it programmatically
+            document.getElementById('voice-input-btn')?.click();
+        });
+    };
+
      const showAiModal = () => {
         const content = `
             <div class="space-y-4">
@@ -1083,7 +1128,6 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
         openModal(createModal('AI Professional Message Assistant', content));
         
-        // --- AI and Voice Logic ---
         const inputEl = document.getElementById('ai-input');
         const outputContainer = document.getElementById('ai-output-container');
         const outputEl = document.getElementById('ai-output');
@@ -1091,30 +1135,24 @@ document.addEventListener('DOMContentLoaded', () => {
         const generateBtn = document.getElementById('generate-ai-message-btn');
         const voiceBtn = document.getElementById('voice-input-btn');
         const copyBtn = document.getElementById('copy-ai-output-btn');
-        const errorContainer = document.getElementById('ai-error-container');
-
-        // Speech Recognition Setup
+        
+        // --- Speech Recognition Logic ---
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        if (!SpeechRecognition) {
-            voiceBtn.style.display = 'none';
-        } else {
-            const recognition = new SpeechRecognition();
-            recognition.lang = 'ta-IN'; // Tamil (India)
+        let recognition;
+        let isListening = false;
+        
+        if (SpeechRecognition) {
+            recognition = new SpeechRecognition();
+            recognition.lang = 'ta-IN';
             recognition.interimResults = true;
             recognition.continuous = true;
-            let isListening = false;
 
             recognition.onresult = (event) => {
-                let interimTranscript = '';
                 let finalTranscript = '';
-                for (let i = event.resultIndex; i < event.results.length; ++i) {
-                    if (event.results[i].isFinal) {
-                        finalTranscript += event.results[i][0].transcript;
-                    } else {
-                        interimTranscript += event.results[i][0].transcript;
-                    }
+                for (let i = 0; i < event.results.length; i++) {
+                    finalTranscript += event.results[i][0].transcript;
                 }
-                inputEl.value = finalTranscript + interimTranscript;
+                inputEl.value = finalTranscript;
             };
 
             recognition.onstart = () => {
@@ -1127,40 +1165,61 @@ document.addEventListener('DOMContentLoaded', () => {
                 voiceBtn.classList.remove('voice-btn-listening');
             };
 
-             recognition.onerror = (event) => {
+            recognition.onerror = (event) => {
                 console.error('Speech recognition error:', event.error);
                 isListening = false;
                 voiceBtn.classList.remove('voice-btn-listening');
-                
-                if (event.error === 'service-not-allowed' || event.error === 'not-allowed') {
-                    errorContainer.innerHTML = `
-                        <strong class="font-semibold">Microphone access denied.</strong><br>
-                        To use voice input, please allow microphone access in your browser's site settings. Look for a lock icon (🔒) in the address bar to change permissions.
-                    `;
-                    errorContainer.classList.remove('hidden');
-                } else {
-                    errorContainer.textContent = `Speech recognition error: ${event.error}. Please try again.`;
-                    errorContainer.classList.remove('hidden');
+                if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+                    showPermissionGuidanceModal();
                 }
             };
-
-            voiceBtn.addEventListener('click', () => {
-                errorContainer.classList.add('hidden'); // Hide error on new attempt
-                if (isListening) {
-                    recognition.stop();
-                } else {
-                    try {
-                       recognition.start();
-                    } catch(e) {
-                         errorContainer.textContent = `Could not start voice recognition. Please ensure your browser is up to date.`;
-                         errorContainer.classList.remove('hidden');
-                    }
-                }
-            });
+        } else {
+             voiceBtn.style.display = 'none';
         }
+
+        const handleVoiceClick = async () => {
+             if (!recognition) return;
+
+             if (isListening) {
+                recognition.stop();
+                return;
+             }
+             
+             try {
+                const permissionStatus = await navigator.permissions.query({ name: 'microphone' });
+
+                if (permissionStatus.state === 'granted') {
+                    recognition.start();
+                } else if (permissionStatus.state === 'prompt') {
+                    // This will trigger the browser's permission pop-up
+                    recognition.start(); 
+                } else if (permissionStatus.state === 'denied') {
+                    // If denied, we show our custom guidance modal
+                    showPermissionGuidanceModal();
+                }
+                 
+                permissionStatus.onchange = () => {
+                    if(permissionStatus.state === 'granted' && !isListening) {
+                       recognition.start();
+                    }
+                };
+
+             } catch (err) {
+                console.error("Permissions API error:", err);
+                // Fallback for older browsers that might not support Permissions API
+                try {
+                   recognition.start();
+                } catch (e) {
+                   if (e.name === 'NotAllowedError' || e.name === 'SecurityError') {
+                       showPermissionGuidanceModal();
+                   }
+                }
+             }
+        };
+        
+        voiceBtn.addEventListener('click', handleVoiceClick);
         
         generateBtn.addEventListener('click', async () => {
-            errorContainer.classList.add('hidden');
             const userInput = inputEl.value.trim();
             if (!userInput) {
                 alert('Please enter a message.');
@@ -1422,6 +1481,5 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 </script>
-<script type="module" src="/index.tsx"></script>
 </body>
-</html>
+</html>enna ippadi varuthu
