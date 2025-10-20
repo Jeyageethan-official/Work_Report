@@ -1,8 +1,0 @@
-
-{
-  "description": "A comprehensive work journal to track daily activities, manage leave, and generate monthly summaries with AI-powered assistance.",
-  "requestFramePermissions": [
-    "microphone"
-  ],
-  "name": "Work Journal"
-}
