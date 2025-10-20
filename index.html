@@ -234,6 +234,19 @@
         html.dark .loader-small {
             border-top-color: #60a5fa;
         }
+
+        /* AI Voice Input Button */
+        @keyframes pulse-mic {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+        .voice-btn-listening svg {
+            color: #ef4444; /* red-500 */
+            animation: pulse-mic 1.5s infinite ease-in-out;
+        }
+        html.dark .voice-btn-listening svg {
+            color: #f87171; /* red-400 */
+        }
     </style>
 <script type="importmap">
 {
@@ -246,6 +259,7 @@
   }
 }
 </script>
+<link rel="stylesheet" href="/index.css">
 </head>
 <body class="bg-gray-50 dark:bg-gray-950">
 
@@ -1040,12 +1054,18 @@ document.addEventListener('DOMContentLoaded', () => {
         const content = `
             <div class="space-y-4">
                 <p class="text-sm text-gray-600 dark:text-gray-400">
-                    Type your leave reason or message in Tanglish (Tamil + English). The AI will convert it into a professional English message.
+                    Speak or type your leave reason in Tanglish (Tamil + English). The AI will convert it into a professional English message.
                 </p>
                 <div>
-                    <label for="ai-input" class="font-medium text-sm mb-1.5 text-gray-700 dark:text-gray-300">Your Message</label>
+                    <div class="flex justify-between items-center mb-1.5">
+                        <label for="ai-input" class="font-medium text-sm text-gray-700 dark:text-gray-300">Your Message</label>
+                        <button id="voice-input-btn" title="Speak your message" class="p-1.5 text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 rounded-full transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line></svg>
+                        </button>
+                    </div>
                     <textarea id="ai-input" rows="4" placeholder="e.g., sir naan inniku office varamudiyathu health illa" class="w-full p-2 border border-gray-300 rounded-lg bg-gray-50/50 transition duration-200 premium-input dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200"></textarea>
                 </div>
+                <div id="ai-error-container" class="hidden text-sm text-red-600 dark:text-red-400 mt-2 p-3 bg-red-50 dark:bg-red-950/20 rounded-lg border border-red-200 dark:border-red-800/50"></div>
                 <button id="generate-ai-message-btn" class="w-full flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg font-semibold text-sm shadow-sm transition-all duration-200 transform hover:scale-[1.03] bg-blue-600 text-white hover:bg-blue-700">
                     <span>Convert to Professional English</span>
                     <div id="ai-spinner" class="loader-small hidden"></div>
@@ -1055,7 +1075,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="relative">
                         <p id="ai-output" class="p-4 bg-gray-100 dark:bg-gray-800/50 rounded-lg text-gray-800 dark:text-gray-200 whitespace-pre-wrap min-h-[50px]"></p>
                         <button id="copy-ai-output-btn" title="Copy to clipboard" class="absolute top-2 right-2 p-1.5 text-gray-500 hover:bg-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 rounded-md">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                            <span class="copy-icon-span"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></span>
                         </button>
                     </div>
                 </div>
@@ -1063,13 +1083,84 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
         openModal(createModal('AI Professional Message Assistant', content));
         
-        document.getElementById('generate-ai-message-btn').addEventListener('click', async () => {
-            const inputEl = document.getElementById('ai-input');
-            const outputContainer = document.getElementById('ai-output-container');
-            const outputEl = document.getElementById('ai-output');
-            const spinner = document.getElementById('ai-spinner');
-            const button = document.getElementById('generate-ai-message-btn');
-            
+        // --- AI and Voice Logic ---
+        const inputEl = document.getElementById('ai-input');
+        const outputContainer = document.getElementById('ai-output-container');
+        const outputEl = document.getElementById('ai-output');
+        const spinner = document.getElementById('ai-spinner');
+        const generateBtn = document.getElementById('generate-ai-message-btn');
+        const voiceBtn = document.getElementById('voice-input-btn');
+        const copyBtn = document.getElementById('copy-ai-output-btn');
+        const errorContainer = document.getElementById('ai-error-container');
+
+        // Speech Recognition Setup
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) {
+            voiceBtn.style.display = 'none';
+        } else {
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'ta-IN'; // Tamil (India)
+            recognition.interimResults = true;
+            recognition.continuous = true;
+            let isListening = false;
+
+            recognition.onresult = (event) => {
+                let interimTranscript = '';
+                let finalTranscript = '';
+                for (let i = event.resultIndex; i < event.results.length; ++i) {
+                    if (event.results[i].isFinal) {
+                        finalTranscript += event.results[i][0].transcript;
+                    } else {
+                        interimTranscript += event.results[i][0].transcript;
+                    }
+                }
+                inputEl.value = finalTranscript + interimTranscript;
+            };
+
+            recognition.onstart = () => {
+                isListening = true;
+                voiceBtn.classList.add('voice-btn-listening');
+            };
+
+            recognition.onend = () => {
+                isListening = false;
+                voiceBtn.classList.remove('voice-btn-listening');
+            };
+
+             recognition.onerror = (event) => {
+                console.error('Speech recognition error:', event.error);
+                isListening = false;
+                voiceBtn.classList.remove('voice-btn-listening');
+                
+                if (event.error === 'service-not-allowed' || event.error === 'not-allowed') {
+                    errorContainer.innerHTML = `
+                        <strong class="font-semibold">Microphone access denied.</strong><br>
+                        To use voice input, please allow microphone access in your browser's site settings. Look for a lock icon (🔒) in the address bar to change permissions.
+                    `;
+                    errorContainer.classList.remove('hidden');
+                } else {
+                    errorContainer.textContent = `Speech recognition error: ${event.error}. Please try again.`;
+                    errorContainer.classList.remove('hidden');
+                }
+            };
+
+            voiceBtn.addEventListener('click', () => {
+                errorContainer.classList.add('hidden'); // Hide error on new attempt
+                if (isListening) {
+                    recognition.stop();
+                } else {
+                    try {
+                       recognition.start();
+                    } catch(e) {
+                         errorContainer.textContent = `Could not start voice recognition. Please ensure your browser is up to date.`;
+                         errorContainer.classList.remove('hidden');
+                    }
+                }
+            });
+        }
+        
+        generateBtn.addEventListener('click', async () => {
+            errorContainer.classList.add('hidden');
             const userInput = inputEl.value.trim();
             if (!userInput) {
                 alert('Please enter a message.');
@@ -1077,10 +1168,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             spinner.classList.remove('hidden');
-            button.disabled = true;
+            generateBtn.disabled = true;
 
             try {
-                // This function is defined in a module script below and attached to window
                 const result = await window.generateProfessionalMessage(userInput);
                 outputEl.textContent = result;
                 outputContainer.classList.remove('hidden');
@@ -1090,20 +1180,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 outputContainer.classList.remove('hidden');
             } finally {
                 spinner.classList.add('hidden');
-                button.disabled = false;
+                generateBtn.disabled = false;
             }
         });
 
-        document.querySelector('#modal-root').addEventListener('click', (e) => {
-            const copyBtn = e.target.closest('#copy-ai-output-btn');
-            if (copyBtn) {
-                const textToCopy = document.getElementById('ai-output').textContent;
-                navigator.clipboard.writeText(textToCopy).then(() => {
-                    alert('Copied to clipboard!');
-                }, () => {
-                    alert('Failed to copy.');
-                });
-            }
+        copyBtn.addEventListener('click', () => {
+            const textToCopy = outputEl.textContent;
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                const originalIcon = copyBtn.innerHTML;
+                copyBtn.innerHTML = 'Copied!';
+                copyBtn.disabled = true;
+                setTimeout(() => {
+                    copyBtn.innerHTML = originalIcon;
+                    copyBtn.disabled = false;
+                }, 2000);
+            }, () => {
+                alert('Failed to copy.');
+            });
         });
     };
 
@@ -1329,5 +1422,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 </script>
+<script type="module" src="/index.tsx"></script>
 </body>
 </html>
