@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -247,46 +248,6 @@
         html.dark .voice-btn-listening svg {
             color: #f87171; /* red-400 */
         }
-        
-        /* Time input clear button ('x') styles */
-        .clear-time-btn {
-            position: absolute;
-            right: 8px;
-            top: 50%;
-            transform: translateY(-50%);
-            background-color: #e5e7eb; /* gray-200 */
-            color: #4b5563; /* gray-600 */
-            border-radius: 9999px;
-            width: 20px;
-            height: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.2s, visibility 0.2s;
-            font-family: sans-serif;
-            font-weight: bold;
-            line-height: 1;
-            font-size: 14px;
-        }
-        html.dark .clear-time-btn {
-            background-color: #4b5563; /* gray-600 */
-            color: #d1d5db; /* gray-300 */
-        }
-        .clear-time-btn:hover {
-            background-color: #d1d5db; /* gray-300 */
-        }
-        html.dark .clear-time-btn:hover {
-            background-color: #6b7280; /* gray-500 */
-        }
-        /* Show the button when parent .day-box has the class */
-        .day-box.show-clear-btns .clear-time-btn {
-            opacity: 1;
-            visibility: visible;
-        }
-
     </style>
 <script type="importmap">
 {
@@ -361,7 +322,6 @@ const applyTheme = (theme) => {
         moonIcon?.classList.remove('hidden');
     }
 }
-
 
 const initTheme = () => {
     const savedTheme = localStorage.getItem('theme');
@@ -519,26 +479,31 @@ document.addEventListener('DOMContentLoaded', () => {
             : ["", "Poya Day", "Public Holiday", "Custom Reason", "Own Leave"];
 
         const createInput = (label, field, type, placeholder = '', value = '') => {
+             const isTimeInput = type === 'time';
+             // Conditionally add the value attribute only if a value exists. This fixes the iOS time input bug.
              const valueAttr = value ? `value="${value}"` : '';
-             return `
-                <div class="flex flex-col">
-                    <label class="font-medium text-sm mb-1.5 text-gray-700 dark:text-gray-300">${label}</label>
-                    <input type="${type}" placeholder="${placeholder}" ${valueAttr} data-key="${dateKey}" data-field="${field}" class="p-2 border border-gray-300 rounded-lg bg-gray-50/50 transition duration-200 premium-input dark:bg-gray-800/50 dark:border-gray-700 dark:text-gray-200 dark:placeholder-gray-400" />
-                </div>`;
-        }
-
-        const createTimeInput = (label, field, value = '') => {
-            const valueAttr = value ? `value="${value}"` : '';
-            return `
-                <div class="flex flex-col">
-                    <label class="font-medium text-sm mb-1.5 text-gray-700 dark:text-gray-300">${label}</label>
-                    <div class="relative">
-                        <input type="time" ${valueAttr} data-key="${dateKey}" data-field="${field}" class="w-full p-2 border border-gray-300 rounded-lg bg-gray-50/50 transition duration-200 premium-input dark:bg-gray-800/50 dark:border-gray-700 dark:text-gray-200 dark:placeholder-gray-400" />
-                        <button class="clear-time-btn" data-key="${dateKey}" data-field="${field}" title="Clear time">×</button>
-                    </div>
-                </div>`;
+             const inputHTML = `<input type="${type}" placeholder="${placeholder}" ${valueAttr} data-key="${dateKey}" data-field="${field}" class="w-full p-2 border border-gray-300 rounded-lg bg-gray-50/50 transition duration-200 premium-input dark:bg-gray-800/50 dark:border-gray-700 dark:text-gray-200 dark:placeholder-gray-400" />`;
+             
+             if (isTimeInput) {
+                return `
+                    <div class="flex flex-col">
+                        <label class="font-medium text-sm mb-1.5 text-gray-700 dark:text-gray-300">${label}</label>
+                        <div class="relative time-input-wrapper">
+                            ${inputHTML}
+                            <button class="clear-time-field-btn hidden absolute top-1/2 right-2 -translate-y-1/2 p-1 text-gray-400 hover:text-red-500 dark:hover:text-red-400 rounded-full bg-white dark:bg-gray-800/80">
+                               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                            </button>
+                        </div>
+                    </div>`;
+             } else {
+                return `
+                    <div class="flex flex-col">
+                        <label class="font-medium text-sm mb-1.5 text-gray-700 dark:text-gray-300">${label}</label>
+                        ${inputHTML}
+                    </div>`;
+             }
         };
-        
+
         const createSelect = (label, field, options, value = '') => `
             <div class="flex flex-col">
                 <label class="font-medium text-sm mb-1.5 text-gray-700 dark:text-gray-300">${label}</label>
@@ -556,8 +521,8 @@ document.addEventListener('DOMContentLoaded', () => {
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
                         </button>
                         <div class="day-card-menu-dropdown hidden">
-                            <div class="day-card-menu-item clear-time-menu-btn">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M12 6v6l4 2"/><path d="m16.5 16.5-4-4"/></svg>
+                             <div class="day-card-menu-item clear-time-btn">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z"/><path d="m12 8-4 4 4 4"/><path d="M16 12H8"/></svg>
                                 <span>Clear Time</span>
                             </div>
                             <div class="day-card-menu-item clear-all-btn">
@@ -572,12 +537,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     <!-- Time Tracking Section -->
                     <div class="grid grid-cols-2 gap-4">
                         <div class="space-y-4">
-                            ${createTimeInput('In Time', 'inTime', dayData.inTime)}
-                            ${createTimeInput('Out Time', 'outTime', dayData.outTime)}
+                            ${createInput('In Time', 'inTime', 'time', '', dayData.inTime)}
+                            ${createInput('Out Time', 'outTime', 'time', '', dayData.outTime)}
                         </div>
                         <div class="space-y-4">
-                            ${createTimeInput('Movement Out', 'movementOut', dayData.movementOut)}
-                            ${createTimeInput('Movement In', 'movementIn', dayData.movementIn)}
+                            ${createInput('Movement Out', 'movementOut', 'time', '', dayData.movementOut)}
+                            ${createInput('Movement In', 'movementIn', 'time', '', dayData.movementIn)}
                         </div>
                     </div>
 
@@ -669,52 +634,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // DATA HANDLING & STATE UPDATES
     const updateWorkData = (dateKey, field, value) => {
-        if (!workData[dateKey]) {
-            workData[dateKey] = {};
-        }
+        workData[dateKey] = workData[dateKey] || {};
+        workData[dateKey][field] = value;
 
-        if (value) {
-            workData[dateKey][field] = value;
-        } else {
-            delete workData[dateKey][field]; // More robust for clearing fields
-        }
-
-        // If the date object is now empty, remove it completely.
-        if (Object.keys(workData[dateKey]).length === 0) {
-            delete workData[dateKey];
-        }
-
-        // Conditional logic for leave status
         if (field === 'leaveStatus' && value !== 'Yes') {
-            if (workData[dateKey]) {
-                delete workData[dateKey].leaveReason;
-                delete workData[dateKey].customReasonDetails;
-                delete workData[dateKey].leaveReasonText;
-            }
+            delete workData[dateKey].leaveReason;
+            delete workData[dateKey].customReasonDetails;
+            delete workData[dateKey].leaveReasonText;
         }
         if (field === 'leaveReason' && value !== 'Custom Reason') {
-            if (workData[dateKey]) delete workData[dateKey].customReasonDetails;
+            delete workData[dateKey].customReasonDetails;
         }
         if (field === 'leaveReason' && value !== 'Own Leave') {
-            if (workData[dateKey]) delete workData[dateKey].leaveReasonText;
+            delete workData[dateKey].leaveReasonText;
         }
 
         saveLocalData();
         syncToCloud();
         
-        if (field === 'leaveStatus' || field === 'leaveReason') {
-            const day = parseInt(dateKey.split('-')[2], 10);
-            const dayBox = document.querySelector(`.day-box[data-day="${day}"]`);
-
+        // Re-render only the affected card if leave status changes, preventing page jump
+        if(field === 'leaveStatus' || field === 'leaveReason') {
+            const day = dateKey.split('-')[2];
+            const dayBox = daysContainer.querySelector(`.day-box[data-day="${day}"]`);
             if (dayBox) {
-                const currentScroll = window.scrollY; // Preserve scroll position
-                const newCardHTML = createDayCardHTML(day);
-                dayBox.outerHTML = newCardHTML;
-                const newDayBox = document.querySelector(`.day-box[data-day="${day}"]`);
-                if (newDayBox) {
-                    addEventListenersToDayCard(newDayBox); // Attach listeners to the new card
-                }
-                window.scrollTo({ top: currentScroll, behavior: 'auto' }); // Restore scroll position instantly
+                const newDayCardHTML = createDayCardHTML(day);
+                dayBox.outerHTML = newDayCardHTML;
+                const newDayBox = daysContainer.querySelector(`.day-box[data-day="${day}"]`);
+                addSingleDayCardEventListeners(newDayBox);
             }
             renderSummary();
         } else {
@@ -734,10 +680,27 @@ document.addEventListener('DOMContentLoaded', () => {
         const month = currentDate.getMonth();
         const dateKey = `${year}-${month}-${day}`;
         if (workData[dateKey]) {
-            delete workData[dateKey];
-            saveLocalData();
-            syncDayDeleteToCloud(dateKey); // Use specific deletion method for cloud sync
-            renderAll(); // Re-render to show the cleared card
+            delete workData[dateKey]; // Clear local data
+            saveLocalData(); // Save to localStorage for non-logged-in users
+
+            if (user) {
+                const userRef = db.collection("users").doc(user.uid);
+                const fieldPath = `workData.${dateKey}`;
+                userRef.update({
+                    [fieldPath]: firebase.firestore.FieldValue.delete()
+                }).catch(err => {
+                    console.error("Firestore field delete error:", err);
+                });
+            }
+            // Re-render only the affected card to show cleared state
+            const dayBox = daysContainer.querySelector(`.day-box[data-day="${day}"]`);
+            if (dayBox) {
+                const newDayCardHTML = createDayCardHTML(day);
+                dayBox.outerHTML = newDayCardHTML;
+                const newDayBox = daysContainer.querySelector(`.day-box[data-day="${day}"]`);
+                addSingleDayCardEventListeners(newDayBox);
+            }
+            renderSummary();
         }
     };
 
@@ -765,12 +728,11 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('ai-assistant-btn').addEventListener('click', showAiModal);
     };
 
-    const addEventListenersToDayCard = (dayBox) => {
+    const addSingleDayCardEventListeners = (dayBox) => {
         const day = dayBox.dataset.day;
-
-        // Kebab menu logic
         const menuBtn = dayBox.querySelector('.day-card-menu-btn');
         const dropdown = dayBox.querySelector('.day-card-menu-dropdown');
+        
         menuBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             document.querySelectorAll('.day-card-menu-dropdown').forEach(d => {
@@ -779,37 +741,49 @@ document.addEventListener('DOMContentLoaded', () => {
             dropdown.classList.toggle('hidden');
         });
 
-        // "Clear All" button logic
-        const clearAllBtn = dayBox.querySelector('.clear-all-btn');
-        clearAllBtn.addEventListener('click', () => {
+        dayBox.querySelector('.clear-all-btn').addEventListener('click', () => {
             if (confirm('Are you sure you want to clear all data for this day?')) {
                 clearDayData(day);
             }
             dropdown.classList.add('hidden');
         });
-
-        // "Clear Time" menu button logic
-        const clearTimeMenuBtn = dayBox.querySelector('.clear-time-menu-btn');
-        clearTimeMenuBtn.addEventListener('click', () => {
-            dayBox.classList.toggle('show-clear-btns');
-            dropdown.classList.add('hidden'); // Close menu after selection
+        
+        dayBox.querySelector('.clear-time-btn').addEventListener('click', () => {
+            dayBox.querySelectorAll('.time-input-wrapper').forEach(wrapper => {
+                const btn = wrapper.querySelector('.clear-time-field-btn');
+                btn.classList.toggle('hidden');
+            });
+            dropdown.classList.add('hidden');
         });
-
-        // Individual time clear 'x' buttons
-        const clearTimeBtns = dayBox.querySelectorAll('.clear-time-btn');
-        clearTimeBtns.forEach(btn => {
+        
+        dayBox.querySelectorAll('.clear-time-field-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                const { key, field } = e.currentTarget.dataset;
-                const input = e.currentTarget.previousElementSibling;
-                if (input) {
-                    input.value = '';
+                const input = e.currentTarget.closest('.time-input-wrapper').querySelector('input');
+                const { key: dateKey, field } = input.dataset;
+
+                input.removeAttribute('value');
+                input.value = '';
+                e.currentTarget.classList.add('hidden');
+
+                if (workData[dateKey]) {
+                    delete workData[dateKey][field];
                 }
-                updateWorkData(key, field, '');
+                saveLocalData();
+
+                if (user) {
+                    const userRef = db.collection("users").doc(user.uid);
+                    const fieldPath = `workData.${dateKey}.${field}`;
+                    userRef.update({
+                        [fieldPath]: firebase.firestore.FieldValue.delete()
+                    }).catch(err => {
+                        console.error("Firestore field delete error:", err);
+                    });
+                }
+                renderSummary();
             });
         });
 
-        // Add change listeners for all inputs/selects in this card
         dayBox.querySelectorAll('input, select').forEach(el => {
             el.addEventListener('change', (e) => {
                 const { key, field } = e.target.dataset;
@@ -820,10 +794,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const addDayCardEventListeners = () => {
         daysContainer.querySelectorAll('.day-box').forEach(dayBox => {
-            addEventListenersToDayCard(dayBox);
+            addSingleDayCardEventListeners(dayBox);
         });
 
-        // Global click listener to close open menus
         document.addEventListener('click', (e) => {
             if (!e.target.closest('.day-card-menu-btn')) {
                 document.querySelectorAll('.day-card-menu-dropdown').forEach(d => d.classList.add('hidden'));
@@ -900,9 +873,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (isCurrentMonthView) {
             const todayEl = document.querySelector(`.day-box[data-day="${today.getDate()}"]`);
             if (todayEl) {
+                // Delay scroll to ensure page has rendered and animations are complete
                 setTimeout(() => {
                     todayEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }, 600); // Increased delay to ensure page is fully rendered and animated
+                }, 500); 
             }
         }
     };
@@ -1421,21 +1395,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (user) {
             db.collection("users").doc(user.uid).set({ workData }, { merge: true })
                 .catch(err => console.error("Firestore write error:", err));
-        }
-    };
-
-    const syncDayDeleteToCloud = (dateKey) => {
-        if (user) {
-            const userRef = db.collection("users").doc(user.uid);
-            // Use dot notation to target the specific field within the workData map for deletion.
-            // This is more efficient and reliable than overwriting the whole workData object.
-            userRef.update({
-                [`workData.${dateKey}`]: firebase.firestore.FieldValue.delete()
-            }).catch(err => {
-                console.error("Firestore field delete error:", err);
-                // Fallback to syncing the whole object if the more specific update fails.
-                syncToCloud();
-            });
         }
     };
 
