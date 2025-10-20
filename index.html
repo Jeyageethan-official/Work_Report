@@ -247,6 +247,46 @@
         html.dark .voice-btn-listening svg {
             color: #f87171; /* red-400 */
         }
+        
+        /* Time input clear button ('x') styles */
+        .clear-time-btn {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: #e5e7eb; /* gray-200 */
+            color: #4b5563; /* gray-600 */
+            border-radius: 9999px;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s, visibility 0.2s;
+            font-family: sans-serif;
+            font-weight: bold;
+            line-height: 1;
+            font-size: 14px;
+        }
+        html.dark .clear-time-btn {
+            background-color: #4b5563; /* gray-600 */
+            color: #d1d5db; /* gray-300 */
+        }
+        .clear-time-btn:hover {
+            background-color: #d1d5db; /* gray-300 */
+        }
+        html.dark .clear-time-btn:hover {
+            background-color: #6b7280; /* gray-500 */
+        }
+        /* Show the button when parent .day-box has the class */
+        .day-box.show-clear-btns .clear-time-btn {
+            opacity: 1;
+            visibility: visible;
+        }
+
     </style>
 <script type="importmap">
 {
@@ -477,11 +517,26 @@ document.addEventListener('DOMContentLoaded', () => {
             ? ["", "Poya Day", "Public Holiday", "Custom Reason", "Own Leave", "Normal Leave Day"]
             : ["", "Poya Day", "Public Holiday", "Custom Reason", "Own Leave"];
 
-        const createInput = (label, field, type, placeholder = '', value = '') => `
-            <div class="flex flex-col">
-                <label class="font-medium text-sm mb-1.5 text-gray-700 dark:text-gray-300">${label}</label>
-                <input type="${type}" placeholder="${placeholder}" ${value ? `value="${value}"` : ''} data-key="${dateKey}" data-field="${field}" class="p-2 border border-gray-300 rounded-lg bg-gray-50/50 transition duration-200 premium-input dark:bg-gray-800/50 dark:border-gray-700 dark:text-gray-200 dark:placeholder-gray-400" />
-            </div>`;
+        const createInput = (label, field, type, placeholder = '', value = '') => {
+             const valueAttr = value ? `value="${value}"` : '';
+             return `
+                <div class="flex flex-col">
+                    <label class="font-medium text-sm mb-1.5 text-gray-700 dark:text-gray-300">${label}</label>
+                    <input type="${type}" placeholder="${placeholder}" ${valueAttr} data-key="${dateKey}" data-field="${field}" class="p-2 border border-gray-300 rounded-lg bg-gray-50/50 transition duration-200 premium-input dark:bg-gray-800/50 dark:border-gray-700 dark:text-gray-200 dark:placeholder-gray-400" />
+                </div>`;
+        }
+
+        const createTimeInput = (label, field, value = '') => {
+            const valueAttr = value ? `value="${value}"` : '';
+            return `
+                <div class="flex flex-col">
+                    <label class="font-medium text-sm mb-1.5 text-gray-700 dark:text-gray-300">${label}</label>
+                    <div class="relative">
+                        <input type="time" ${valueAttr} data-key="${dateKey}" data-field="${field}" class="w-full p-2 border border-gray-300 rounded-lg bg-gray-50/50 transition duration-200 premium-input dark:bg-gray-800/50 dark:border-gray-700 dark:text-gray-200 dark:placeholder-gray-400" />
+                        <button class="clear-time-btn" data-key="${dateKey}" data-field="${field}" title="Clear time">×</button>
+                    </div>
+                </div>`;
+        };
         
         const createSelect = (label, field, options, value = '') => `
             <div class="flex flex-col">
@@ -500,6 +555,10 @@ document.addEventListener('DOMContentLoaded', () => {
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
                         </button>
                         <div class="day-card-menu-dropdown hidden">
+                            <div class="day-card-menu-item clear-time-menu-btn">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M12 6v6l4 2"/><path d="m16.5 16.5-4-4"/></svg>
+                                <span>Clear Time</span>
+                            </div>
                             <div class="day-card-menu-item clear-all-btn">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 2.5a.5.5 0 0 0 0 1h1.841l1.643 3.594a.5.5 0 0 0 .445.306h10.122a.5.5 0 0 0 .445-.306l1.643-3.594H20.5a.5.5 0 0 0 0-1H2.5Z"/><path d="M5.625 7.5 7.5 20h9l1.875-12.5H5.625Z"/></svg>
                                 <span>Clear All</span>
@@ -512,12 +571,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     <!-- Time Tracking Section -->
                     <div class="grid grid-cols-2 gap-4">
                         <div class="space-y-4">
-                            ${createInput('In Time', 'inTime', 'time', '', dayData.inTime)}
-                            ${createInput('Out Time', 'outTime', 'time', '', dayData.outTime)}
+                            ${createTimeInput('In Time', 'inTime', dayData.inTime)}
+                            ${createTimeInput('Out Time', 'outTime', dayData.outTime)}
                         </div>
                         <div class="space-y-4">
-                            ${createInput('Movement Out', 'movementOut', 'time', '', dayData.movementOut)}
-                            ${createInput('Movement In', 'movementIn', 'time', '', dayData.movementIn)}
+                            ${createTimeInput('Movement Out', 'movementOut', dayData.movementOut)}
+                            ${createTimeInput('Movement In', 'movementIn', dayData.movementIn)}
                         </div>
                     </div>
 
@@ -609,28 +668,40 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // DATA HANDLING & STATE UPDATES
     const updateWorkData = (dateKey, field, value) => {
-        workData[dateKey] = workData[dateKey] || {};
-        workData[dateKey][field] = value;
+        if (!workData[dateKey]) {
+            workData[dateKey] = {};
+        }
 
-        // Conditional logic from original app
+        if (value) {
+            workData[dateKey][field] = value;
+        } else {
+            delete workData[dateKey][field]; // More robust for clearing fields
+        }
+
+        // If the date object is now empty, remove it completely.
+        if (Object.keys(workData[dateKey]).length === 0) {
+            delete workData[dateKey];
+        }
+
+        // Conditional logic for leave status
         if (field === 'leaveStatus' && value !== 'Yes') {
-            delete workData[dateKey].leaveReason;
-            delete workData[dateKey].customReasonDetails;
-            delete workData[dateKey].leaveReasonText;
+            if (workData[dateKey]) {
+                delete workData[dateKey].leaveReason;
+                delete workData[dateKey].customReasonDetails;
+                delete workData[dateKey].leaveReasonText;
+            }
         }
         if (field === 'leaveReason' && value !== 'Custom Reason') {
-            delete workData[dateKey].customReasonDetails;
+            if (workData[dateKey]) delete workData[dateKey].customReasonDetails;
         }
         if (field === 'leaveReason' && value !== 'Own Leave') {
-            delete workData[dateKey].leaveReasonText;
+            if (workData[dateKey]) delete workData[dateKey].leaveReasonText;
         }
 
-        // Save and re-render
         saveLocalData();
         syncToCloud();
         
-        // Full re-render is needed if leave status changes to show/hide fields
-        if(field === 'leaveStatus' || field === 'leaveReason') {
+        if (field === 'leaveStatus' || field === 'leaveReason') {
             renderAll();
         } else {
             renderSummary();
@@ -689,7 +760,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const dropdown = dayBox.querySelector('.day-card-menu-dropdown');
             menuBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                // Close all other menus first
                 document.querySelectorAll('.day-card-menu-dropdown').forEach(d => {
                     if (d !== dropdown) d.classList.add('hidden');
                 });
@@ -703,6 +773,29 @@ document.addEventListener('DOMContentLoaded', () => {
                     clearDayData(day);
                 }
                 dropdown.classList.add('hidden');
+            });
+
+            // "Clear Time" menu button logic
+            const clearTimeMenuBtn = dayBox.querySelector('.clear-time-menu-btn');
+            clearTimeMenuBtn.addEventListener('click', () => {
+                dayBox.classList.toggle('show-clear-btns');
+                dropdown.classList.add('hidden'); // Close menu after selection
+            });
+
+            // Individual time clear 'x' buttons
+            const clearTimeBtns = dayBox.querySelectorAll('.clear-time-btn');
+            clearTimeBtns.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const { key, field } = e.currentTarget.dataset;
+                    // Find the sibling input and clear it visually
+                    const input = e.currentTarget.previousElementSibling;
+                    if (input) {
+                        input.value = '';
+                    }
+                    // Update the data model
+                    updateWorkData(key, field, '');
+                });
             });
         });
 
