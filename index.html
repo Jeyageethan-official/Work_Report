@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -252,10 +251,15 @@
 <script type="importmap">
 {
   "imports": {
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "firebase/": "https://aistudiocdn.com/firebase@^12.4.0/",
     "@google/genai": "https://aistudiocdn.com/@google/genai@^0.14.0"
   }
 }
 </script>
+<link rel="stylesheet" href="/index.css">
 </head>
 <body class="bg-gray-50 dark:bg-gray-950">
 
@@ -554,7 +558,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const monthPrefix = `${year}-${month}`;
 
         let regularLeaves = 0, specialDays = 0, weekendLeaveDays = 0;
-        let weekdayOtHours = 0, satSunOtHours = 0, poyaPublicOtHours = 0;
+        let weekendOtHours = 0, satSunOtHours = 0, poyaPublicOtHours = 0;
 
         Object.keys(workData).forEach(key => {
             if (key.startsWith(monthPrefix)) {
@@ -567,7 +571,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (workingHours > 0) {
                      if (isSpecial) poyaPublicOtHours += workingHours;
                      else if (weekend) satSunOtHours += workingHours;
-                     else if (workingHours > 9) weekdayOtHours += workingHours - 9;
+                     else if (workingHours > 9) weekendOtHours += workingHours - 9;
                 }
                
                 if (data.leaveReason === "Own Leave" || (data.leaveReason === "Custom Reason" && !weekend && !isSpecial)) regularLeaves++;
@@ -576,7 +580,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (weekend && data.leaveReason === "Normal Leave Day") weekendLeaveDays++;
             }
         });
-        const totalOtHours = weekdayOtHours + satSunOtHours + poyaPublicOtHours;
+        const totalOtHours = weekendOtHours + satSunOtHours + poyaPublicOtHours;
 
         summaryContainer.innerHTML = `
             <div class="mt-8 p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-800/50">
@@ -586,7 +590,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <p>Leave Days (Poya/Public): <span class="font-semibold text-gray-800 dark:text-gray-100">${specialDays}</span></p>
                     <p>Leave Days (Weekend): <span class="font-semibold text-gray-800 dark:text-gray-100">${weekendLeaveDays}</span></p>
                     <div class="md:col-span-2 my-2 border-t border-gray-200 dark:border-gray-800"></div>
-                    <p>Weekday OT Hours: <span class="font-semibold text-gray-800 dark:text-gray-100">${weekdayOtHours.toFixed(2)}</span> hours</p>
+                    <p>Weekday OT Hours: <span class="font-semibold text-gray-800 dark:text-gray-100">${weekendOtHours.toFixed(2)}</span> hours</p>
                     <p>Weekend OT Hours: <span class="font-semibold text-gray-800 dark:text-gray-100">${satSunOtHours.toFixed(2)}</span> hours</p>
                     <p>Poya/Public OT Hours: <span class="font-semibold text-gray-800 dark:text-gray-100">${poyaPublicOtHours.toFixed(2)}</span> hours</p>
                     <p class="md:col-span-2 text-lg font-bold text-blue-600 dark:text-blue-400">Total OT Hours: <span id="totalOtHours">${totalOtHours.toFixed(2)}</span> hours</p>
@@ -809,7 +813,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <button id="forgot-password-btn" class="text-xs font-medium text-blue-600 hover:underline dark:text-blue-400">Forgot Password?</button>
                     </div>
                 </div>
-                <p id="auth-feedback" class="text-sm h-4"></p>
+                <p id="auth-error" class="text-red-500 text-sm h-4"></p>
                 <button id="auth-submit" class="w-full px-5 py-2.5 rounded-lg font-semibold text-sm shadow-sm transition-all duration-200 transform hover:scale-[1.03] bg-blue-600 text-white hover:bg-blue-700">Login / Sign Up</button>
                 <div class="relative my-4"><div class="absolute inset-0 flex items-center"><div class="w-full border-t border-gray-300 dark:border-gray-700"></div></div><div class="relative flex justify-center text-sm"><span class="px-2 bg-white dark:bg-gray-900 text-gray-500">Or</span></div></div>
                 <button id="google-login" class="w-full flex items-center justify-center gap-3 px-5 py-2.5 rounded-lg font-semibold text-sm shadow-sm transition-all duration-200 transform hover:scale-[1.03] bg-white text-gray-800 border border-gray-300 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-700">
@@ -820,32 +824,35 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
         openModal(createModal('Login or Sign Up', content));
         
-        const feedbackEl = document.getElementById('auth-feedback');
-
+        // Add event listeners for the auth modal
         document.getElementById('forgot-password-btn').addEventListener('click', async () => {
             const email = document.getElementById('auth-email').value;
-            feedbackEl.textContent = '';
+            const errorEl = document.getElementById('auth-error');
+            errorEl.classList.remove('text-green-500', 'dark:text-green-400');
+            errorEl.classList.add('text-red-500');
 
             if (!email) {
-                feedbackEl.textContent = 'Please enter your email to reset password.';
-                feedbackEl.className = 'text-sm h-4 text-red-500';
+                errorEl.textContent = 'Please enter your email to reset password.';
                 return;
             }
 
             try {
                 await auth.sendPasswordResetEmail(email);
-                feedbackEl.textContent = 'Password reset email sent! Check your inbox.';
-                feedbackEl.className = 'text-sm h-4 text-green-500 dark:text-green-400';
+                errorEl.textContent = 'Password reset email sent! Check your inbox.';
+                errorEl.classList.remove('text-red-500');
+                errorEl.classList.add('text-green-500', 'dark:text-green-400');
             } catch (error) {
-                feedbackEl.textContent = error.message;
-                feedbackEl.className = 'text-sm h-4 text-red-500';
+                errorEl.textContent = error.message;
             }
         });
 
         document.getElementById('auth-submit').addEventListener('click', async () => {
             const email = document.getElementById('auth-email').value;
             const password = document.getElementById('auth-password').value;
-            feedbackEl.textContent = '';
+            const errorEl = document.getElementById('auth-error');
+            errorEl.textContent = '';
+            errorEl.classList.remove('text-green-500', 'dark:text-green-400');
+            errorEl.classList.add('text-red-500');
             
             try {
                 await auth.setPersistence(firebase.auth.Auth.Persistence.SESSION);
@@ -858,12 +865,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         await auth.createUserWithEmailAndPassword(email, password);
                         closeModal();
                     } catch (signUpError) {
-                        feedbackEl.textContent = signUpError.message;
-                        feedbackEl.className = 'text-sm h-4 text-red-500';
+                        errorEl.textContent = signUpError.message;
                     }
                 } else {
-                    feedbackEl.textContent = e.message;
-                    feedbackEl.className = 'text-sm h-4 text-red-500';
+                    errorEl.textContent = e.message;
                 }
             }
         });
@@ -875,8 +880,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 await auth.signInWithPopup(provider);
                 closeModal();
             } catch (e) {
-                feedbackEl.textContent = e.message;
-                feedbackEl.className = 'text-sm h-4 text-red-500';
+                document.getElementById('auth-error').textContent = e.message;
             }
         });
     };
@@ -1023,7 +1027,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const showShareModal = () => {
-        const totalOt = document.getElementById('totalOtHours')?.textContent || '0.00';
+        const totalOt = document.getElementById('totalOtHours')?.textContent || 'N/A';
         const summaryText = `Work Report Summary for ${months[currentDate.getMonth()]} ${currentDate.getFullYear()}:\n- Total OT Hours: ${totalOt} hours.`;
         
         const content = `
@@ -1044,6 +1048,52 @@ document.addEventListener('DOMContentLoaded', () => {
                 .catch(() => alert('Failed to copy summary.'));
         });
         document.getElementById('export-pdf-btn').addEventListener('click', showExportPreview);
+    };
+
+    const showPermissionGuidanceModal = () => {
+        const ua = navigator.userAgent;
+        let browserSpecificInstructions = '';
+
+        if (ua.indexOf("Firefox") > -1) {
+            browserSpecificInstructions = `
+                <p class="text-sm">1. Click the 🔒 lock icon in the address bar.</p>
+                <p class="text-sm">2. Find "Microphone" and click the "x" to clear the setting.</p>
+                <p class="text-sm">3. Try the microphone again; it will ask for permission.</p>
+                <img src="https://i.imgur.com/bgyrSjx.png" alt="Firefox microphone permission" class="mt-2 rounded-lg border dark:border-gray-700"/>
+            `;
+        } else if (ua.indexOf("Safari") > -1 && !ua.indexOf("Chrome") > -1) {
+            browserSpecificInstructions = `
+                <p class="text-sm">1. With this page open, go to <span class="font-semibold">Safari > Settings for This Website...</span> in the menu bar.</p>
+                <p class="text-sm">2. Find "Microphone" and set it to <span class="font-semibold">"Allow"</span>.</p>
+                <p class="text-sm">3. Reload the page if needed.</p>
+                 <img src="https://i.imgur.com/LqLg46v.png" alt="Safari microphone permission" class="mt-2 rounded-lg border dark:border-gray-700"/>
+            `;
+        } else { // Default to Chrome-based browsers
+             browserSpecificInstructions = `
+                <p class="text-sm">1. Click the 🔒 lock icon in the address bar.</p>
+                <p class="text-sm">2. Turn on the toggle next to "Microphone".</p>
+                <p class="text-sm">3. You may need to reload the page.</p>
+                <img src="https://i.imgur.com/G526s0y.png" alt="Chrome microphone permission" class="mt-2 rounded-lg border dark:border-gray-700"/>
+            `;
+        }
+
+        const content = `
+            <div class="space-y-4">
+                <p class="text-base font-semibold">Microphone Access is Blocked</p>
+                <div class="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg border dark:border-gray-700 text-gray-700 dark:text-gray-300">
+                    ${browserSpecificInstructions}
+                </div>
+                <p class="text-xs text-gray-500 dark:text-gray-400">After enabling the permission in your browser settings, click the button below to try again.</p>
+                <button id="retry-mic-permission-btn" class="w-full mt-4 px-5 py-2.5 rounded-lg font-semibold text-sm shadow-sm transition-all bg-blue-600 text-white hover:bg-blue-700">I've Enabled It, Try Again</button>
+            </div>
+        `;
+        openModal(createModal('Action Required', content, 'permission-guidance-modal'));
+
+        document.getElementById('retry-mic-permission-btn').addEventListener('click', () => {
+            closeModal();
+            // We find the mic button in the main AI modal and click it programmatically
+            document.getElementById('voice-input-btn')?.click();
+        });
     };
 
      const showAiModal = () => {
@@ -1079,7 +1129,6 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
         openModal(createModal('AI Professional Message Assistant', content));
         
-        // --- AI and Voice Logic ---
         const inputEl = document.getElementById('ai-input');
         const outputContainer = document.getElementById('ai-output-container');
         const outputEl = document.getElementById('ai-output');
@@ -1087,25 +1136,24 @@ document.addEventListener('DOMContentLoaded', () => {
         const generateBtn = document.getElementById('generate-ai-message-btn');
         const voiceBtn = document.getElementById('voice-input-btn');
         const copyBtn = document.getElementById('copy-ai-output-btn');
-        const errorContainer = document.getElementById('ai-error-container');
-
-        // Speech Recognition Setup
+        
+        // --- Speech Recognition Logic ---
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        if (!SpeechRecognition) {
-            voiceBtn.style.display = 'none';
-        } else {
-            const recognition = new SpeechRecognition();
-            recognition.lang = 'ta-IN'; // Tamil (India)
+        let recognition;
+        let isListening = false;
+        
+        if (SpeechRecognition) {
+            recognition = new SpeechRecognition();
+            recognition.lang = 'ta-IN';
             recognition.interimResults = true;
-            recognition.continuous = false; // Set to false to auto-stop after a pause
-            let isListening = false;
+            recognition.continuous = true;
 
             recognition.onresult = (event) => {
-                let transcript = '';
+                let finalTranscript = '';
                 for (let i = 0; i < event.results.length; i++) {
-                    transcript += event.results[i][0].transcript;
+                    finalTranscript += event.results[i][0].transcript;
                 }
-                inputEl.value = transcript;
+                inputEl.value = finalTranscript;
             };
 
             recognition.onstart = () => {
@@ -1118,57 +1166,61 @@ document.addEventListener('DOMContentLoaded', () => {
                 voiceBtn.classList.remove('voice-btn-listening');
             };
 
-             recognition.onerror = (event) => {
-                console.error('Speech recognition error:', event.error, event.message);
+            recognition.onerror = (event) => {
+                console.error('Speech recognition error:', event.error);
                 isListening = false;
                 voiceBtn.classList.remove('voice-btn-listening');
-                 errorContainer.textContent = `Speech recognition error: ${event.error}. Please ensure you've granted microphone permission and are on a secure (HTTPS) connection.`;
-                 errorContainer.classList.remove('hidden');
-            };
-
-            const startRecognition = () => {
-                if (isListening) {
-                    recognition.stop();
-                } else {
-                    try {
-                        recognition.start();
-                    } catch (e) {
-                        errorContainer.textContent = `Could not start voice recognition: ${e.message}. Please ensure your browser is up to date.`;
-                        errorContainer.classList.remove('hidden');
-                    }
+                if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+                    showPermissionGuidanceModal();
                 }
             };
-            
-            voiceBtn.addEventListener('click', () => {
-                errorContainer.classList.add('hidden');
-                if (isListening) {
-                    recognition.stop();
-                    return;
-                }
-
-                // New robust flow: First get permission, then start recognition.
-                navigator.mediaDevices.getUserMedia({ audio: true })
-                    .then(stream => {
-                        // We have permission. We don't need to use the stream, just needed to trigger the prompt.
-                        // Stop the tracks immediately to release the microphone indicator in the browser tab.
-                        stream.getTracks().forEach(track => track.stop());
-                        startRecognition(); // Now, we can safely start the recognition.
-                    })
-                    .catch(err => {
-                        console.error('getUserMedia error:', err);
-                        let message = `An error occurred: ${err.name}. Please try again.`;
-                        if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
-                             message = `<strong class="font-semibold">Microphone access denied.</strong><br>
-                                        To use voice input, please allow microphone access in your browser's site settings. Look for a lock icon (🔒) in the address bar to change permissions.`;
-                        }
-                        errorContainer.innerHTML = message;
-                        errorContainer.classList.remove('hidden');
-                    });
-            });
+        } else {
+             voiceBtn.style.display = 'none';
         }
+
+        const handleVoiceClick = async () => {
+             if (!recognition) return;
+
+             if (isListening) {
+                recognition.stop();
+                return;
+             }
+             
+             try {
+                const permissionStatus = await navigator.permissions.query({ name: 'microphone' });
+
+                if (permissionStatus.state === 'granted') {
+                    recognition.start();
+                } else if (permissionStatus.state === 'prompt') {
+                    // This will trigger the browser's permission pop-up
+                    recognition.start(); 
+                } else if (permissionStatus.state === 'denied') {
+                    // If denied, we show our custom guidance modal
+                    showPermissionGuidanceModal();
+                }
+                 
+                permissionStatus.onchange = () => {
+                    if(permissionStatus.state === 'granted' && !isListening) {
+                       recognition.start();
+                    }
+                };
+
+             } catch (err) {
+                console.error("Permissions API error:", err);
+                // Fallback for older browsers that might not support Permissions API
+                try {
+                   recognition.start();
+                } catch (e) {
+                   if (e.name === 'NotAllowedError' || e.name === 'SecurityError') {
+                       showPermissionGuidanceModal();
+                   }
+                }
+             }
+        };
+        
+        voiceBtn.addEventListener('click', handleVoiceClick);
         
         generateBtn.addEventListener('click', async () => {
-            errorContainer.classList.add('hidden');
             const userInput = inputEl.value.trim();
             if (!userInput) {
                 alert('Please enter a message.');
@@ -1184,10 +1236,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 outputContainer.classList.remove('hidden');
             } catch (error) {
                 console.error(error);
-                outputEl.textContent = '';
-                errorContainer.textContent = error.message;
-                errorContainer.classList.remove('hidden');
-                outputContainer.classList.add('hidden');
+                outputEl.textContent = 'Sorry, an error occurred. Please try again.';
+                outputContainer.classList.remove('hidden');
             } finally {
                 spinner.classList.add('hidden');
                 generateBtn.disabled = false;
@@ -1285,25 +1335,31 @@ document.addEventListener('DOMContentLoaded', () => {
             const spinner = document.getElementById('loading-spinner');
             spinner.style.display = 'flex';
 
+            // To ensure consistent rendering across devices, especially on mobile where the table might
+            // render very wide, we temporarily set a fixed width before capturing with html2canvas.
             const originalWidth = el.style.width;
             el.style.width = '1200px';
 
             html2canvas(el, { scale: 3, useCORS: true, backgroundColor: '#ffffff' }).then(canvas => {
+                // Restore the original width after capture
                 el.style.width = originalWidth;
 
                 const { jsPDF } = window.jspdf;
+                // Explicitly create a portrait A4 document
                 const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
                 
                 const imgData = canvas.toDataURL('image/png');
                 const pdfWidth = pdf.internal.pageSize.getWidth();
                 const pdfHeight = pdf.internal.pageSize.getHeight();
                 
+                // Add the image to fill the entire page, which will remove vertical gaps
+                // but may stretch the content slightly. This fulfills the user request.
                 pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
                 pdf.save(`Work_Report_${year}_${month + 1}.pdf`);
                 spinner.style.display = 'none';
 
             }).catch(err => {
-                el.style.width = originalWidth;
+                el.style.width = originalWidth; // Also restore on error
                 console.error('PDF generation failed:', err);
                 alert('Sorry, there was an error generating the PDF.');
                 spinner.style.display = 'none';
@@ -1402,8 +1458,11 @@ document.addEventListener('DOMContentLoaded', () => {
 <script type="module">
     import { GoogleGenAI } from "@google/genai";
 
+    // Directly use the API key provided by the user.
+    const apiKey = "AIzaSyCppq-j59GI9USv1Y0v2miQEn9y_7NfIWM";
+    const ai = new GoogleGenAI({ apiKey: apiKey });
+
     window.generateProfessionalMessage = async (userInput) => {
-        const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
         try {
             const prompt = `You are an expert in converting informal 'Tanglish' (a mix of Tamil and English) text into professional, formal English. Convert the following message into a polite and professional English sentence suitable for a workplace context. Do not add any explanations, preamble, or markdown formatting. Just provide the converted sentence as plain text. Tanglish message: "${userInput}"`;
 
@@ -1415,12 +1474,14 @@ document.addEventListener('DOMContentLoaded', () => {
             return response.text.trim();
         } catch (error) {
             console.error("Error calling Gemini API:", error);
+            // Provide a more specific error message if the API key is invalid.
             if (error.toString().includes('API key not valid')) {
-                throw new Error("The API key is not valid. Please check your environment configuration.");
+                return "The provided API key is not valid. Please check the key and try again.";
             }
-            throw new Error("Sorry, there was an error processing your request. Please try again.");
+            return "Sorry, there was an error processing your request. Please try again.";
         }
     };
 </script>
+<script type="module" src="/index.tsx"></script>
 </body>
-</html>
+</html>enna ippadi varuthu
