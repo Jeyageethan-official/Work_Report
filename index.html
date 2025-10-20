@@ -4,6 +4,16 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Work Journal</title>
+
+    <!-- PWA & Homescreen Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Work Journal">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta id="theme-color-meta" name="theme-color" content="#f8f9fa"> <!-- Default light theme color -->
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='4' fill='%234A90E2'/%3E%3Cpath d='M8 3V21' stroke='white' stroke-width='1.5' stroke-linecap='round'/%3E%3Cpath d='M16 7H11' stroke='white' stroke-width='1.5' stroke-linecap='round'/%3E%3Cpath d='M16 12H11' stroke='white' stroke-width='1.5' stroke-linecap='round'/%3E%3Cpath d='M13 17H11' stroke='white' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='4' fill='%234A90E2'/%3E%3Cpath d='M8 3V21' stroke='white' stroke-width='1.5' stroke-linecap='round'/%3E%3Cpath d='M16 7H11' stroke='white' stroke-width='1.5' stroke-linecap='round'/%3E%3Cpath d='M16 12H11' stroke='white' stroke-width='1.5' stroke-linecap='round'/%3E%3Cpath d='M13 17H11' stroke='white' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -349,18 +359,26 @@
 const applyTheme = (theme) => {
     const sunIcon = document.getElementById('theme-icon-sun');
     const moonIcon = document.getElementById('theme-icon-moon');
+    const themeColorMeta = document.getElementById('theme-color-meta');
+    const statusBarMeta = document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]');
+
     if (theme === 'dark') {
         document.documentElement.classList.add('dark');
         localStorage.setItem('theme', 'dark');
         sunIcon?.classList.remove('hidden');
         moonIcon?.classList.add('hidden');
+        themeColorMeta?.setAttribute('content', '#111827'); // Dark theme for browser chrome
+        statusBarMeta?.setAttribute('content', 'black-translucent');
     } else {
         document.documentElement.classList.remove('dark');
         localStorage.setItem('theme', 'light');
         sunIcon?.classList.add('hidden');
         moonIcon?.classList.remove('hidden');
+        themeColorMeta?.setAttribute('content', '#f8f9fa'); // Light theme for browser chrome
+        statusBarMeta?.setAttribute('content', 'default');
     }
 }
+
 
 const initTheme = () => {
     const savedTheme = localStorage.getItem('theme');
