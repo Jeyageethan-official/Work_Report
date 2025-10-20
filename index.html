@@ -638,7 +638,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (workData[dateKey]) {
             delete workData[dateKey];
             saveLocalData();
-            syncToCloud();
+            syncDayDeleteToCloud(dateKey); // Call the specific delete function for cloud sync
             renderAll(); // Re-render to show the cleared card
         }
     };
@@ -1216,6 +1216,18 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     
     // FIREBASE-RELATED FUNCTIONS
+    const syncDayDeleteToCloud = (dateKey) => {
+        if (user) {
+            const userRef = db.collection("users").doc(user.uid);
+            // Use FieldValue.delete() to remove the specific day's data from the workData map.
+            // This is more efficient and direct than overwriting the whole workData object.
+            const updatePayload = {};
+            updatePayload[`workData.${dateKey}`] = firebase.firestore.FieldValue.delete();
+            userRef.update(updatePayload)
+                .catch(err => console.error("Firestore field delete error:", err));
+        }
+    };
+
     const syncToCloud = () => {
         if (user) {
             db.collection("users").doc(user.uid).set({ workData }, { merge: true })
