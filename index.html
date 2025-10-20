@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -711,11 +712,16 @@ document.addEventListener('DOMContentLoaded', () => {
             updateWorkData(key, field, e.target.value);
         };
 
-        // Use 'input' for all inputs for immediate updates (fixes time field clearing).
+        // Listen to both 'input' and 'change' for comprehensive coverage across devices.
+        // 'input' is great for desktop clearing and immediate feedback.
+        // 'change' acts as a fallback for some native mobile pickers (like on iOS)
+        // which may not fire the 'input' event when the value is cleared.
         daysContainer.querySelectorAll('input').forEach(el => {
             el.addEventListener('input', handleDataUpdate);
+            el.addEventListener('change', handleDataUpdate);
         });
-        // Use 'change' for selects as 'input' event is not standard.
+        
+        // Use 'change' for selects.
         daysContainer.querySelectorAll('select').forEach(el => {
             el.addEventListener('change', handleDataUpdate);
         });
