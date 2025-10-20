@@ -703,7 +703,20 @@ document.addEventListener('DOMContentLoaded', () => {
         syncToCloud();
         
         if (field === 'leaveStatus' || field === 'leaveReason') {
-            renderAll();
+            const day = parseInt(dateKey.split('-')[2], 10);
+            const dayBox = document.querySelector(`.day-box[data-day="${day}"]`);
+
+            if (dayBox) {
+                const currentScroll = window.scrollY; // Preserve scroll position
+                const newCardHTML = createDayCardHTML(day);
+                dayBox.outerHTML = newCardHTML;
+                const newDayBox = document.querySelector(`.day-box[data-day="${day}"]`);
+                if (newDayBox) {
+                    addEventListenersToDayCard(newDayBox); // Attach listeners to the new card
+                }
+                window.scrollTo({ top: currentScroll, behavior: 'auto' }); // Restore scroll position instantly
+            }
+            renderSummary();
         } else {
             renderSummary();
         }
@@ -752,60 +765,62 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('ai-assistant-btn').addEventListener('click', showAiModal);
     };
 
-    const addDayCardEventListeners = () => {
-        daysContainer.querySelectorAll('.day-box').forEach(dayBox => {
-            const day = dayBox.dataset.day;
+    const addEventListenersToDayCard = (dayBox) => {
+        const day = dayBox.dataset.day;
 
-            // Kebab menu logic
-            const menuBtn = dayBox.querySelector('.day-card-menu-btn');
-            const dropdown = dayBox.querySelector('.day-card-menu-dropdown');
-            menuBtn.addEventListener('click', (e) => {
+        // Kebab menu logic
+        const menuBtn = dayBox.querySelector('.day-card-menu-btn');
+        const dropdown = dayBox.querySelector('.day-card-menu-dropdown');
+        menuBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            document.querySelectorAll('.day-card-menu-dropdown').forEach(d => {
+                if (d !== dropdown) d.classList.add('hidden');
+            });
+            dropdown.classList.toggle('hidden');
+        });
+
+        // "Clear All" button logic
+        const clearAllBtn = dayBox.querySelector('.clear-all-btn');
+        clearAllBtn.addEventListener('click', () => {
+            if (confirm('Are you sure you want to clear all data for this day?')) {
+                clearDayData(day);
+            }
+            dropdown.classList.add('hidden');
+        });
+
+        // "Clear Time" menu button logic
+        const clearTimeMenuBtn = dayBox.querySelector('.clear-time-menu-btn');
+        clearTimeMenuBtn.addEventListener('click', () => {
+            dayBox.classList.toggle('show-clear-btns');
+            dropdown.classList.add('hidden'); // Close menu after selection
+        });
+
+        // Individual time clear 'x' buttons
+        const clearTimeBtns = dayBox.querySelectorAll('.clear-time-btn');
+        clearTimeBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                document.querySelectorAll('.day-card-menu-dropdown').forEach(d => {
-                    if (d !== dropdown) d.classList.add('hidden');
-                });
-                dropdown.classList.toggle('hidden');
-            });
-
-            // "Clear All" button logic
-            const clearAllBtn = dayBox.querySelector('.clear-all-btn');
-            clearAllBtn.addEventListener('click', () => {
-                if (confirm('Are you sure you want to clear all data for this day?')) {
-                    clearDayData(day);
+                const { key, field } = e.currentTarget.dataset;
+                const input = e.currentTarget.previousElementSibling;
+                if (input) {
+                    input.value = '';
                 }
-                dropdown.classList.add('hidden');
-            });
-
-            // "Clear Time" menu button logic
-            const clearTimeMenuBtn = dayBox.querySelector('.clear-time-menu-btn');
-            clearTimeMenuBtn.addEventListener('click', () => {
-                dayBox.classList.toggle('show-clear-btns');
-                dropdown.classList.add('hidden'); // Close menu after selection
-            });
-
-            // Individual time clear 'x' buttons
-            const clearTimeBtns = dayBox.querySelectorAll('.clear-time-btn');
-            clearTimeBtns.forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const { key, field } = e.currentTarget.dataset;
-                    // Find the sibling input and clear it visually
-                    const input = e.currentTarget.previousElementSibling;
-                    if (input) {
-                        input.value = '';
-                    }
-                    // Update the data model
-                    updateWorkData(key, field, '');
-                });
+                updateWorkData(key, field, '');
             });
         });
 
-        // Add change listeners for all inputs/selects
-        daysContainer.querySelectorAll('input, select').forEach(el => {
+        // Add change listeners for all inputs/selects in this card
+        dayBox.querySelectorAll('input, select').forEach(el => {
             el.addEventListener('change', (e) => {
                 const { key, field } = e.target.dataset;
                 updateWorkData(key, field, e.target.value);
             });
+        });
+    };
+
+    const addDayCardEventListeners = () => {
+        daysContainer.querySelectorAll('.day-box').forEach(dayBox => {
+            addEventListenersToDayCard(dayBox);
         });
 
         // Global click listener to close open menus
@@ -887,7 +902,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (todayEl) {
                 setTimeout(() => {
                     todayEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }, 500); // Delay to allow page to render fully
+                }, 600); // Increased delay to ensure page is fully rendered and animated
             }
         }
     };
