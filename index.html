@@ -26,6 +26,7 @@
             --bg-light: #f8f9fa; /* A clean, near-white */
             --bg-dark-start: #111827;
             --bg-dark-end: #000000;
+            --slt-blue: #3b82f6; /* A corporate blue */
         }
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         body {
@@ -91,8 +92,8 @@
         /* Premium input focus glow */
         .premium-input:focus,
         .premium-select:focus {
-             border-color: #1559b3;
-             box-shadow: 0 0 0 3px rgba(21, 89, 179, 0.2);
+             border-color: var(--slt-blue);
+             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
              outline: none;
         }
         html.dark .premium-input:focus,
@@ -123,7 +124,7 @@
             display: none;
         }
 
-        /* New Doodle Loading Animation */
+        /* New Corporate Doodle Loading Animation */
         .loader-content {
             display: flex;
             flex-direction: column;
@@ -135,9 +136,9 @@
             height: 80px;
         }
         .animated-logo-svg .draw-stroke {
-            stroke-dasharray: 1000;
-            stroke-dashoffset: 1000;
-            animation: draw 1s ease-out forwards;
+            stroke-dasharray: 500;
+            stroke-dashoffset: 500;
+            animation: draw 0.8s ease-out forwards;
         }
         html.dark .animated-logo-svg .logo-stroke-color {
              stroke: #60a5fa;
@@ -145,11 +146,14 @@
         html.dark .animated-logo-svg .logo-fill-color {
              fill: #60a5fa;
         }
-        .animated-logo-svg .line1 { animation-delay: 0s; }
-        .animated-logo-svg .line2 { animation-delay: 0.2s; }
-        .animated-logo-svg .line3 { animation-delay: 0.4s; }
-        .animated-logo-svg .clip { animation-delay: 0.2s; }
-        .animated-logo-svg .paper { animation-delay: 0.1s; }
+        
+        /* Animation Sequence Delays */
+        .animated-logo-svg .doc-outline { animation-delay: 0s; }
+        .animated-logo-svg .doc-corner { animation-delay: 0.1s; }
+        .animated-logo-svg .text-line1 { animation-delay: 0.2s; }
+        .animated-logo-svg .text-line2 { animation-delay: 0.3s; }
+        .animated-logo-svg .text-line3 { animation-delay: 0.4s; }
+        .animated-logo-svg .checkmark { animation-delay: 0.5s; }
         
         @keyframes draw {
             to {
@@ -161,7 +165,7 @@
             font-weight: 600;
             color: #4b5563; /* gray-600 */
             opacity: 0;
-            animation: fadeIn 0.5s ease-out 0.6s forwards;
+            animation: fadeIn 0.5s ease-out 0.8s forwards;
         }
         html.dark .loader-text {
              color: #d1d5db; /* gray-300 */
@@ -295,12 +299,15 @@
     <div id="loading-spinner" class="fixed inset-0 bg-white/80 dark:bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 transition-opacity duration-300">
         <div class="loader-content">
             <svg class="animated-logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                <g class="logo-stroke-color" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="none">
-                    <path class="draw-stroke paper" d="M25 15 H75 V85 H25 Z" />
-                    <path class="draw-stroke clip" d="M40 15 V 5 H60 V15" />
-                    <path class="draw-stroke line1" d="M35 35 H65" />
-                    <path class="draw-stroke line2" d="M35 50 H65" />
-                    <path class="draw-stroke line3" d="M35 65 H55" />
+                <g class="logo-stroke-color" stroke="var(--slt-blue)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none">
+                    <!-- Document Outline -->
+                    <path class="draw-stroke doc-outline" d="M25,15 h50 a5,5 0 0 1 5,5 v60 a5,5 0 0 1 -5,5 h-50 a5,5 0 0 1 -5,-5 v-60 a5,5 0 0 1 5,-5 z" />
+                    <!-- Text Lines -->
+                    <path class="draw-stroke text-line1" d="M35 35 H 75" />
+                    <path class="draw-stroke text-line2" d="M35 48 H 75" />
+                    <path class="draw-stroke text-line3" d="M35 61 H 60" />
+                    <!-- Checkmark -->
+                    <path class="draw-stroke checkmark" d="M40 75 L50 82 L70 65" />
                 </g>
             </svg>
             <span class="loader-text dark:text-gray-300">Work Report</span>
