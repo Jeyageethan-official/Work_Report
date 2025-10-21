@@ -450,6 +450,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentDate = new Date();
     let workData = {};
     let reminders = [];
+    let isInitialLoad = true;
     
     const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
     const reminderCategories = ['Wedding', 'Nobility Ceremony', 'Birthday', 'House Warming Ceremony', 'Other'];
@@ -983,6 +984,8 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const scrollToToday = () => {
+        if (!isInitialLoad) return;
+
         const today = new Date();
         const isCurrentMonthView = today.getFullYear() === currentDate.getFullYear() && today.getMonth() === currentDate.getMonth();
 
@@ -994,6 +997,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }, 500); 
             }
         }
+        isInitialLoad = false;
     };
 
     // MODAL CONTENT AND LOGIC
@@ -1170,6 +1174,7 @@ document.addEventListener('DOMContentLoaded', () => {
             auth.signOut().then(() => {
                 localStorage.removeItem('workData');
                 localStorage.removeItem('reminders');
+                isInitialLoad = true; // Reset for next login
                 closeModal();
             });
         });
@@ -1180,11 +1185,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const numVisibleItems = 5; // Corresponds to 200px height
         const paddingItems = Math.floor(numVisibleItems / 2);
 
-        let currentHour = 0;
-        let currentMinute = 0;
+        let currentHour, currentMinute;
         const initialValue = targetInput.value;
         if (initialValue && initialValue.includes(':')) {
             [currentHour, currentMinute] = initialValue.split(':').map(Number);
+        } else {
+            const now = new Date();
+            currentHour = now.getHours();
+            currentMinute = now.getMinutes();
         }
 
         const hours = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '0'));
