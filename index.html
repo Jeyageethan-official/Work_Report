@@ -35,7 +35,7 @@
         }
         /* Smoother theme transitions */
         body, .bg-white, .bg-gray-50, .dark .dark\:bg-gray-900, .dark .dark\:bg-gray-950, .premium-input, .premium-select {
-            transition: background-color: 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
         }
         html:not(.dark) body {
             background-color: var(--bg-light);
@@ -500,14 +500,28 @@ document.addEventListener('DOMContentLoaded', () => {
             : ["", "Poya Day", "Public Holiday", "Custom Reason", "Own Leave"];
 
         const createInput = (label, field, type, placeholder = '', value = '') => {
+             const isTimeInput = type === 'time';
              const valueAttr = value ? `value="${value}"` : '';
              const inputHTML = `<input type="${type}" placeholder="${placeholder}" ${valueAttr} data-key="${dateKey}" data-field="${field}" class="w-full p-2 border border-gray-300 rounded-lg bg-gray-50/50 transition duration-200 premium-input dark:bg-gray-800/50 dark:border-gray-700 dark:text-gray-200 dark:placeholder-gray-400" />`;
              
-             return `
-                <div class="flex flex-col">
-                    <label class="font-medium text-sm mb-1.5 text-gray-700 dark:text-gray-300">${label}</label>
-                    ${inputHTML}
-                </div>`;
+             if (isTimeInput) {
+                return `
+                    <div class="flex flex-col">
+                        <label class="font-medium text-sm mb-1.5 text-gray-700 dark:text-gray-300">${label}</label>
+                        <div class="relative time-input-wrapper">
+                            ${inputHTML}
+                            <button class="clear-time-field-btn hidden absolute top-1/2 right-2 -translate-y-1/2 p-1 text-gray-400 hover:text-red-500 dark:hover:text-red-400 rounded-full bg-white dark:bg-gray-800/80">
+                               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                            </button>
+                        </div>
+                    </div>`;
+             } else {
+                return `
+                    <div class="flex flex-col">
+                        <label class="font-medium text-sm mb-1.5 text-gray-700 dark:text-gray-300">${label}</label>
+                        ${inputHTML}
+                    </div>`;
+             }
         };
 
         const createSelect = (label, field, options, value = '') => `
@@ -527,6 +541,10 @@ document.addEventListener('DOMContentLoaded', () => {
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
                         </button>
                         <div class="day-card-menu-dropdown hidden">
+                             <div class="day-card-menu-item clear-time-btn">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z"/><path d="m12 8-4 4 4 4"/><path d="M16 12H8"/></svg>
+                                <span>Clear Time</span>
+                            </div>
                             <div class="day-card-menu-item clear-all-btn">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 2.5a.5.5 0 0 0 0 1h1.841l1.643 3.594a.5.5 0 0 0 .445.306h10.122a.5.5 0 0 0 .445-.306l1.643-3.594H20.5a.5.5 0 0 0 0-1H2.5Z"/><path d="M5.625 7.5 7.5 20h9l1.875-12.5H5.625Z"/></svg>
                                 <span>Clear All</span>
@@ -779,19 +797,32 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             dropdown.classList.add('hidden');
         });
+        
+        dayBox.querySelector('.clear-time-btn').addEventListener('click', () => {
+            dayBox.querySelectorAll('.time-input-wrapper').forEach(wrapper => {
+                const btn = wrapper.querySelector('.clear-time-field-btn');
+                btn.classList.toggle('hidden');
+            });
+            dropdown.classList.add('hidden');
+        });
+        
+        dayBox.querySelectorAll('.clear-time-field-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const input = e.currentTarget.closest('.time-input-wrapper').querySelector('input');
+                
+                input.value = '';
+                input.dispatchEvent(new Event('input', { bubbles: true })); // Trigger the main event handler
+                
+                e.currentTarget.classList.add('hidden');
+            });
+        });
 
         dayBox.querySelectorAll('input, select').forEach(el => {
             const eventType = el.tagName === 'SELECT' ? 'change' : 'input';
             el.addEventListener(eventType, (e) => {
                 const { key, field } = e.target.dataset;
-                const value = e.target.value;
-
-                // Robust fix for iOS Safari time input clearing
-                if (el.type === 'time' && value === '') {
-                    e.target.removeAttribute('value');
-                }
-                
-                updateWorkData(key, field, value);
+                updateWorkData(key, field, e.target.value);
             });
         });
     };
@@ -1489,7 +1520,7 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 const credential = new PasswordCredential({ id: email, password: password, name: email });
                 await navigator.credentials.store(credential);
-            } catch (err) => {
+            } catch (err) {
                 console.error('Error storing credential:', err);
             }
         }
@@ -1658,4 +1689,3 @@ document.addEventListener('DOMContentLoaded', () => {
 <script type="module" src="/index.tsx"></script>
 </body>
 </html>
-```
