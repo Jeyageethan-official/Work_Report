@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -35,7 +34,7 @@
         }
         /* Smoother theme transitions */
         body, .bg-white, .bg-gray-50, .dark .dark\:bg-gray-900, .dark .dark\:bg-gray-950, .premium-input, .premium-select {
-            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+            transition: background-color: 0.3s ease, color 0.3s ease, border-color 0.3s ease;
         }
         html:not(.dark) body {
             background-color: var(--bg-light);
@@ -102,12 +101,6 @@
              box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2);
         }
 
-        /* Hide default time/date input icons */
-        input[type="time"]::-webkit-calendar-picker-indicator,
-        input[type="date"]::-webkit-calendar-picker-indicator {
-            display: none;
-        }
-        
         /* Custom select arrow */
         .premium-select {
             appearance: none;
@@ -251,6 +244,49 @@
         }
         html.dark .voice-btn-listening svg {
             color: #f87171; /* red-400 */
+        }
+        
+        /* Custom Time Picker Modal */
+        .time-picker-scroller {
+            height: 200px;
+            overflow-y: scroll;
+            scroll-snap-type: y mandatory;
+            -webkit-overflow-scrolling: touch; /* for smooth scrolling on iOS */
+        }
+        .time-picker-scroller::-webkit-scrollbar {
+            display: none; /* Hide scrollbar */
+        }
+        .time-picker-item {
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem; /* 24px */
+            scroll-snap-align: center;
+            color: #9ca3af; /* gray-400 */
+            transition: color 0.2s, font-weight 0.2s;
+        }
+        .time-picker-padding {
+            height: 80px; /* (scroller height - item height) / 2 */
+            flex-shrink: 0;
+        }
+        .selection-indicator {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            transform: translateY(-50%);
+            height: 40px;
+            background-color: rgba(0, 122, 255, 0.1);
+            border-top: 1px solid rgba(0, 122, 255, 0.2);
+            border-bottom: 1px solid rgba(0, 122, 255, 0.2);
+            border-radius: 8px;
+            pointer-events: none; /* Allows scrolling through it */
+        }
+        html.dark .selection-indicator {
+            background-color: rgba(96, 165, 250, 0.1);
+            border-top-color: rgba(96, 165, 250, 0.2);
+            border-bottom-color: rgba(96, 165, 250, 0.2);
         }
     </style>
 <script type="importmap">
@@ -400,7 +436,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // MODAL RENDERING & MANAGEMENT
     const openModal = (modalHTML) => {
         modalRoot.innerHTML = modalHTML;
-        // Attach close listeners to all elements with data-dismiss="modal"
         modalRoot.querySelectorAll('[data-dismiss="modal"]').forEach(el => {
             el.addEventListener('click', closeModal);
         });
@@ -500,28 +535,25 @@ document.addEventListener('DOMContentLoaded', () => {
             : ["", "Poya Day", "Public Holiday", "Custom Reason", "Own Leave"];
 
         const createInput = (label, field, type, placeholder = '', value = '') => {
-             const isTimeInput = type === 'time';
-             const valueAttr = value ? `value="${value}"` : '';
-             const inputHTML = `<input type="${type}" placeholder="${placeholder}" ${valueAttr} data-key="${dateKey}" data-field="${field}" class="w-full p-2 border border-gray-300 rounded-lg bg-gray-50/50 transition duration-200 premium-input dark:bg-gray-800/50 dark:border-gray-700 dark:text-gray-200 dark:placeholder-gray-400" />`;
-             
-             if (isTimeInput) {
+             if (type === 'time') {
+                const formattedValue = value || '';
                 return `
                     <div class="flex flex-col">
                         <label class="font-medium text-sm mb-1.5 text-gray-700 dark:text-gray-300">${label}</label>
-                        <div class="relative time-input-wrapper">
-                            ${inputHTML}
-                            <button class="clear-time-field-btn hidden absolute top-1/2 right-2 -translate-y-1/2 p-1 text-gray-400 hover:text-red-500 dark:hover:text-red-400 rounded-full bg-white dark:bg-gray-800/80">
-                               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                            </button>
+                        <div class="relative custom-time-input-wrapper cursor-pointer">
+                            <input type="text" readonly placeholder="--:--" value="${formattedValue}" data-key="${dateKey}" data-field="${field}" class="w-full p-2 border border-gray-300 rounded-lg bg-gray-50/50 transition duration-200 premium-input dark:bg-gray-800/50 dark:border-gray-700 dark:text-gray-200 dark:placeholder-gray-400 text-center cursor-pointer" />
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="absolute top-1/2 left-3 -translate-y-1/2 text-gray-400 pointer-events-none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
                         </div>
                     </div>`;
-             } else {
+            } else {
+                const valueAttr = value ? `value="${value}"` : '';
+                const inputHTML = `<input type="${type}" placeholder="${placeholder}" ${valueAttr} data-key="${dateKey}" data-field="${field}" class="w-full p-2 border border-gray-300 rounded-lg bg-gray-50/50 transition duration-200 premium-input dark:bg-gray-800/50 dark:border-gray-700 dark:text-gray-200 dark:placeholder-gray-400" />`;
                 return `
                     <div class="flex flex-col">
                         <label class="font-medium text-sm mb-1.5 text-gray-700 dark:text-gray-300">${label}</label>
                         ${inputHTML}
                     </div>`;
-             }
+            }
         };
 
         const createSelect = (label, field, options, value = '') => `
@@ -541,10 +573,6 @@ document.addEventListener('DOMContentLoaded', () => {
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
                         </button>
                         <div class="day-card-menu-dropdown hidden">
-                             <div class="day-card-menu-item clear-time-btn">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z"/><path d="m12 8-4 4 4 4"/><path d="M16 12H8"/></svg>
-                                <span>Clear Time</span>
-                            </div>
                             <div class="day-card-menu-item clear-all-btn">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 2.5a.5.5 0 0 0 0 1h1.841l1.643 3.594a.5.5 0 0 0 .445.306h10.122a.5.5 0 0 0 .445-.306l1.643-3.594H20.5a.5.5 0 0 0 0-1H2.5Z"/><path d="M5.625 7.5 7.5 20h9l1.875-12.5H5.625Z"/></svg>
                                 <span>Clear All</span>
@@ -653,10 +681,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // DATA HANDLING & STATE UPDATES
     const updateWorkData = (dateKey, field, value) => {
-        // 1. Prepare local update
         workData[dateKey] = workData[dateKey] || {};
+        
+        if (!value) {
+            delete workData[dateKey][field];
+        } else {
+            workData[dateKey][field] = value;
+        }
 
-        // 2. Handle cascading changes locally first
         if (field === 'leaveStatus' && value !== 'Yes') {
             delete workData[dateKey].leaveReason;
             delete workData[dateKey].customReasonDetails;
@@ -669,42 +701,12 @@ document.addEventListener('DOMContentLoaded', () => {
             delete workData[dateKey].leaveReasonText;
         }
 
-        // 3. Apply the primary change locally
-        if (value) {
-            workData[dateKey][field] = value;
-        } else {
-            delete workData[dateKey][field];
-        }
-
-        // 4. Prepare and send cloud update if logged in
         if (user) {
-            const userRef = db.collection("users").doc(user.uid);
-            const updatePayload = {};
-            const baseFieldPath = `workData.${dateKey}`;
-
-            // Add primary change to payload
-            updatePayload[`${baseFieldPath}.${field}`] = value ? value : firebase.firestore.FieldValue.delete();
-
-            // Add cascading changes to payload
-            if (field === 'leaveStatus' && value !== 'Yes') {
-                updatePayload[`${baseFieldPath}.leaveReason`] = firebase.firestore.FieldValue.delete();
-                updatePayload[`${baseFieldPath}.customReasonDetails`] = firebase.firestore.FieldValue.delete();
-                updatePayload[`${baseFieldPath}.leaveReasonText`] = firebase.firestore.FieldValue.delete();
-            }
-            if (field === 'leaveReason' && value !== 'Custom Reason') {
-                updatePayload[`${baseFieldPath}.customReasonDetails`] = firebase.firestore.FieldValue.delete();
-            }
-            if (field === 'leaveReason' && value !== 'Own Leave') {
-                updatePayload[`${baseFieldPath}.leaveReasonText`] = firebase.firestore.FieldValue.delete();
-            }
-            
-            userRef.update(updatePayload).catch(err => console.error("Firestore update error:", err));
+            syncToCloud();
         } else {
-            // 5. Save locally if not logged in
             saveLocalData();
         }
-
-        // 6. Re-render UI
+        
         if (field === 'leaveStatus' || field === 'leaveReason') {
             const day = dateKey.split('-')[2];
             const dayBox = daysContainer.querySelector(`.day-box[data-day="${day}"]`);
@@ -717,7 +719,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         renderSummary();
     };
-
     
     const saveLocalData = () => {
         localStorage.setItem('workData', JSON.stringify(workData));
@@ -797,28 +798,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             dropdown.classList.add('hidden');
         });
-        
-        dayBox.querySelector('.clear-time-btn').addEventListener('click', () => {
-            dayBox.querySelectorAll('.time-input-wrapper').forEach(wrapper => {
-                const btn = wrapper.querySelector('.clear-time-field-btn');
-                btn.classList.toggle('hidden');
-            });
-            dropdown.classList.add('hidden');
-        });
-        
-        dayBox.querySelectorAll('.clear-time-field-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const input = e.currentTarget.closest('.time-input-wrapper').querySelector('input');
-                
-                input.value = '';
-                input.dispatchEvent(new Event('input', { bubbles: true })); // Trigger the main event handler
-                
-                e.currentTarget.classList.add('hidden');
-            });
-        });
 
-        dayBox.querySelectorAll('input, select').forEach(el => {
+        dayBox.querySelectorAll('input[type="text"]:not([readonly]), input[type="number"], select').forEach(el => {
             const eventType = el.tagName === 'SELECT' ? 'change' : 'input';
             el.addEventListener(eventType, (e) => {
                 const { key, field } = e.target.dataset;
@@ -1008,7 +989,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
                 const result = await auth.signInWithPopup(provider);
                 const email = result.user.email;
-                await promptToSavePassword(email, '******');
+                await promptToSavePassword(email, '******'); // Password not available for Google sign-in
                 closeModal();
             } catch (e) {
                 document.getElementById('auth-error').textContent = e.message;
@@ -1239,6 +1220,72 @@ document.addEventListener('DOMContentLoaded', () => {
                 closeModal();
             });
         });
+    };
+    
+    const showTimePickerModal = (targetInput) => {
+        const { key: dateKey, field } = targetInput.dataset;
+        const initialValue = targetInput.value;
+        let [initialHour, initialMinute] = (initialValue || "00:00").split(':').map(Number);
+
+        const hours = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '0'));
+        const minutes = Array.from({ length: 60 }, (_, i) => String(i).padStart(2, '0'));
+
+        const content = `
+            <div class="relative flex justify-center items-center h-[200px] text-2xl font-mono">
+                <!-- Scrollers -->
+                <div class="flex-1 time-picker-scroller" id="hour-scroller">
+                    <div class="time-picker-padding"></div>
+                    ${hours.map(h => `<div class="time-picker-item">${h}</div>`).join('')}
+                    <div class="time-picker-padding"></div>
+                </div>
+                <span class="font-bold text-3xl pb-1">:</span>
+                <div class="flex-1 time-picker-scroller" id="minute-scroller">
+                    <div class="time-picker-padding"></div>
+                    ${minutes.map(m => `<div class="time-picker-item">${m}</div>`).join('')}
+                    <div class="time-picker-padding"></div>
+                </div>
+
+                <!-- Selection Indicator -->
+                <div class="selection-indicator"></div>
+            </div>
+            <div class="grid grid-cols-3 gap-3 pt-6">
+                <button id="time-picker-cancel" class="w-full px-4 py-2.5 rounded-lg font-semibold text-sm shadow-sm transition-all bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 active:scale-95">Cancel</button>
+                <button id="time-picker-clear" class="w-full px-4 py-2.5 rounded-lg font-semibold text-sm shadow-sm transition-all bg-red-100 text-red-700 hover:bg-red-200 dark:bg-red-900/50 dark:text-red-300 dark:hover:bg-red-900 active:scale-95">Clear</button>
+                <button id="time-picker-done" class="w-full px-4 py-2.5 rounded-lg font-semibold text-sm shadow-sm transition-all bg-blue-600 text-white hover:bg-blue-700 active:scale-95">Done</button>
+            </div>
+        `;
+
+        openModal(createModal('Select Time', content, 'time-picker-modal'));
+
+        const hourScroller = document.getElementById('hour-scroller');
+        const minuteScroller = document.getElementById('minute-scroller');
+        const itemHeight = 40; 
+
+        hourScroller.scrollTop = initialHour * itemHeight;
+        minuteScroller.scrollTop = initialMinute * itemHeight;
+        
+        document.getElementById('time-picker-done').addEventListener('click', () => {
+            hourScroller.scrollTop = Math.round(hourScroller.scrollTop / itemHeight) * itemHeight;
+            minuteScroller.scrollTop = Math.round(minuteScroller.scrollTop / itemHeight) * itemHeight;
+            
+            const finalHour = Math.round(hourScroller.scrollTop / itemHeight);
+            const finalMinute = Math.round(minuteScroller.scrollTop / itemHeight);
+            
+            const formattedTime = `${String(finalHour).padStart(2, '0')}:${String(finalMinute).padStart(2, '0')}`;
+            targetInput.value = formattedTime;
+            targetInput.setAttribute('value', formattedTime);
+            updateWorkData(dateKey, field, formattedTime);
+            closeModal();
+        });
+
+        document.getElementById('time-picker-clear').addEventListener('click', () => {
+            targetInput.value = '';
+            targetInput.removeAttribute('value');
+            updateWorkData(dateKey, field, '');
+            closeModal();
+        });
+
+        document.getElementById('time-picker-cancel').addEventListener('click', closeModal);
     };
 
     const showShareModal = () => {
@@ -1520,7 +1567,7 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 const credential = new PasswordCredential({ id: email, password: password, name: email });
                 await navigator.credentials.store(credential);
-            } catch (err) {
+            } catch (err) => {
                 console.error('Error storing credential:', err);
             }
         }
@@ -1541,7 +1588,7 @@ document.addEventListener('DOMContentLoaded', () => {
         loadingSpinner.style.opacity = '0';
         setTimeout(() => {
             loadingSpinner.style.display = 'none';
-        }, 1000);
+        }, 100); // Drastically reduced loading time
         appContainer.classList.add('fade-in');
         appContainer.style.opacity = '1';
     };
@@ -1549,6 +1596,16 @@ document.addEventListener('DOMContentLoaded', () => {
     // -----------------------------------------------------------------------------
     // SCRIPT EXECUTION & EVENT BINDING
     // -----------------------------------------------------------------------------
+    
+    document.body.addEventListener('click', (e) => {
+        const wrapper = e.target.closest('.custom-time-input-wrapper');
+        if (wrapper) {
+            const input = wrapper.querySelector('input[type="text"]');
+            if (input) {
+                showTimePickerModal(input);
+            }
+        }
+    });
     
     window.addEventListener('scroll', () => {
         const isAtTop = window.scrollY < 100;
@@ -1584,6 +1641,9 @@ document.addEventListener('DOMContentLoaded', () => {
             userRefUnsubscribe = null;
         }
         
+        loadingSpinner.style.display = 'flex';
+        loadingSpinner.style.opacity = '1';
+
         if (currentUser) {
             await currentUser.reload();
         }
@@ -1591,63 +1651,67 @@ document.addEventListener('DOMContentLoaded', () => {
         if (currentUser && currentUser.emailVerified) {
             user = currentUser;
             const userRef = db.collection("users").doc(user.uid);
-            const snapshot = await userRef.get();
+            
+            try {
+                let doc = await userRef.get();
 
-            if (!snapshot.exists) {
-                const { displayName, email } = user;
-                try {
-                    await userRef.set({
+                if (!doc.exists) {
+                    const { displayName, email } = user;
+                    const initialData = {
                         displayName,
                         email,
                         createdAt: new Date(),
                         workData: {},
                         reminders: []
-                    });
-                } catch (error) {
-                    console.error("Error creating user document", error);
+                    };
+                    await userRef.set(initialData);
+                    doc = await userRef.get();
                 }
-            }
 
-            const localWorkDataRaw = localStorage.getItem('workData');
-            const localRemindersRaw = localStorage.getItem('reminders');
+                let cloudData = doc.data() || {};
+                workData = cloudData.workData || {};
+                reminders = cloudData.reminders || [];
 
-            if (localWorkDataRaw || localRemindersRaw) {
-                loadingSpinner.style.display = 'flex';
-                try {
+                const localWorkDataRaw = localStorage.getItem('workData');
+                const localRemindersRaw = localStorage.getItem('reminders');
+
+                if (localWorkDataRaw || localRemindersRaw) {
                     const localWorkData = JSON.parse(localWorkDataRaw || '{}');
                     const localReminders = JSON.parse(localRemindersRaw || '[]');
                     
-                    const doc = await userRef.get();
-                    const cloudData = doc.data() || {};
-                    
-                    const mergedWorkData = { ...(cloudData.workData || {}), ...localWorkData };
-                    const mergedReminders = [...(cloudData.reminders || []), ...localReminders];
-                    const uniqueReminders = Array.from(new Set(mergedReminders.map(r => JSON.stringify(r)))).map(s => JSON.parse(s));
+                    workData = { ...workData, ...localWorkData };
+                    const mergedReminders = [...reminders, ...localReminders];
+                    reminders = Array.from(new Set(mergedReminders.map(r => JSON.stringify(r)))).map(s => JSON.parse(s));
 
                     await userRef.update({
-                        workData: mergedWorkData,
-                        reminders: uniqueReminders
+                        workData: workData,
+                        reminders: reminders
                     });
                     
                     localStorage.removeItem('workData');
                     localStorage.removeItem('reminders');
-                } catch (err) {
-                    console.error("Failed to sync local data on login:", err);
-                    alert("Could not sync local data.");
-                } finally {
-                    loadingSpinner.style.display = 'none';
                 }
-            }
 
-            userRefUnsubscribe = userRef.onSnapshot(doc => {
-                const data = doc.data();
-                workData = data?.workData || {};
-                reminders = data?.reminders || [];
                 initializeApp();
-            }, err => {
-                console.error("Firestore snapshot error: ", err);
+
+                userRefUnsubscribe = userRef.onSnapshot(snapshot => {
+                    const updatedData = snapshot.data();
+                    if (updatedData) {
+                        workData = updatedData.workData || {};
+                        reminders = updatedData.reminders || [];
+                        renderAll(); 
+                    }
+                }, err => {
+                    console.error("Firestore snapshot error: ", err);
+                });
+
+            } catch (error) {
+                console.error("Error during authentication/data fetch:", error);
+                user = null;
+                workData = JSON.parse(localStorage.getItem('workData') || '{}');
+                reminders = JSON.parse(localStorage.getItem('reminders') || '[]');
                 initializeApp();
-            });
+            }
 
         } else {
             if (currentUser && !currentUser.emailVerified) {
