@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -34,7 +35,7 @@
         }
         /* Smoother theme transitions */
         body, .bg-white, .bg-gray-50, .dark .dark\:bg-gray-900, .dark .dark\:bg-gray-950, .premium-input, .premium-select {
-            transition: background-color: 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
         }
         html:not(.dark) body {
             background-color: var(--bg-light);
@@ -101,6 +102,12 @@
              box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2);
         }
 
+        /* Hide default time/date input icons */
+        input[type="time"]::-webkit-calendar-picker-indicator,
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            display: none;
+        }
+        
         /* Custom select arrow */
         .premium-select {
             appearance: none;
@@ -131,7 +138,7 @@
         .animated-logo-svg .draw-stroke {
             stroke-dasharray: 500;
             stroke-dashoffset: 500;
-            animation: draw 0.8s ease-out forwards;
+            animation: draw 0.3s ease-out forwards;
         }
         html.dark .animated-logo-svg .logo-stroke-color {
              stroke: #60a5fa;
@@ -142,11 +149,11 @@
         
         /* Animation Sequence Delays */
         .animated-logo-svg .doc-outline { animation-delay: 0s; }
-        .animated-logo-svg .doc-corner { animation-delay: 0.1s; }
-        .animated-logo-svg .text-line1 { animation-delay: 0.2s; }
-        .animated-logo-svg .text-line2 { animation-delay: 0.3s; }
-        .animated-logo-svg .text-line3 { animation-delay: 0.4s; }
-        .animated-logo-svg .checkmark { animation-delay: 0.5s; }
+        .animated-logo-svg .doc-corner { animation-delay: 0.05s; }
+        .animated-logo-svg .text-line1 { animation-delay: 0.1s; }
+        .animated-logo-svg .text-line2 { animation-delay: 0.15s; }
+        .animated-logo-svg .text-line3 { animation-delay: 0.2s; }
+        .animated-logo-svg .checkmark { animation-delay: 0.25s; }
         
         @keyframes draw {
             to {
@@ -158,7 +165,7 @@
             font-weight: 600;
             color: #4b5563; /* gray-600 */
             opacity: 0;
-            animation: fadeIn 0.5s ease-out 0.8s forwards;
+            animation: fadeIn 0.2s ease-out 0.3s forwards;
         }
         html.dark .loader-text {
              color: #d1d5db; /* gray-300 */
@@ -246,47 +253,93 @@
             color: #f87171; /* red-400 */
         }
         
-        /* Custom Time Picker Modal */
-        .time-picker-scroller {
-            height: 200px;
-            overflow-y: scroll;
-            scroll-snap-type: y mandatory;
-            -webkit-overflow-scrolling: touch; /* for smooth scrolling on iOS */
+        /* Custom iOS-style Time Picker */
+        @keyframes slide-up {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
         }
-        .time-picker-scroller::-webkit-scrollbar {
-            display: none; /* Hide scrollbar */
+        .time-picker-content {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: #f9f9f9;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            padding: 16px;
+            padding-bottom: calc(16px + env(safe-area-inset-bottom)); /* For iPhone X+ */
+            animation: slide-up 0.3s ease-out;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+            max-width: 420px;
+            margin: 0 auto;
+        }
+        html.dark .time-picker-content {
+            background-color: #1c1c1e;
+        }
+        .time-picker-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #dcdcdc;
+        }
+        html.dark .time-picker-header {
+            border-bottom-color: #3a3a3c;
+        }
+        .time-picker-wheels {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+            position: relative;
+            overflow: hidden;
+            margin: 16px 0;
+        }
+        .time-picker-selection-indicator {
+            position: absolute;
+            top: 50%;
+            left: 16px;
+            right: 16px;
+            height: 40px;
+            transform: translateY(-50%);
+            background-color: rgba(0, 0, 0, 0.05);
+            border-top: 1px solid #d1d1d6;
+            border-bottom: 1px solid #d1d1d6;
+            border-radius: 8px;
+            pointer-events: none;
+            z-index: 1;
+        }
+        html.dark .time-picker-selection-indicator {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-color: #444;
+        }
+        .time-picker-wheel {
+            flex: 1;
+            height: 100%;
+            overflow-y: scroll;
+            scrollbar-width: none; /* Firefox */
+        }
+        .time-picker-wheel::-webkit-scrollbar {
+            display: none; /* Webkit */
+        }
+        .time-picker-wheel-col {
+            padding: 0;
+            margin: 0;
+            list-style: none;
         }
         .time-picker-item {
             height: 40px;
             display: flex;
-            align-items: center;
             justify-content: center;
-            font-size: 1.5rem; /* 24px */
-            scroll-snap-align: center;
-            color: #9ca3af; /* gray-400 */
-            transition: color 0.2s, font-weight 0.2s;
+            align-items: center;
+            font-size: 22px;
+            font-weight: 400;
         }
-        .time-picker-padding {
-            height: 80px; /* (scroller height - item height) / 2 */
-            flex-shrink: 0;
-        }
-        .selection-indicator {
-            position: absolute;
-            top: 50%;
-            left: 0;
-            right: 0;
-            transform: translateY(-50%);
-            height: 40px;
-            background-color: rgba(0, 122, 255, 0.1);
-            border-top: 1px solid rgba(0, 122, 255, 0.2);
-            border-bottom: 1px solid rgba(0, 122, 255, 0.2);
-            border-radius: 8px;
-            pointer-events: none; /* Allows scrolling through it */
-        }
-        html.dark .selection-indicator {
-            background-color: rgba(96, 165, 250, 0.1);
-            border-top-color: rgba(96, 165, 250, 0.2);
-            border-bottom-color: rgba(96, 165, 250, 0.2);
+        .time-picker-spacer {
+            font-size: 22px;
+            font-weight: 500;
+            padding: 0 10px;
+            align-self: center;
         }
     </style>
 <script type="importmap">
@@ -436,6 +489,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // MODAL RENDERING & MANAGEMENT
     const openModal = (modalHTML) => {
         modalRoot.innerHTML = modalHTML;
+        // Attach close listeners to all elements with data-dismiss="modal"
         modalRoot.querySelectorAll('[data-dismiss="modal"]').forEach(el => {
             el.addEventListener('click', closeModal);
         });
@@ -535,25 +589,20 @@ document.addEventListener('DOMContentLoaded', () => {
             : ["", "Poya Day", "Public Holiday", "Custom Reason", "Own Leave"];
 
         const createInput = (label, field, type, placeholder = '', value = '') => {
-             if (type === 'time') {
-                const formattedValue = value || '';
-                return `
-                    <div class="flex flex-col">
-                        <label class="font-medium text-sm mb-1.5 text-gray-700 dark:text-gray-300">${label}</label>
-                        <div class="relative custom-time-input-wrapper cursor-pointer">
-                            <input type="text" readonly placeholder="--:--" value="${formattedValue}" data-key="${dateKey}" data-field="${field}" class="w-full p-2 border border-gray-300 rounded-lg bg-gray-50/50 transition duration-200 premium-input dark:bg-gray-800/50 dark:border-gray-700 dark:text-gray-200 dark:placeholder-gray-400 text-center cursor-pointer" />
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="absolute top-1/2 left-3 -translate-y-1/2 text-gray-400 pointer-events-none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                        </div>
-                    </div>`;
+            const valueAttr = value ? `value="${value}"` : '';
+            let inputHTML;
+
+            if (type === 'time') {
+                inputHTML = `<input type="text" readonly placeholder="--:--" ${valueAttr} data-key="${dateKey}" data-field="${field}" class="w-full p-2 border border-gray-300 rounded-lg bg-gray-50/50 transition duration-200 premium-input dark:bg-gray-800/50 dark:border-gray-700 dark:text-gray-200 dark:placeholder-gray-400 custom-time-input cursor-pointer" />`;
             } else {
-                const valueAttr = value ? `value="${value}"` : '';
-                const inputHTML = `<input type="${type}" placeholder="${placeholder}" ${valueAttr} data-key="${dateKey}" data-field="${field}" class="w-full p-2 border border-gray-300 rounded-lg bg-gray-50/50 transition duration-200 premium-input dark:bg-gray-800/50 dark:border-gray-700 dark:text-gray-200 dark:placeholder-gray-400" />`;
-                return `
-                    <div class="flex flex-col">
-                        <label class="font-medium text-sm mb-1.5 text-gray-700 dark:text-gray-300">${label}</label>
-                        ${inputHTML}
-                    </div>`;
+                inputHTML = `<input type="${type}" placeholder="${placeholder}" ${valueAttr} data-key="${dateKey}" data-field="${field}" class="w-full p-2 border border-gray-300 rounded-lg bg-gray-50/50 transition duration-200 premium-input dark:bg-gray-800/50 dark:border-gray-700 dark:text-gray-200 dark:placeholder-gray-400" />`;
             }
+            
+            return `
+                <div class="flex flex-col">
+                    <label class="font-medium text-sm mb-1.5 text-gray-700 dark:text-gray-300">${label}</label>
+                    ${inputHTML}
+                </div>`;
         };
 
         const createSelect = (label, field, options, value = '') => `
@@ -573,6 +622,10 @@ document.addEventListener('DOMContentLoaded', () => {
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
                         </button>
                         <div class="day-card-menu-dropdown hidden">
+                             <div class="day-card-menu-item clear-time-btn">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z"/><path d="m12 8-4 4 4 4"/><path d="M16 12H8"/></svg>
+                                <span>Clear Time</span>
+                            </div>
                             <div class="day-card-menu-item clear-all-btn">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 2.5a.5.5 0 0 0 0 1h1.841l1.643 3.594a.5.5 0 0 0 .445.306h10.122a.5.5 0 0 0 .445-.306l1.643-3.594H20.5a.5.5 0 0 0 0-1H2.5Z"/><path d="M5.625 7.5 7.5 20h9l1.875-12.5H5.625Z"/></svg>
                                 <span>Clear All</span>
@@ -681,14 +734,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // DATA HANDLING & STATE UPDATES
     const updateWorkData = (dateKey, field, value) => {
+        // 1. Prepare local update
         workData[dateKey] = workData[dateKey] || {};
-        
-        if (!value) {
-            delete workData[dateKey][field];
-        } else {
-            workData[dateKey][field] = value;
-        }
 
+        // 2. Handle cascading changes locally first
         if (field === 'leaveStatus' && value !== 'Yes') {
             delete workData[dateKey].leaveReason;
             delete workData[dateKey].customReasonDetails;
@@ -701,12 +750,42 @@ document.addEventListener('DOMContentLoaded', () => {
             delete workData[dateKey].leaveReasonText;
         }
 
-        if (user) {
-            syncToCloud();
+        // 3. Apply the primary change locally
+        if (value) {
+            workData[dateKey][field] = value;
         } else {
+            delete workData[dateKey][field];
+        }
+
+        // 4. Prepare and send cloud update if logged in
+        if (user) {
+            const userRef = db.collection("users").doc(user.uid);
+            const updatePayload = {};
+            const baseFieldPath = `workData.${dateKey}`;
+
+            // Add primary change to payload
+            updatePayload[`${baseFieldPath}.${field}`] = value ? value : firebase.firestore.FieldValue.delete();
+
+            // Add cascading changes to payload
+            if (field === 'leaveStatus' && value !== 'Yes') {
+                updatePayload[`${baseFieldPath}.leaveReason`] = firebase.firestore.FieldValue.delete();
+                updatePayload[`${baseFieldPath}.customReasonDetails`] = firebase.firestore.FieldValue.delete();
+                updatePayload[`${baseFieldPath}.leaveReasonText`] = firebase.firestore.FieldValue.delete();
+            }
+            if (field === 'leaveReason' && value !== 'Custom Reason') {
+                updatePayload[`${baseFieldPath}.customReasonDetails`] = firebase.firestore.FieldValue.delete();
+            }
+            if (field === 'leaveReason' && value !== 'Own Leave') {
+                updatePayload[`${baseFieldPath}.leaveReasonText`] = firebase.firestore.FieldValue.delete();
+            }
+            
+            userRef.update(updatePayload).catch(err => console.error("Firestore update error:", err));
+        } else {
+            // 5. Save locally if not logged in
             saveLocalData();
         }
-        
+
+        // 6. Re-render UI
         if (field === 'leaveStatus' || field === 'leaveReason') {
             const day = dateKey.split('-')[2];
             const dayBox = daysContainer.querySelector(`.day-box[data-day="${day}"]`);
@@ -719,6 +798,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         renderSummary();
     };
+
     
     const saveLocalData = () => {
         localStorage.setItem('workData', JSON.stringify(workData));
@@ -798,8 +878,22 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             dropdown.classList.add('hidden');
         });
+        
+        dayBox.querySelector('.clear-time-btn').addEventListener('click', () => {
+            dayBox.querySelectorAll('.custom-time-input').forEach(input => {
+                if (input.value !== '') {
+                    input.value = '';
+                    input.dispatchEvent(new Event('input', { bubbles: true }));
+                }
+            });
+            dropdown.classList.add('hidden');
+        });
 
-        dayBox.querySelectorAll('input[type="text"]:not([readonly]), input[type="number"], select').forEach(el => {
+        dayBox.querySelectorAll('input, select').forEach(el => {
+            if (el.classList.contains('custom-time-input')) {
+                el.addEventListener('click', (e) => showTimePickerModal(e.target));
+            }
+            // All inputs need this listener for data binding
             const eventType = el.tagName === 'SELECT' ? 'change' : 'input';
             el.addEventListener(eventType, (e) => {
                 const { key, field } = e.target.dataset;
@@ -989,7 +1083,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
                 const result = await auth.signInWithPopup(provider);
                 const email = result.user.email;
-                await promptToSavePassword(email, '******'); // Password not available for Google sign-in
+                await promptToSavePassword(email, '******');
                 closeModal();
             } catch (e) {
                 document.getElementById('auth-error').textContent = e.message;
@@ -1081,6 +1175,97 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
     
+    const showTimePickerModal = (targetInput) => {
+        const itemHeight = 40;
+        const numVisibleItems = 5; // Corresponds to 200px height
+        const paddingItems = Math.floor(numVisibleItems / 2);
+
+        let currentHour = 0;
+        let currentMinute = 0;
+        const initialValue = targetInput.value;
+        if (initialValue && initialValue.includes(':')) {
+            [currentHour, currentMinute] = initialValue.split(':').map(Number);
+        }
+
+        const hours = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '0'));
+        const minutes = Array.from({ length: 60 }, (_, i) => String(i).padStart(2, '0'));
+
+        const createWheelItems = (items) => {
+            let listItems = '';
+            for (let i = 0; i < paddingItems; i++) listItems += '<li class="time-picker-item">&nbsp;</li>';
+            items.forEach(item => listItems += `<li class="time-picker-item">${item}</li>`);
+            for (let i = 0; i < paddingItems; i++) listItems += '<li class="time-picker-item">&nbsp;</li>';
+            return listItems;
+        };
+        
+        const modalContent = `
+            <div class="time-picker-header">
+                <button id="clear-time-btn" class="text-blue-600 dark:text-blue-400 font-semibold px-2 py-1">Clear</button>
+                <h3 class="font-bold text-lg dark:text-gray-200">Select Time</h3>
+                <button id="done-time-btn" class="text-blue-600 dark:text-blue-400 font-bold px-2 py-1">Done</button>
+            </div>
+            <div class="time-picker-wheels">
+                <div class="time-picker-selection-indicator"></div>
+                <div id="hour-wheel" class="time-picker-wheel">
+                    <ul class="time-picker-wheel-col">${createWheelItems(hours)}</ul>
+                </div>
+                <div class="time-picker-spacer">:</div>
+                <div id="minute-wheel" class="time-picker-wheel">
+                    <ul class="time-picker-wheel-col">${createWheelItems(minutes)}</ul>
+                </div>
+            </div>
+        `;
+
+        const modalHTML = `<div class="fixed inset-0 bg-gray-900 bg-opacity-50 backdrop-blur-sm flex justify-center items-end z-50 p-0 modal-bg-animate" data-dismiss="modal">
+            <div class="time-picker-content" onclick="event.stopPropagation()">${modalContent}</div>
+        </div>`;
+        openModal(modalHTML);
+
+        const hourWheel = document.getElementById('hour-wheel');
+        const minuteWheel = document.getElementById('minute-wheel');
+
+        const snapToValue = (wheel, value) => {
+            wheel.scrollTo({ top: value * itemHeight, behavior: 'smooth' });
+        };
+
+        // Initial scroll
+        setTimeout(() => {
+            hourWheel.scrollTop = currentHour * itemHeight;
+            minuteWheel.scrollTop = currentMinute * itemHeight;
+        }, 10);
+
+
+        let scrollTimeout;
+        const setupSnapScroll = (wheel) => {
+            wheel.addEventListener('scroll', () => {
+                clearTimeout(scrollTimeout);
+                scrollTimeout = setTimeout(() => {
+                    const selectedIndex = Math.round(wheel.scrollTop / itemHeight);
+                    snapToValue(wheel, selectedIndex);
+                }, 150);
+            });
+        };
+
+        setupSnapScroll(hourWheel);
+        setupSnapScroll(minuteWheel);
+
+        document.getElementById('done-time-btn').addEventListener('click', () => {
+            const selectedHour = Math.round(hourWheel.scrollTop / itemHeight);
+            const selectedMinute = Math.round(minuteWheel.scrollTop / itemHeight);
+            const formattedTime = `${String(selectedHour).padStart(2, '0')}:${String(selectedMinute).padStart(2, '0')}`;
+            
+            targetInput.value = formattedTime;
+            targetInput.dispatchEvent(new Event('input', { bubbles: true }));
+            closeModal();
+        });
+
+        document.getElementById('clear-time-btn').addEventListener('click', () => {
+            targetInput.value = '';
+            targetInput.dispatchEvent(new Event('input', { bubbles: true }));
+            closeModal();
+        });
+    };
+
     const showReminderModal = () => {
         const renderReminderContent = (isAdding = false, editingIndex = null) => {
             let content = '';
@@ -1220,72 +1405,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 closeModal();
             });
         });
-    };
-    
-    const showTimePickerModal = (targetInput) => {
-        const { key: dateKey, field } = targetInput.dataset;
-        const initialValue = targetInput.value;
-        let [initialHour, initialMinute] = (initialValue || "00:00").split(':').map(Number);
-
-        const hours = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '0'));
-        const minutes = Array.from({ length: 60 }, (_, i) => String(i).padStart(2, '0'));
-
-        const content = `
-            <div class="relative flex justify-center items-center h-[200px] text-2xl font-mono">
-                <!-- Scrollers -->
-                <div class="flex-1 time-picker-scroller" id="hour-scroller">
-                    <div class="time-picker-padding"></div>
-                    ${hours.map(h => `<div class="time-picker-item">${h}</div>`).join('')}
-                    <div class="time-picker-padding"></div>
-                </div>
-                <span class="font-bold text-3xl pb-1">:</span>
-                <div class="flex-1 time-picker-scroller" id="minute-scroller">
-                    <div class="time-picker-padding"></div>
-                    ${minutes.map(m => `<div class="time-picker-item">${m}</div>`).join('')}
-                    <div class="time-picker-padding"></div>
-                </div>
-
-                <!-- Selection Indicator -->
-                <div class="selection-indicator"></div>
-            </div>
-            <div class="grid grid-cols-3 gap-3 pt-6">
-                <button id="time-picker-cancel" class="w-full px-4 py-2.5 rounded-lg font-semibold text-sm shadow-sm transition-all bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 active:scale-95">Cancel</button>
-                <button id="time-picker-clear" class="w-full px-4 py-2.5 rounded-lg font-semibold text-sm shadow-sm transition-all bg-red-100 text-red-700 hover:bg-red-200 dark:bg-red-900/50 dark:text-red-300 dark:hover:bg-red-900 active:scale-95">Clear</button>
-                <button id="time-picker-done" class="w-full px-4 py-2.5 rounded-lg font-semibold text-sm shadow-sm transition-all bg-blue-600 text-white hover:bg-blue-700 active:scale-95">Done</button>
-            </div>
-        `;
-
-        openModal(createModal('Select Time', content, 'time-picker-modal'));
-
-        const hourScroller = document.getElementById('hour-scroller');
-        const minuteScroller = document.getElementById('minute-scroller');
-        const itemHeight = 40; 
-
-        hourScroller.scrollTop = initialHour * itemHeight;
-        minuteScroller.scrollTop = initialMinute * itemHeight;
-        
-        document.getElementById('time-picker-done').addEventListener('click', () => {
-            hourScroller.scrollTop = Math.round(hourScroller.scrollTop / itemHeight) * itemHeight;
-            minuteScroller.scrollTop = Math.round(minuteScroller.scrollTop / itemHeight) * itemHeight;
-            
-            const finalHour = Math.round(hourScroller.scrollTop / itemHeight);
-            const finalMinute = Math.round(minuteScroller.scrollTop / itemHeight);
-            
-            const formattedTime = `${String(finalHour).padStart(2, '0')}:${String(finalMinute).padStart(2, '0')}`;
-            targetInput.value = formattedTime;
-            targetInput.setAttribute('value', formattedTime);
-            updateWorkData(dateKey, field, formattedTime);
-            closeModal();
-        });
-
-        document.getElementById('time-picker-clear').addEventListener('click', () => {
-            targetInput.value = '';
-            targetInput.removeAttribute('value');
-            updateWorkData(dateKey, field, '');
-            closeModal();
-        });
-
-        document.getElementById('time-picker-cancel').addEventListener('click', closeModal);
     };
 
     const showShareModal = () => {
@@ -1567,7 +1686,7 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 const credential = new PasswordCredential({ id: email, password: password, name: email });
                 await navigator.credentials.store(credential);
-            } catch (err) => {
+            } catch (err) {
                 console.error('Error storing credential:', err);
             }
         }
@@ -1588,7 +1707,7 @@ document.addEventListener('DOMContentLoaded', () => {
         loadingSpinner.style.opacity = '0';
         setTimeout(() => {
             loadingSpinner.style.display = 'none';
-        }, 100); // Drastically reduced loading time
+        }, 50);
         appContainer.classList.add('fade-in');
         appContainer.style.opacity = '1';
     };
@@ -1596,16 +1715,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // -----------------------------------------------------------------------------
     // SCRIPT EXECUTION & EVENT BINDING
     // -----------------------------------------------------------------------------
-    
-    document.body.addEventListener('click', (e) => {
-        const wrapper = e.target.closest('.custom-time-input-wrapper');
-        if (wrapper) {
-            const input = wrapper.querySelector('input[type="text"]');
-            if (input) {
-                showTimePickerModal(input);
-            }
-        }
-    });
     
     window.addEventListener('scroll', () => {
         const isAtTop = window.scrollY < 100;
@@ -1641,9 +1750,6 @@ document.addEventListener('DOMContentLoaded', () => {
             userRefUnsubscribe = null;
         }
         
-        loadingSpinner.style.display = 'flex';
-        loadingSpinner.style.opacity = '1';
-
         if (currentUser) {
             await currentUser.reload();
         }
@@ -1651,67 +1757,63 @@ document.addEventListener('DOMContentLoaded', () => {
         if (currentUser && currentUser.emailVerified) {
             user = currentUser;
             const userRef = db.collection("users").doc(user.uid);
-            
-            try {
-                let doc = await userRef.get();
+            const snapshot = await userRef.get();
 
-                if (!doc.exists) {
-                    const { displayName, email } = user;
-                    const initialData = {
+            if (!snapshot.exists) {
+                const { displayName, email } = user;
+                try {
+                    await userRef.set({
                         displayName,
                         email,
                         createdAt: new Date(),
                         workData: {},
                         reminders: []
-                    };
-                    await userRef.set(initialData);
-                    doc = await userRef.get();
+                    });
+                } catch (error) {
+                    console.error("Error creating user document", error);
                 }
+            }
 
-                let cloudData = doc.data() || {};
-                workData = cloudData.workData || {};
-                reminders = cloudData.reminders || [];
+            const localWorkDataRaw = localStorage.getItem('workData');
+            const localRemindersRaw = localStorage.getItem('reminders');
 
-                const localWorkDataRaw = localStorage.getItem('workData');
-                const localRemindersRaw = localStorage.getItem('reminders');
-
-                if (localWorkDataRaw || localRemindersRaw) {
+            if (localWorkDataRaw || localRemindersRaw) {
+                loadingSpinner.style.display = 'flex';
+                try {
                     const localWorkData = JSON.parse(localWorkDataRaw || '{}');
                     const localReminders = JSON.parse(localRemindersRaw || '[]');
                     
-                    workData = { ...workData, ...localWorkData };
-                    const mergedReminders = [...reminders, ...localReminders];
-                    reminders = Array.from(new Set(mergedReminders.map(r => JSON.stringify(r)))).map(s => JSON.parse(s));
+                    const doc = await userRef.get();
+                    const cloudData = doc.data() || {};
+                    
+                    const mergedWorkData = { ...(cloudData.workData || {}), ...localWorkData };
+                    const mergedReminders = [...(cloudData.reminders || []), ...localReminders];
+                    const uniqueReminders = Array.from(new Set(mergedReminders.map(r => JSON.stringify(r)))).map(s => JSON.parse(s));
 
                     await userRef.update({
-                        workData: workData,
-                        reminders: reminders
+                        workData: mergedWorkData,
+                        reminders: uniqueReminders
                     });
                     
                     localStorage.removeItem('workData');
                     localStorage.removeItem('reminders');
+                } catch (err) {
+                    console.error("Failed to sync local data on login:", err);
+                    alert("Could not sync local data.");
+                } finally {
+                    loadingSpinner.style.display = 'none';
                 }
-
-                initializeApp();
-
-                userRefUnsubscribe = userRef.onSnapshot(snapshot => {
-                    const updatedData = snapshot.data();
-                    if (updatedData) {
-                        workData = updatedData.workData || {};
-                        reminders = updatedData.reminders || [];
-                        renderAll(); 
-                    }
-                }, err => {
-                    console.error("Firestore snapshot error: ", err);
-                });
-
-            } catch (error) {
-                console.error("Error during authentication/data fetch:", error);
-                user = null;
-                workData = JSON.parse(localStorage.getItem('workData') || '{}');
-                reminders = JSON.parse(localStorage.getItem('reminders') || '[]');
-                initializeApp();
             }
+
+            userRefUnsubscribe = userRef.onSnapshot(doc => {
+                const data = doc.data();
+                workData = data?.workData || {};
+                reminders = data?.reminders || [];
+                initializeApp();
+            }, err => {
+                console.error("Firestore snapshot error: ", err);
+                initializeApp();
+            });
 
         } else {
             if (currentUser && !currentUser.emailVerified) {
