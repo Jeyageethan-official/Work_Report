@@ -623,10 +623,6 @@ document.addEventListener('DOMContentLoaded', () => {
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
                         </button>
                         <div class="day-card-menu-dropdown hidden">
-                             <div class="day-card-menu-item clear-time-btn">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z"/><path d="m12 8-4 4 4 4"/><path d="M16 12H8"/></svg>
-                                <span>Clear Time</span>
-                            </div>
                             <div class="day-card-menu-item clear-all-btn">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 2.5a.5.5 0 0 0 0 1h1.841l1.643 3.594a.5.5 0 0 0 .445.306h10.122a.5.5 0 0 0 .445-.306l1.643-3.594H20.5a.5.5 0 0 0 0-1H2.5Z"/><path d="M5.625 7.5 7.5 20h9l1.875-12.5H5.625Z"/></svg>
                                 <span>Clear All</span>
@@ -877,16 +873,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (confirm('Are you sure you want to clear all data for this day?')) {
                 clearDayData(day);
             }
-            dropdown.classList.add('hidden');
-        });
-        
-        dayBox.querySelector('.clear-time-btn').addEventListener('click', () => {
-            dayBox.querySelectorAll('.custom-time-input').forEach(input => {
-                if (input.value !== '') {
-                    input.value = '';
-                    input.dispatchEvent(new Event('input', { bubbles: true }));
-                }
-            });
             dropdown.classList.add('hidden');
         });
 
