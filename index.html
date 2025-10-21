@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Work Journal</title>
+    <title>Work Report</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -123,48 +123,19 @@
             display: none;
         }
 
-        /* Animated Loader Logo */
-        @keyframes logo-pop {
-            0% { transform: scale(0.8); opacity: 0; }
-            50% { transform: scale(1.05); opacity: 1; }
-            100% { transform: scale(1); opacity: 1; }
+        /* New Animated Loader */
+        @keyframes spin-loader {
+            to { transform: rotate(360deg); }
         }
-        @keyframes page-turn {
-            0% { transform: rotateY(0deg); }
-            100% { transform: rotateY(-180deg); }
-        }
-        .loader-logo {
-            animation: logo-pop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-            width: 80px;
-            height: 80px;
-            position: relative;
-        }
-        .loader-logo .page {
-            width: 50%;
-            height: 100%;
-            position: absolute;
-            top: 0;
-            right: 0;
-            background: #4A90E2;
-            transform-origin: left center;
-            animation: page-turn 1.5s ease-in-out infinite alternate;
-            border-top-right-radius: 8px;
-            border-bottom-right-radius: 8px;
-        }
-        .loader-logo .binder {
-            width: 100%;
-            height: 100%;
-            background: #fff;
-            border-radius: 8px;
-            border: 4px solid #4A90E2;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-        html.dark .loader-logo .binder {
-            background: #1f2937;
-            border-color: #60a5fa;
-        }
-        html.dark .loader-logo .page {
-            background: #60a5fa;
+        .new-loader {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            display: inline-block;
+            border-top: 4px solid #3b82f6; /* blue-500 */
+            border-right: 4px solid transparent;
+            box-sizing: border-box;
+            animation: spin-loader 1s linear infinite;
         }
 
         .break-words {
@@ -226,7 +197,7 @@
             border-radius: 50%;
             width: 16px;
             height: 16px;
-            animation: spin 1s linear infinite;
+            animation: spin-loader 1s linear infinite;
         }
         @keyframes spin {
             0% { transform: rotate(0deg); }
@@ -293,17 +264,14 @@
 
     <!-- Loading Spinner -->
     <div id="loading-spinner" class="fixed inset-0 bg-white/80 dark:bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 transition-opacity duration-300">
-        <div class="loader-logo">
-            <div class="binder"></div>
-            <div class="page"></div>
-        </div>
+        <div class="new-loader"></div>
     </div>
 
 
 <script>
 // ===================================================================================
 //
-//                          WORK JOURNAL - VANILLA JS APP
+//                          WORK REPORT - VANILLA JS APP
 //
 // ===================================================================================
 
@@ -410,6 +378,12 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
         `;
     };
+    
+    const showInfoModal = (title, message) => {
+        const content = `<p class="text-gray-600 dark:text-gray-400 text-center">${message}</p>`;
+        openModal(createModal(title, content));
+    };
+
 
     // COMPONENT RENDERING (as HTML strings)
     const renderAuthArea = () => {
@@ -426,7 +400,12 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         `;
         document.getElementById('login-btn')?.addEventListener('click', showAuthModal);
-        document.getElementById('logout-btn')?.addEventListener('click', () => auth.signOut());
+        document.getElementById('logout-btn')?.addEventListener('click', () => {
+            auth.signOut().then(() => {
+                localStorage.removeItem('workData');
+                localStorage.removeItem('reminders');
+            });
+        });
     }
 
     const renderHeader = () => {
@@ -437,7 +416,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         headerContainer.innerHTML = `
             <div class="text-center pb-4 border-b border-gray-200 dark:border-gray-800">
-                <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-50 tracking-tight">Work Journal</h1>
+                <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-50 tracking-tight">Work Report</h1>
             </div>
             <div class="mt-6 flex flex-col sm:flex-row justify-between items-center gap-4">
                 <div class="flex items-center gap-2 bg-white dark:bg-gray-900 p-1 rounded-lg border border-gray-200 dark:border-gray-800 shadow-sm">
@@ -892,7 +871,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // MODAL CONTENT AND LOGIC
     const showAuthModal = () => {
         const content = `
-            <form id="login-form">
+            <form id="login-form" autocomplete="on">
                 <div class="space-y-4">
                      <div>
                         <label for="email" class="font-medium text-sm mb-1.5 text-gray-700 dark:text-gray-300">Email</label>
@@ -955,7 +934,13 @@ document.addEventListener('DOMContentLoaded', () => {
             
             try {
                 await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
-                await auth.signInWithEmailAndPassword(email, password);
+                const userCredential = await auth.signInWithEmailAndPassword(email, password);
+
+                if (!userCredential.user.emailVerified) {
+                    errorEl.textContent = 'Your email is not verified. Please check your inbox or spam folder.';
+                    await auth.signOut();
+                    return;
+                }
                 closeModal();
             } catch (err) {
                 errorEl.textContent = err.message;
@@ -976,7 +961,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const showSignUpModal = () => {
         const content = `
-            <form id="signup-form">
+            <form id="signup-form" autocomplete="on">
                 <div class="space-y-4">
                      <div>
                         <label for="signup-name" class="font-medium text-sm mb-1.5 text-gray-700 dark:text-gray-300">Full Name</label>
@@ -1024,11 +1009,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
             try {
-                await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
-                const { user } = await auth.createUserWithEmailAndPassword(email, password);
-                await user.updateProfile({ displayName: fullName });
-                // The onAuthStateChanged listener will handle creating the Firestore document.
+                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                await userCredential.user.updateProfile({ displayName: fullName });
+                await userCredential.user.sendEmailVerification();
+                await auth.signOut(); // Log out user until they verify
+
                 closeModal();
+                showInfoModal('Verification Required', 'A verification link has been sent to your email. Please verify your account before logging in.');
             } catch (err) {
                 errorEl.textContent = err.message;
             }
@@ -1487,7 +1474,7 @@ document.addEventListener('DOMContentLoaded', () => {
         loadingSpinner.style.opacity = '0';
         setTimeout(() => {
             loadingSpinner.style.display = 'none';
-        }, 300);
+        }, 1000); // Keep spinner for 1 second before fading
         appContainer.classList.add('fade-in');
         appContainer.style.opacity = '1';
     };
@@ -1531,16 +1518,13 @@ document.addEventListener('DOMContentLoaded', () => {
             userRefUnsubscribe();
             userRefUnsubscribe = null;
         }
-        
-        user = currentUser;
 
-        if (user) {
-            // User is logged in
+        if (currentUser && currentUser.emailVerified) {
+            user = currentUser;
             const userRef = db.collection("users").doc(user.uid);
             const snapshot = await userRef.get();
 
             if (!snapshot.exists) {
-                // This is a new user (from signup or first-time Google login), create their profile
                 const { displayName, email } = user;
                 try {
                     await userRef.set({
@@ -1555,7 +1539,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
-            // Sync local data to cloud on login
             const localWorkDataRaw = localStorage.getItem('workData');
             const localRemindersRaw = localStorage.getItem('reminders');
 
@@ -1565,10 +1548,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     const localWorkData = JSON.parse(localWorkDataRaw || '{}');
                     const localReminders = JSON.parse(localRemindersRaw || '[]');
                     
-                    const doc = await userRef.get(); // Re-fetch to get latest data
+                    const doc = await userRef.get();
                     const cloudData = doc.data() || {};
                     
-                    // Merge data, local takes precedence
                     const mergedWorkData = { ...(cloudData.workData || {}), ...localWorkData };
                     const mergedReminders = [...(cloudData.reminders || []), ...localReminders];
                     const uniqueReminders = Array.from(new Set(mergedReminders.map(r => JSON.stringify(r)))).map(s => JSON.parse(s));
@@ -1589,7 +1571,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
-            // Now, listen for real-time updates from Firestore
             userRefUnsubscribe = userRef.onSnapshot(doc => {
                 const data = doc.data();
                 workData = data?.workData || {};
@@ -1601,7 +1582,10 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
         } else {
-            // User is logged out
+            if (currentUser && !currentUser.emailVerified) {
+                 showInfoModal('Verification Required', 'Please verify your email to continue. Check your inbox or spam folder for the verification link.');
+            }
+            user = null; // Treat unverified or logged-out users as guests
             workData = JSON.parse(localStorage.getItem('workData') || '{}');
             reminders = JSON.parse(localStorage.getItem('reminders') || '[]');
             initializeApp();
