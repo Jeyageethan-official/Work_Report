@@ -35,7 +35,7 @@
         }
         /* Smoother theme transitions */
         body, .bg-white, .bg-gray-50, .dark .dark\:bg-gray-900, .dark .dark\:bg-gray-950, .premium-input, .premium-select {
-            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+            transition: background-color: 0.3s ease, color 0.3s ease, border-color 0.3s ease;
         }
         html:not(.dark) body {
             background-color: var(--bg-light);
@@ -784,7 +784,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const eventType = el.tagName === 'SELECT' ? 'change' : 'input';
             el.addEventListener(eventType, (e) => {
                 const { key, field } = e.target.dataset;
-                updateWorkData(key, field, e.target.value);
+                const value = e.target.value;
+
+                // Robust fix for iOS Safari time input clearing
+                if (el.type === 'time' && value === '') {
+                    e.target.removeAttribute('value');
+                }
+                
+                updateWorkData(key, field, value);
             });
         });
     };
@@ -1482,7 +1489,7 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 const credential = new PasswordCredential({ id: email, password: password, name: email });
                 await navigator.credentials.store(credential);
-            } catch (err) {
+            } catch (err) => {
                 console.error('Error storing credential:', err);
             }
         }
@@ -1651,3 +1658,4 @@ document.addEventListener('DOMContentLoaded', () => {
 <script type="module" src="/index.tsx"></script>
 </body>
 </html>
+```
