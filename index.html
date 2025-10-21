@@ -123,32 +123,45 @@
             display: none;
         }
 
-        /* New Loading Animation */
-        @keyframes pulse-glow-logo {
-            0%, 100% {
-                transform: scale(1);
-                filter: drop-shadow(0 0 5px rgba(59, 130, 246, 0.3));
-            }
-            50% {
-                transform: scale(1.05);
-                filter: drop-shadow(0 0 15px rgba(59, 130, 246, 0.6));
-            }
-        }
+        /* New Doodle Loading Animation */
         .loader-content {
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 1rem;
         }
-        .app-logo-loader {
-            width: 72px;
-            height: 72px;
-            animation: pulse-glow-logo 2s infinite ease-in-out;
+        .animated-logo-svg {
+            width: 80px;
+            height: 80px;
+        }
+        .animated-logo-svg .draw-stroke {
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 1000;
+            animation: draw 1s ease-out forwards;
+        }
+        html.dark .animated-logo-svg .logo-stroke-color {
+             stroke: #60a5fa;
+        }
+        html.dark .animated-logo-svg .logo-fill-color {
+             fill: #60a5fa;
+        }
+        .animated-logo-svg .line1 { animation-delay: 0s; }
+        .animated-logo-svg .line2 { animation-delay: 0.2s; }
+        .animated-logo-svg .line3 { animation-delay: 0.4s; }
+        .animated-logo-svg .clip { animation-delay: 0.2s; }
+        .animated-logo-svg .paper { animation-delay: 0.1s; }
+        
+        @keyframes draw {
+            to {
+                stroke-dashoffset: 0;
+            }
         }
         .loader-text {
             font-size: 1.25rem;
             font-weight: 600;
             color: #4b5563; /* gray-600 */
+            opacity: 0;
+            animation: fadeIn 0.5s ease-out 0.6s forwards;
         }
         html.dark .loader-text {
              color: #d1d5db; /* gray-300 */
@@ -281,16 +294,14 @@
     <!-- Loading Spinner -->
     <div id="loading-spinner" class="fixed inset-0 bg-white/80 dark:bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 transition-opacity duration-300">
         <div class="loader-content">
-            <svg class="app-logo-loader" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                <defs>
-                    <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" style="stop-color:#3b82f6" />
-                        <stop offset="100%" style="stop-color:#60a5fa" />
-                    </linearGradient>
-                </defs>
-                <path fill="url(#logoGradient)" d="M50,5A45,45,0,1,1,5,50,45,45,0,0,1,50,5 M50,0a50,50,0,1,0,50,50A50,50,0,0,0,50,0Z"/>
-                <path fill="#ffffff" d="M35,30 h30 v10 h-30 z M35,45 h30 v10 h-30 z M35,60 h20 v10 h-20 z"/>
-                 <path fill="url(#logoGradient)" d="M48,28 h4 v44 h-4 z" opacity="0.2"/>
+            <svg class="animated-logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <g class="logo-stroke-color" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="none">
+                    <path class="draw-stroke paper" d="M25 15 H75 V85 H25 Z" />
+                    <path class="draw-stroke clip" d="M40 15 V 5 H60 V15" />
+                    <path class="draw-stroke line1" d="M35 35 H65" />
+                    <path class="draw-stroke line2" d="M35 50 H65" />
+                    <path class="draw-stroke line3" d="M35 65 H55" />
+                </g>
             </svg>
             <span class="loader-text dark:text-gray-300">Work Report</span>
         </div>
@@ -439,23 +450,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const isDarkMode = document.documentElement.classList.contains('dark');
 
         headerContainer.innerHTML = `
-            <div class="flex justify-between items-center pb-4 border-b border-gray-200 dark:border-gray-800">
-                <div class="flex items-center gap-3">
-                    <button id="header-logo-btn" title="Logout">
-                        <svg class="h-10 w-10" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                            <defs>
-                                <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                    <stop offset="0%" style="stop-color:#3b82f6" />
-                                    <stop offset="100%" style="stop-color:#60a5fa" />
-                                </linearGradient>
-                            </defs>
-                            <path fill="url(#logoGradient)" d="M50,5A45,45,0,1,1,5,50,45,45,0,0,1,50,5 M50,0a50,50,0,1,0,50,50A50,50,0,0,0,50,0Z"/>
-                            <path fill="#ffffff" d="M35,30 h30 v10 h-30 z M35,45 h30 v10 h-30 z M35,60 h20 v10 h-20 z"/>
-                            <path fill="url(#logoGradient)" d="M48,28 h4 v44 h-4 z" opacity="0.2"/>
-                        </svg>
-                    </button>
-                    <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-50 tracking-tight">Work Report</h1>
-                </div>
+            <div class="text-center pb-4 border-b border-gray-200 dark:border-gray-800">
+                <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-50 tracking-tight">Work Report</h1>
             </div>
             <div class="mt-6 flex flex-col sm:flex-row justify-between items-center gap-4">
                 <div class="flex items-center gap-2 bg-white dark:bg-gray-900 p-1 rounded-lg border border-gray-200 dark:border-gray-800 shadow-sm">
@@ -731,7 +727,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const addHeaderEventListeners = () => {
-        document.getElementById('header-logo-btn')?.addEventListener('click', showLogoutConfirmationModal);
         document.getElementById('prev-month-btn').addEventListener('click', () => navigateMonth(-1));
         document.getElementById('next-month-btn').addEventListener('click', () => navigateMonth(1));
         document.getElementById('monthDropdown').addEventListener('change', (e) => {
