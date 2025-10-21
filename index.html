@@ -123,19 +123,35 @@
             display: none;
         }
 
-        /* New Animated Loader */
-        @keyframes spin-loader {
-            to { transform: rotate(360deg); }
+        /* New Loading Animation */
+        @keyframes pulse-glow-logo {
+            0%, 100% {
+                transform: scale(1);
+                filter: drop-shadow(0 0 5px rgba(59, 130, 246, 0.3));
+            }
+            50% {
+                transform: scale(1.05);
+                filter: drop-shadow(0 0 15px rgba(59, 130, 246, 0.6));
+            }
         }
-        .new-loader {
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            display: inline-block;
-            border-top: 4px solid #3b82f6; /* blue-500 */
-            border-right: 4px solid transparent;
-            box-sizing: border-box;
-            animation: spin-loader 1s linear infinite;
+        .loader-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+        .app-logo-loader {
+            width: 72px;
+            height: 72px;
+            animation: pulse-glow-logo 2s infinite ease-in-out;
+        }
+        .loader-text {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #4b5563; /* gray-600 */
+        }
+        html.dark .loader-text {
+             color: #d1d5db; /* gray-300 */
         }
 
         .break-words {
@@ -191,17 +207,17 @@
         }
 
         /* Small inline loader for AI modal */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
         .loader-small {
             border: 2px solid #f3f3f3;
             border-top: 2px solid #3498db;
             border-radius: 50%;
             width: 16px;
             height: 16px;
-            animation: spin-loader 1s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            animation: spin 1s linear infinite;
         }
         html.dark .loader-small {
             border-top-color: #60a5fa;
@@ -264,7 +280,20 @@
 
     <!-- Loading Spinner -->
     <div id="loading-spinner" class="fixed inset-0 bg-white/80 dark:bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 transition-opacity duration-300">
-        <div class="new-loader"></div>
+        <div class="loader-content">
+            <svg class="app-logo-loader" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#3b82f6" />
+                        <stop offset="100%" style="stop-color:#60a5fa" />
+                    </linearGradient>
+                </defs>
+                <path fill="url(#logoGradient)" d="M50,5A45,45,0,1,1,5,50,45,45,0,0,1,50,5 M50,0a50,50,0,1,0,50,50A50,50,0,0,0,50,0Z"/>
+                <path fill="#ffffff" d="M35,30 h30 v10 h-30 z M35,45 h30 v10 h-30 z M35,60 h20 v10 h-20 z"/>
+                 <path fill="url(#logoGradient)" d="M48,28 h4 v44 h-4 z" opacity="0.2"/>
+            </svg>
+            <span class="loader-text dark:text-gray-300">Work Report</span>
+        </div>
     </div>
 
 
@@ -389,7 +418,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const renderAuthArea = () => {
         authArea.innerHTML = `
             ${user 
-                ? `<div class="flex items-center gap-2">
+                ? `<div class="flex items-center gap-3">
                         <span class="text-sm text-gray-600 dark:text-gray-400 hidden sm:block">Welcome, ${user.displayName || user.email}</span>
                         <button id="logout-btn" class="flex items-center gap-2 text-sm font-semibold bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 px-3 py-2 rounded-lg shadow-sm border border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
@@ -400,12 +429,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         `;
         document.getElementById('login-btn')?.addEventListener('click', showAuthModal);
-        document.getElementById('logout-btn')?.addEventListener('click', () => {
-            auth.signOut().then(() => {
-                localStorage.removeItem('workData');
-                localStorage.removeItem('reminders');
-            });
-        });
+        document.getElementById('logout-btn')?.addEventListener('click', showLogoutConfirmationModal);
     }
 
     const renderHeader = () => {
@@ -415,8 +439,23 @@ document.addEventListener('DOMContentLoaded', () => {
         const isDarkMode = document.documentElement.classList.contains('dark');
 
         headerContainer.innerHTML = `
-            <div class="text-center pb-4 border-b border-gray-200 dark:border-gray-800">
-                <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-50 tracking-tight">Work Report</h1>
+            <div class="flex justify-between items-center pb-4 border-b border-gray-200 dark:border-gray-800">
+                <div class="flex items-center gap-3">
+                    <button id="header-logo-btn" title="Logout">
+                        <svg class="h-10 w-10" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#3b82f6" />
+                                    <stop offset="100%" style="stop-color:#60a5fa" />
+                                </linearGradient>
+                            </defs>
+                            <path fill="url(#logoGradient)" d="M50,5A45,45,0,1,1,5,50,45,45,0,0,1,50,5 M50,0a50,50,0,1,0,50,50A50,50,0,0,0,50,0Z"/>
+                            <path fill="#ffffff" d="M35,30 h30 v10 h-30 z M35,45 h30 v10 h-30 z M35,60 h20 v10 h-20 z"/>
+                            <path fill="url(#logoGradient)" d="M48,28 h4 v44 h-4 z" opacity="0.2"/>
+                        </svg>
+                    </button>
+                    <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-50 tracking-tight">Work Report</h1>
+                </div>
             </div>
             <div class="mt-6 flex flex-col sm:flex-row justify-between items-center gap-4">
                 <div class="flex items-center gap-2 bg-white dark:bg-gray-900 p-1 rounded-lg border border-gray-200 dark:border-gray-800 shadow-sm">
@@ -692,6 +731,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const addHeaderEventListeners = () => {
+        document.getElementById('header-logo-btn')?.addEventListener('click', showLogoutConfirmationModal);
         document.getElementById('prev-month-btn').addEventListener('click', () => navigateMonth(-1));
         document.getElementById('next-month-btn').addEventListener('click', () => navigateMonth(1));
         document.getElementById('monthDropdown').addEventListener('change', (e) => {
@@ -743,8 +783,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 const input = e.currentTarget.closest('.time-input-wrapper').querySelector('input');
                 const { key: dateKey, field } = input.dataset;
 
-                input.removeAttribute('value');
+                // iOS Safari fix: change type to text then back to time to properly clear it visually
+                const originalType = input.type;
+                input.type = 'text';
                 input.value = '';
+                input.type = originalType;
+                
+                input.removeAttribute('value');
                 e.currentTarget.classList.add('hidden');
 
                 if (workData[dateKey] && workData[dateKey][field]) {
@@ -941,6 +986,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     await auth.signOut();
                     return;
                 }
+                
+                await promptToSavePassword(email, password);
                 closeModal();
             } catch (err) {
                 errorEl.textContent = err.message;
@@ -951,7 +998,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const provider = new firebase.auth.GoogleAuthProvider();
             try {
                 await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
-                await auth.signInWithPopup(provider);
+                const result = await auth.signInWithPopup(provider);
+                const email = result.user.email;
+                await promptToSavePassword(email, '******'); // Password isn't available, but this helps trigger the prompt
                 closeModal();
             } catch (e) {
                 document.getElementById('auth-error').textContent = e.message;
@@ -1014,11 +1063,32 @@ document.addEventListener('DOMContentLoaded', () => {
                 await userCredential.user.sendEmailVerification();
                 await auth.signOut(); // Log out user until they verify
 
+                await promptToSavePassword(email, password);
                 closeModal();
                 showInfoModal('Verification Required', 'A verification link has been sent to your email. Please verify your account before logging in.');
             } catch (err) {
                 errorEl.textContent = err.message;
             }
+        });
+    };
+
+     const showLogoutConfirmationModal = () => {
+        const content = `
+            <p class="text-center text-gray-600 dark:text-gray-400 mb-6">Are you sure you want to log out?</p>
+            <div class="flex gap-4">
+                 <button id="cancel-logout-btn" class="w-full px-5 py-2.5 rounded-lg font-semibold text-sm shadow-sm transition-all duration-200 bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600">Cancel</button>
+                 <button id="confirm-logout-btn" class="w-full px-5 py-2.5 rounded-lg font-semibold text-sm shadow-sm transition-all duration-200 bg-red-600 text-white hover:bg-red-700">Logout</button>
+            </div>
+        `;
+        openModal(createModal('Logout', content));
+
+        document.getElementById('cancel-logout-btn').addEventListener('click', closeModal);
+        document.getElementById('confirm-logout-btn').addEventListener('click', () => {
+            auth.signOut().then(() => {
+                localStorage.removeItem('workData');
+                localStorage.removeItem('reminders');
+                closeModal();
+            });
         });
     };
     
@@ -1460,6 +1530,25 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+    const promptToSavePassword = async (email, password) => {
+        if ('credentials' in navigator && navigator.credentials.store) {
+            try {
+                const credential = new PasswordCredential({
+                    id: email,
+                    password: password,
+                    name: email, 
+                });
+                await navigator.credentials.store(credential);
+                console.log('Credential stored successfully.');
+            } catch (err) {
+                console.error('Error storing credential:', err);
+            }
+        } else {
+            console.log('Credential Management API not supported.');
+        }
+    };
+
+
     // MAIN RENDER/INITIALIZATION FUNCTIONS
     const renderAll = () => {
         renderAuthArea();
@@ -1517,6 +1606,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (userRefUnsubscribe) {
             userRefUnsubscribe();
             userRefUnsubscribe = null;
+        }
+        
+        // Reload the user object to get the latest emailVerified state
+        if (currentUser) {
+            await currentUser.reload();
         }
 
         if (currentUser && currentUser.emailVerified) {
