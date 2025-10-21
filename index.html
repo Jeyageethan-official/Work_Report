@@ -416,7 +416,7 @@ document.addEventListener('DOMContentLoaded', () => {
         authArea.innerHTML = `
             ${user 
                 ? `<div class="flex items-center gap-2">
-                        <span class="text-sm text-gray-600 dark:text-gray-400 hidden sm:block">Welcome, ${user.email}</span>
+                        <span class="text-sm text-gray-600 dark:text-gray-400 hidden sm:block">Welcome, ${user.displayName || user.email}</span>
                         <button id="logout-btn" class="flex items-center gap-2 text-sm font-semibold bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 px-3 py-2 rounded-lg shadow-sm border border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
                             <span class="hidden sm:inline">Logout</span>
@@ -648,8 +648,11 @@ document.addEventListener('DOMContentLoaded', () => {
             delete workData[dateKey].leaveReasonText;
         }
 
-        saveLocalData();
-        syncToCloud();
+        if (user) {
+          syncToCloud();
+        } else {
+          saveLocalData();
+        }
         
         // Re-render only the affected card if leave status changes, preventing page jump
         if(field === 'leaveStatus' || field === 'leaveReason') {
@@ -668,9 +671,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     
     const saveLocalData = () => {
-        if (!user) { // Only save to local storage if not logged in
-            localStorage.setItem('workData', JSON.stringify(workData));
-        }
+        localStorage.setItem('workData', JSON.stringify(workData));
         localStorage.setItem('reminders', JSON.stringify(reminders));
     };
 
@@ -680,8 +681,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const dateKey = `${year}-${month}-${day}`;
         if (workData[dateKey]) {
             delete workData[dateKey]; // Clear local data
-            saveLocalData(); // Save to localStorage for non-logged-in users
-
+            
             if (user) {
                 const userRef = db.collection("users").doc(user.uid);
                 const fieldPath = `workData.${dateKey}`;
@@ -690,7 +690,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 }).catch(err => {
                     console.error("Firestore field delete error:", err);
                 });
+            } else {
+                saveLocalData();
             }
+
             // Re-render only the affected card to show cleared state
             const dayBox = daysContainer.querySelector(`.day-box[data-day="${day}"]`);
             if (dayBox) {
@@ -767,8 +770,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (workData[dateKey] && workData[dateKey][field]) {
                     delete workData[dateKey][field];
-                    saveLocalData();
-
                     if (user) {
                         const userRef = db.collection("users").doc(user.uid);
                         const fieldPath = `workData.${dateKey}.${field}`;
@@ -777,6 +778,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         }).catch(err => {
                             console.error("Firestore field delete error:", err);
                         });
+                    } else {
+                       saveLocalData();
                     }
                 }
                 renderSummary();
@@ -821,8 +824,11 @@ document.addEventListener('DOMContentLoaded', () => {
             Object.keys(workData).forEach(key => {
                 if (key.startsWith(monthPrefix)) delete workData[key];
             });
-            saveLocalData();
-            syncToCloud();
+            if(user) {
+                syncToCloud();
+            } else {
+                saveLocalData();
+            }
             renderAll();
         }
     };
@@ -853,8 +859,11 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 const restoredData = JSON.parse(event.target.result);
                 workData = { ...workData, ...restoredData };
-                saveLocalData();
-                syncToCloud();
+                if(user) {
+                    syncToCloud();
+                } else {
+                    saveLocalData();
+                }
                 renderAll();
                 alert("Data restored successfully.");
             } catch (err) {
@@ -883,30 +892,40 @@ document.addEventListener('DOMContentLoaded', () => {
     // MODAL CONTENT AND LOGIC
     const showAuthModal = () => {
         const content = `
-            <div class="space-y-4">
-                 <div>
-                    <label for="email" class="font-medium text-sm mb-1.5 text-gray-700 dark:text-gray-300">Email</label>
-                    <input id="auth-email" type="email" placeholder="Enter your email" class="p-2 w-full border border-gray-300 rounded-lg bg-gray-50/50 transition duration-200 premium-input dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200" />
-                </div>
-                <div>
-                    <label for="password" class="font-medium text-sm mb-1.5 text-gray-700 dark:text-gray-300">Password</label>
-                    <input id="auth-password" type="password" placeholder="Enter your password" class="p-2 w-full border border-gray-300 rounded-lg bg-gray-50/50 transition duration-200 premium-input dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200" />
-                    <div class="text-right mt-2">
-                        <button id="forgot-password-btn" class="text-xs font-medium text-blue-600 hover:underline dark:text-blue-400">Forgot Password?</button>
+            <form id="login-form">
+                <div class="space-y-4">
+                     <div>
+                        <label for="email" class="font-medium text-sm mb-1.5 text-gray-700 dark:text-gray-300">Email</label>
+                        <input id="auth-email" type="email" placeholder="Enter your email" autocomplete="email" required class="p-2 w-full border border-gray-300 rounded-lg bg-gray-50/50 transition duration-200 premium-input dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200" />
                     </div>
+                    <div>
+                        <label for="password" class="font-medium text-sm mb-1.5 text-gray-700 dark:text-gray-300">Password</label>
+                        <input id="auth-password" type="password" placeholder="Enter your password" autocomplete="current-password" required class="p-2 w-full border border-gray-300 rounded-lg bg-gray-50/50 transition duration-200 premium-input dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200" />
+                        <div class="text-right mt-2">
+                            <button type="button" id="forgot-password-btn" class="text-xs font-medium text-blue-600 hover:underline dark:text-blue-400">Forgot Password?</button>
+                        </div>
+                    </div>
+                    <p id="auth-error" class="text-red-500 text-sm h-4"></p>
+                    <button type="submit" class="w-full px-5 py-2.5 rounded-lg font-semibold text-sm shadow-sm transition-all duration-200 transform hover:scale-[1.03] bg-blue-600 text-white hover:bg-blue-700">Login</button>
+                    <p class="text-center text-sm text-gray-600 dark:text-gray-400">
+                        Don’t have an account? 
+                        <button type="button" id="show-signup-btn" class="font-semibold text-blue-600 hover:underline dark:text-blue-400">Sign up</button>
+                    </p>
+                    <div class="relative my-2"><div class="absolute inset-0 flex items-center"><div class="w-full border-t border-gray-300 dark:border-gray-700"></div></div><div class="relative flex justify-center text-sm"><span class="px-2 bg-white dark:bg-gray-900 text-gray-500">Or</span></div></div>
+                    <button type="button" id="google-login" class="w-full flex items-center justify-center gap-3 px-5 py-2.5 rounded-lg font-semibold text-sm shadow-sm transition-all duration-200 transform hover:scale-[1.03] bg-white text-gray-800 border border-gray-300 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-700">
+                        <svg class="w-5 h-5" viewBox="0 0 48 48"><path fill="#4285F4" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path><path fill="#34A853" d="M46.98 24.55c0-1.57-.15-3.09-.42-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path><path fill="#EA4335" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path><path fill="none" d="M0 0h48v48H0z"></path></svg>
+                        Sign in with Google
+                    </button>
                 </div>
-                <p id="auth-error" class="text-red-500 text-sm h-4"></p>
-                <button id="auth-submit" class="w-full px-5 py-2.5 rounded-lg font-semibold text-sm shadow-sm transition-all duration-200 transform hover:scale-[1.03] bg-blue-600 text-white hover:bg-blue-700">Login / Sign Up</button>
-                <div class="relative my-4"><div class="absolute inset-0 flex items-center"><div class="w-full border-t border-gray-300 dark:border-gray-700"></div></div><div class="relative flex justify-center text-sm"><span class="px-2 bg-white dark:bg-gray-900 text-gray-500">Or</span></div></div>
-                <button id="google-login" class="w-full flex items-center justify-center gap-3 px-5 py-2.5 rounded-lg font-semibold text-sm shadow-sm transition-all duration-200 transform hover:scale-[1.03] bg-white text-gray-800 border border-gray-300 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-700">
-                    <svg class="w-5 h-5" viewBox="0 0 48 48"><path fill="#4285F4" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path><path fill="#34A853" d="M46.98 24.55c0-1.57-.15-3.09-.42-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path><path fill="#EA4335" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path><path fill="none" d="M0 0h48v48H0z"></path></svg>
-                    Sign in with Google
-                </button>
-            </div>
+            </form>
         `;
-        openModal(createModal('Login or Sign Up', content));
+        openModal(createModal('Login', content));
         
-        // Add event listeners for the auth modal
+        document.getElementById('show-signup-btn').addEventListener('click', () => {
+            closeModal();
+            showSignUpModal();
+        });
+
         document.getElementById('forgot-password-btn').addEventListener('click', async () => {
             const email = document.getElementById('auth-email').value;
             const errorEl = document.getElementById('auth-error');
@@ -917,7 +936,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 errorEl.textContent = 'Please enter your email to reset password.';
                 return;
             }
-
             try {
                 await auth.sendPasswordResetEmail(email);
                 errorEl.textContent = 'Password reset email sent! Check your inbox.';
@@ -928,41 +946,91 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        document.getElementById('auth-submit').addEventListener('click', async () => {
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
             const email = document.getElementById('auth-email').value;
             const password = document.getElementById('auth-password').value;
             const errorEl = document.getElementById('auth-error');
             errorEl.textContent = '';
-            errorEl.classList.remove('text-green-500', 'dark:text-green-400');
-            errorEl.classList.add('text-red-500');
             
             try {
-                await auth.setPersistence(firebase.auth.Auth.Persistence.SESSION);
+                await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
                 await auth.signInWithEmailAndPassword(email, password);
                 closeModal();
-            } catch (e) {
-                if (e.code === 'auth/user-not-found' || e.code === 'auth/wrong-password') {
-                     try {
-                        await auth.setPersistence(firebase.auth.Auth.Persistence.SESSION);
-                        await auth.createUserWithEmailAndPassword(email, password);
-                        closeModal();
-                    } catch (signUpError) {
-                        errorEl.textContent = signUpError.message;
-                    }
-                } else {
-                    errorEl.textContent = e.message;
-                }
+            } catch (err) {
+                errorEl.textContent = err.message;
             }
         });
 
         document.getElementById('google-login').addEventListener('click', async () => {
             const provider = new firebase.auth.GoogleAuthProvider();
             try {
-                await auth.setPersistence(firebase.auth.Auth.Persistence.SESSION);
+                await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
                 await auth.signInWithPopup(provider);
                 closeModal();
             } catch (e) {
                 document.getElementById('auth-error').textContent = e.message;
+            }
+        });
+    };
+
+    const showSignUpModal = () => {
+        const content = `
+            <form id="signup-form">
+                <div class="space-y-4">
+                     <div>
+                        <label for="signup-name" class="font-medium text-sm mb-1.5 text-gray-700 dark:text-gray-300">Full Name</label>
+                        <input id="signup-name" type="text" placeholder="Enter your full name" autocomplete="name" required class="p-2 w-full border border-gray-300 rounded-lg bg-gray-50/50 transition duration-200 premium-input dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200" />
+                    </div>
+                     <div>
+                        <label for="signup-email" class="font-medium text-sm mb-1.5 text-gray-700 dark:text-gray-300">Email</label>
+                        <input id="signup-email" type="email" placeholder="Enter your email" autocomplete="email" required class="p-2 w-full border border-gray-300 rounded-lg bg-gray-50/50 transition duration-200 premium-input dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200" />
+                    </div>
+                    <div>
+                        <label for="signup-password" class="font-medium text-sm mb-1.5 text-gray-700 dark:text-gray-300">Password</label>
+                        <input id="signup-password" type="password" placeholder="Create a password" autocomplete="new-password" required class="p-2 w-full border border-gray-300 rounded-lg bg-gray-50/50 transition duration-200 premium-input dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200" />
+                    </div>
+                    <div>
+                        <label for="signup-confirm-password" class="font-medium text-sm mb-1.5 text-gray-700 dark:text-gray-300">Confirm Password</label>
+                        <input id="signup-confirm-password" type="password" placeholder="Confirm your password" autocomplete="new-password" required class="p-2 w-full border border-gray-300 rounded-lg bg-gray-50/50 transition duration-200 premium-input dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200" />
+                    </div>
+                    <p id="signup-error" class="text-red-500 text-sm h-4"></p>
+                    <button type="submit" class="w-full px-5 py-2.5 rounded-lg font-semibold text-sm shadow-sm transition-all duration-200 transform hover:scale-[1.03] bg-blue-600 text-white hover:bg-blue-700">Create Account</button>
+                    <p class="text-center text-sm text-gray-600 dark:text-gray-400">
+                        Already have an account? 
+                        <button type="button" id="show-login-btn" class="font-semibold text-blue-600 hover:underline dark:text-blue-400">Login</button>
+                    </p>
+                </div>
+            </form>
+        `;
+        openModal(createModal('Sign Up', content));
+
+        document.getElementById('show-login-btn').addEventListener('click', () => {
+            closeModal();
+            showAuthModal();
+        });
+
+        document.getElementById('signup-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const fullName = document.getElementById('signup-name').value;
+            const email = document.getElementById('signup-email').value;
+            const password = document.getElementById('signup-password').value;
+            const confirmPassword = document.getElementById('signup-confirm-password').value;
+            const errorEl = document.getElementById('signup-error');
+            errorEl.textContent = '';
+
+            if (password !== confirmPassword) {
+                errorEl.textContent = 'Passwords do not match.';
+                return;
+            }
+            try {
+                await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+                const { user } = await auth.createUserWithEmailAndPassword(email, password);
+                await user.updateProfile({ displayName: fullName });
+                // The onAuthStateChanged listener will handle creating the Firestore document.
+                closeModal();
+            } catch (err) {
+                errorEl.textContent = err.message;
             }
         });
     };
@@ -1032,7 +1100,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     } else {
                         reminders.push(newReminder);
                     }
-                    saveLocalData();
+                    if(user) {
+                      syncToCloud();
+                    } else {
+                      saveLocalData();
+                    }
                     renderReminderContent(); // Re-render list view
                 });
                  document.getElementById('reminder-category').addEventListener('change', (e) => {
@@ -1043,7 +1115,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.querySelectorAll('.edit-reminder-btn').forEach(btn => btn.addEventListener('click', (e) => renderReminderContent(true, e.target.dataset.index)));
                 document.querySelectorAll('.remove-reminder-btn').forEach(btn => btn.addEventListener('click', (e) => {
                     reminders.splice(e.target.dataset.index, 1);
-                    saveLocalData();
+                    if(user) {
+                      syncToCloud();
+                    } else {
+                      saveLocalData();
+                    }
                     renderReminderContent(); // Re-render list
                 }));
             }
@@ -1392,7 +1468,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // FIREBASE-RELATED FUNCTIONS
     const syncToCloud = () => {
         if (user) {
-            db.collection("users").doc(user.uid).set({ workData }, { merge: true })
+            db.collection("users").doc(user.uid).set({ workData, reminders }, { merge: true })
                 .catch(err => console.error("Firestore write error:", err));
         }
     };
@@ -1406,7 +1482,6 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const initializeApp = () => {
-        reminders = JSON.parse(localStorage.getItem('reminders') || '[]');
         renderAll();
         scrollToToday();
         loadingSpinner.style.opacity = '0';
@@ -1451,28 +1526,84 @@ document.addEventListener('DOMContentLoaded', () => {
     const db = firebase.firestore();
     let userRefUnsubscribe = null;
 
-    auth.onAuthStateChanged(currentUser => {
-        user = currentUser;
-
+    auth.onAuthStateChanged(async (currentUser) => {
         if (userRefUnsubscribe) {
-            userRefUnsubscribe(); // Detach previous listener
+            userRefUnsubscribe();
             userRefUnsubscribe = null;
         }
+        
+        user = currentUser;
 
         if (user) {
+            // User is logged in
             const userRef = db.collection("users").doc(user.uid);
-            userRefUnsubscribe = userRef.onSnapshot(doc => {
-                if (doc.exists) {
-                    workData = doc.data()?.workData || {};
+            const snapshot = await userRef.get();
+
+            if (!snapshot.exists) {
+                // This is a new user (from signup or first-time Google login), create their profile
+                const { displayName, email } = user;
+                try {
+                    await userRef.set({
+                        displayName,
+                        email,
+                        createdAt: new Date(),
+                        workData: {},
+                        reminders: []
+                    });
+                } catch (error) {
+                    console.error("Error creating user document", error);
                 }
-                initializeApp(); // Re-render with user data
+            }
+
+            // Sync local data to cloud on login
+            const localWorkDataRaw = localStorage.getItem('workData');
+            const localRemindersRaw = localStorage.getItem('reminders');
+
+            if (localWorkDataRaw || localRemindersRaw) {
+                loadingSpinner.style.display = 'flex';
+                try {
+                    const localWorkData = JSON.parse(localWorkDataRaw || '{}');
+                    const localReminders = JSON.parse(localRemindersRaw || '[]');
+                    
+                    const doc = await userRef.get(); // Re-fetch to get latest data
+                    const cloudData = doc.data() || {};
+                    
+                    // Merge data, local takes precedence
+                    const mergedWorkData = { ...(cloudData.workData || {}), ...localWorkData };
+                    const mergedReminders = [...(cloudData.reminders || []), ...localReminders];
+                    const uniqueReminders = Array.from(new Set(mergedReminders.map(r => JSON.stringify(r)))).map(s => JSON.parse(s));
+
+                    await userRef.update({
+                        workData: mergedWorkData,
+                        reminders: uniqueReminders
+                    });
+                    
+                    localStorage.removeItem('workData');
+                    localStorage.removeItem('reminders');
+                    console.log("Local data synced to cloud.");
+                } catch (err) {
+                    console.error("Failed to sync local data on login:", err);
+                    alert("Could not sync local data. Please check your connection.");
+                } finally {
+                    loadingSpinner.style.display = 'none';
+                }
+            }
+
+            // Now, listen for real-time updates from Firestore
+            userRefUnsubscribe = userRef.onSnapshot(doc => {
+                const data = doc.data();
+                workData = data?.workData || {};
+                reminders = data?.reminders || [];
+                initializeApp();
             }, err => {
                 console.error("Firestore snapshot error: ", err);
-                initializeApp(); // Continue with local data on error
+                initializeApp();
             });
+
         } else {
-            // Not logged in, load from local storage
+            // User is logged out
             workData = JSON.parse(localStorage.getItem('workData') || '{}');
+            reminders = JSON.parse(localStorage.getItem('reminders') || '[]');
             initializeApp();
         }
     });
