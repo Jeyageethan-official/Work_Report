@@ -201,7 +201,7 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            transition: background-color 0.2s;
+            transition: background-color: 0.2s;
         }
         .day-card-menu-item:hover {
              background: #f1f5f9;
@@ -501,7 +501,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const createInput = (label, field, type, placeholder = '', value = '') => {
              const isTimeInput = type === 'time';
-             // Conditionally add the value attribute only if a value exists. This fixes the iOS time input bug.
              const valueAttr = value ? `value="${value}"` : '';
              const inputHTML = `<input type="${type}" placeholder="${placeholder}" ${valueAttr} data-key="${dateKey}" data-field="${field}" class="w-full p-2 border border-gray-300 rounded-lg bg-gray-50/50 transition duration-200 premium-input dark:bg-gray-800/50 dark:border-gray-700 dark:text-gray-200 dark:placeholder-gray-400" />`;
              
@@ -654,9 +653,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // DATA HANDLING & STATE UPDATES
     const updateWorkData = (dateKey, field, value) => {
+        // 1. Prepare local update
         workData[dateKey] = workData[dateKey] || {};
-        workData[dateKey][field] = value;
 
+        // 2. Handle cascading changes locally first
         if (field === 'leaveStatus' && value !== 'Yes') {
             delete workData[dateKey].leaveReason;
             delete workData[dateKey].customReasonDetails;
@@ -669,14 +669,43 @@ document.addEventListener('DOMContentLoaded', () => {
             delete workData[dateKey].leaveReasonText;
         }
 
-        if (user) {
-          syncToCloud();
+        // 3. Apply the primary change locally
+        if (value) {
+            workData[dateKey][field] = value;
         } else {
-          saveLocalData();
+            delete workData[dateKey][field];
         }
-        
-        // Re-render only the affected card if leave status changes, preventing page jump
-        if(field === 'leaveStatus' || field === 'leaveReason') {
+
+        // 4. Prepare and send cloud update if logged in
+        if (user) {
+            const userRef = db.collection("users").doc(user.uid);
+            const updatePayload = {};
+            const baseFieldPath = `workData.${dateKey}`;
+
+            // Add primary change to payload
+            updatePayload[`${baseFieldPath}.${field}`] = value ? value : firebase.firestore.FieldValue.delete();
+
+            // Add cascading changes to payload
+            if (field === 'leaveStatus' && value !== 'Yes') {
+                updatePayload[`${baseFieldPath}.leaveReason`] = firebase.firestore.FieldValue.delete();
+                updatePayload[`${baseFieldPath}.customReasonDetails`] = firebase.firestore.FieldValue.delete();
+                updatePayload[`${baseFieldPath}.leaveReasonText`] = firebase.firestore.FieldValue.delete();
+            }
+            if (field === 'leaveReason' && value !== 'Custom Reason') {
+                updatePayload[`${baseFieldPath}.customReasonDetails`] = firebase.firestore.FieldValue.delete();
+            }
+            if (field === 'leaveReason' && value !== 'Own Leave') {
+                updatePayload[`${baseFieldPath}.leaveReasonText`] = firebase.firestore.FieldValue.delete();
+            }
+            
+            userRef.update(updatePayload).catch(err => console.error("Firestore update error:", err));
+        } else {
+            // 5. Save locally if not logged in
+            saveLocalData();
+        }
+
+        // 6. Re-render UI
+        if (field === 'leaveStatus' || field === 'leaveReason') {
             const day = dateKey.split('-')[2];
             const dayBox = daysContainer.querySelector(`.day-box[data-day="${day}"]`);
             if (dayBox) {
@@ -685,11 +714,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 const newDayBox = daysContainer.querySelector(`.day-box[data-day="${day}"]`);
                 addSingleDayCardEventListeners(newDayBox);
             }
-            renderSummary();
-        } else {
-            renderSummary();
         }
+        renderSummary();
     };
+
     
     const saveLocalData = () => {
         localStorage.setItem('workData', JSON.stringify(workData));
@@ -701,7 +729,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const month = currentDate.getMonth();
         const dateKey = `${year}-${month}-${day}`;
         if (workData[dateKey]) {
-            delete workData[dateKey]; // Clear local data
+            delete workData[dateKey];
             
             if (user) {
                 const userRef = db.collection("users").doc(user.uid);
@@ -715,7 +743,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 saveLocalData();
             }
 
-            // Re-render only the affected card to show cleared state
             const dayBox = daysContainer.querySelector(`.day-box[data-day="${day}"]`);
             if (dayBox) {
                 const newDayCardHTML = createDayCardHTML(day);
@@ -783,37 +810,17 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 const input = e.currentTarget.closest('.time-input-wrapper').querySelector('input');
-                const { key: dateKey, field } = input.dataset;
-
-                // iOS Safari fix: change type to text then back to time to properly clear it visually
-                const originalType = input.type;
-                input.type = 'text';
-                input.value = '';
-                input.type = originalType;
                 
-                input.removeAttribute('value');
+                input.value = '';
+                input.dispatchEvent(new Event('input', { bubbles: true })); // Trigger the main event handler
+                
                 e.currentTarget.classList.add('hidden');
-
-                if (workData[dateKey] && workData[dateKey][field]) {
-                    delete workData[dateKey][field];
-                    if (user) {
-                        const userRef = db.collection("users").doc(user.uid);
-                        const fieldPath = `workData.${dateKey}.${field}`;
-                        userRef.update({
-                            [fieldPath]: firebase.firestore.FieldValue.delete()
-                        }).catch(err => {
-                            console.error("Firestore field delete error:", err);
-                        });
-                    } else {
-                       saveLocalData();
-                    }
-                }
-                renderSummary();
             });
         });
 
         dayBox.querySelectorAll('input, select').forEach(el => {
-            el.addEventListener('change', (e) => {
+            const eventType = el.tagName === 'SELECT' ? 'change' : 'input';
+            el.addEventListener(eventType, (e) => {
                 const { key, field } = e.target.dataset;
                 updateWorkData(key, field, e.target.value);
             });
@@ -907,7 +914,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (isCurrentMonthView) {
             const todayEl = document.querySelector(`.day-box[data-day="${today.getDate()}"]`);
             if (todayEl) {
-                // Delay scroll to ensure page has rendered and animations are complete
                 setTimeout(() => {
                     todayEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 }, 500); 
@@ -984,7 +990,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const userCredential = await auth.signInWithEmailAndPassword(email, password);
 
                 if (!userCredential.user.emailVerified) {
-                    errorEl.textContent = 'Your email is not verified. Please check your inbox or spam folder.';
+                    errorEl.textContent = 'Your email is not verified. Please check your inbox.';
                     await auth.signOut();
                     return;
                 }
@@ -1002,7 +1008,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
                 const result = await auth.signInWithPopup(provider);
                 const email = result.user.email;
-                await promptToSavePassword(email, '******'); // Password isn't available, but this helps trigger the prompt
+                await promptToSavePassword(email, '******');
                 closeModal();
             } catch (e) {
                 document.getElementById('auth-error').textContent = e.message;
@@ -1063,7 +1069,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const userCredential = await auth.createUserWithEmailAndPassword(email, password);
                 await userCredential.user.updateProfile({ displayName: fullName });
                 await userCredential.user.sendEmailVerification();
-                await auth.signOut(); // Log out user until they verify
+                await auth.signOut();
 
                 await promptToSavePassword(email, password);
                 closeModal();
@@ -1095,7 +1101,6 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     
     const showReminderModal = () => {
-        // This function will render the list view or the form view inside the modal
         const renderReminderContent = (isAdding = false, editingIndex = null) => {
             let content = '';
             if (isAdding) {
@@ -1144,7 +1149,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             openModal(createModal('Your Reminders', content, 'reminder-modal'));
 
-            // Add event listeners for this specific modal content
             if (isAdding) {
                 document.getElementById('cancel-reminder').addEventListener('click', () => renderReminderContent());
                 document.getElementById('save-reminder').addEventListener('click', () => {
@@ -1164,7 +1168,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     } else {
                       saveLocalData();
                     }
-                    renderReminderContent(); // Re-render list view
+                    renderReminderContent();
                 });
                  document.getElementById('reminder-category').addEventListener('change', (e) => {
                     document.getElementById('custom-details-container').classList.toggle('hidden', e.target.value !== 'Other');
@@ -1179,11 +1183,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     } else {
                       saveLocalData();
                     }
-                    renderReminderContent(); // Re-render list
+                    renderReminderContent();
                 }));
             }
         };
-        renderReminderContent(); // Initial render of the modal
+        renderReminderContent();
     };
 
     const showDatePickerModal = () => {
@@ -1192,7 +1196,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const today = new Date();
         const isCurrentMonthView = today.getFullYear() === year && today.getMonth() === month;
 
-        const firstDayOfMonth = (new Date(year, month, 1).getDay() + 6) % 7; // 0=Mon, 6=Sun
+        const firstDayOfMonth = (new Date(year, month, 1).getDay() + 6) % 7;
         const daysInMonth = getDaysInMonth(year, month);
 
         const dayLabels = ['M', 'T', 'W', 'T', 'F', 'S', 'S'].map(label => `
@@ -1200,20 +1204,15 @@ document.addEventListener('DOMContentLoaded', () => {
         `).join('');
 
         let daysGrid = '';
-
-        // Add padding for days before the start of the month
         for (let i = 0; i < firstDayOfMonth; i++) {
             daysGrid += '<div></div>';
         }
 
-        // Add days of the month
         for (let day = 1; day <= daysInMonth; day++) {
             const dateKey = `${year}-${month}-${day}`;
             const hasData = workData[dateKey] && Object.keys(workData[dateKey]).length > 0;
             const isToday = isCurrentMonthView && day === today.getDate();
-            
             const highlightClass = isToday ? 'bg-blue-600 text-white' : 'hover:bg-blue-100 dark:hover:bg-gray-700';
-            
             daysGrid += `
                 <button data-day="${day}" class="date-select-btn relative flex items-center justify-center h-10 w-10 rounded-full text-sm font-medium text-gray-700 dark:text-gray-300 ${highlightClass} transition-colors">
                     ${day}
@@ -1228,7 +1227,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 ${daysGrid}
             </div>
         `;
-        
         openModal(createModal('Go to Date', content));
         
         document.querySelectorAll('.date-select-btn').forEach(btn => {
@@ -1300,7 +1298,6 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
         openModal(createModal('AI Professional Message Assistant', content));
         
-        // --- AI and Voice Logic ---
         const inputEl = document.getElementById('ai-input');
         const outputContainer = document.getElementById('ai-output-container');
         const outputEl = document.getElementById('ai-output');
@@ -1310,13 +1307,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const copyBtn = document.getElementById('copy-ai-output-btn');
         const errorContainer = document.getElementById('ai-error-container');
 
-        // Speech Recognition Setup
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         if (!SpeechRecognition) {
             voiceBtn.style.display = 'none';
         } else {
             const recognition = new SpeechRecognition();
-            recognition.lang = 'ta-IN'; // Tamil (India)
+            recognition.lang = 'ta-IN';
             recognition.interimResults = true;
             recognition.continuous = true;
             let isListening = false;
@@ -1352,7 +1348,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (event.error === 'service-not-allowed' || event.error === 'not-allowed') {
                     errorContainer.innerHTML = `
                         <strong class="font-semibold">Microphone access denied.</strong><br>
-                        To use voice input, please allow microphone access in your browser's site settings. Look for a lock icon (🔒) in the address bar to change permissions.
+                        To use voice input, please allow microphone access in your browser's site settings.
                     `;
                     errorContainer.classList.remove('hidden');
                 } else {
@@ -1362,14 +1358,14 @@ document.addEventListener('DOMContentLoaded', () => {
             };
 
             voiceBtn.addEventListener('click', () => {
-                errorContainer.classList.add('hidden'); // Hide error on new attempt
+                errorContainer.classList.add('hidden');
                 if (isListening) {
                     recognition.stop();
                 } else {
                     try {
                        recognition.start();
                     } catch(e) {
-                         errorContainer.textContent = `Could not start voice recognition. Please ensure your browser is up to date.`;
+                         errorContainer.textContent = `Could not start voice recognition.`;
                          errorContainer.classList.remove('hidden');
                     }
                 }
@@ -1402,8 +1398,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         copyBtn.addEventListener('click', () => {
-            const textToCopy = outputEl.textContent;
-            navigator.clipboard.writeText(textToCopy).then(() => {
+            navigator.clipboard.writeText(outputEl.textContent).then(() => {
                 const originalIcon = copyBtn.innerHTML;
                 copyBtn.innerHTML = 'Copied!';
                 copyBtn.disabled = true;
@@ -1411,8 +1406,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     copyBtn.innerHTML = originalIcon;
                     copyBtn.disabled = false;
                 }, 2000);
-            }, () => {
-                alert('Failed to copy.');
             });
         });
     };
@@ -1431,11 +1424,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const weekend = isWeekend(year, month, day);
 
             const rowClass = 'border-b border-gray-200';
-            
             const dateClass = weekend ? 'text-red-500 font-bold' : '';
-            const leaveStatusHTML = leaveStatusText === 'Yes' 
-                ? `<span class="font-bold text-blue-700">${leaveStatusText}</span>`
-                : leaveStatusText;
+            const leaveStatusHTML = leaveStatusText === 'Yes' ? `<span class="font-bold text-blue-700">${leaveStatusText}</span>` : leaveStatusText;
 
             return `
                 <tr class="${rowClass}">
@@ -1492,31 +1482,24 @@ document.addEventListener('DOMContentLoaded', () => {
             const spinner = document.getElementById('loading-spinner');
             spinner.style.display = 'flex';
 
-            // To ensure consistent rendering across devices, especially on mobile where the table might
-            // render very wide, we temporarily set a fixed width before capturing with html2canvas.
             const originalWidth = el.style.width;
             el.style.width = '1200px';
 
             html2canvas(el, { scale: 3, useCORS: true, backgroundColor: '#ffffff' }).then(canvas => {
-                // Restore the original width after capture
                 el.style.width = originalWidth;
 
                 const { jsPDF } = window.jspdf;
-                // Explicitly create a portrait A4 document
                 const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-                
                 const imgData = canvas.toDataURL('image/png');
                 const pdfWidth = pdf.internal.pageSize.getWidth();
                 const pdfHeight = pdf.internal.pageSize.getHeight();
                 
-                // Add the image to fill the entire page, which will remove vertical gaps
-                // but may stretch the content slightly. This fulfills the user request.
                 pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
                 pdf.save(`Work_Report_${year}_${month + 1}.pdf`);
                 spinner.style.display = 'none';
 
             }).catch(err => {
-                el.style.width = originalWidth; // Also restore on error
+                el.style.width = originalWidth;
                 console.error('PDF generation failed:', err);
                 alert('Sorry, there was an error generating the PDF.');
                 spinner.style.display = 'none';
@@ -1535,18 +1518,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const promptToSavePassword = async (email, password) => {
         if ('credentials' in navigator && navigator.credentials.store) {
             try {
-                const credential = new PasswordCredential({
-                    id: email,
-                    password: password,
-                    name: email, 
-                });
+                const credential = new PasswordCredential({ id: email, password: password, name: email });
                 await navigator.credentials.store(credential);
-                console.log('Credential stored successfully.');
             } catch (err) {
                 console.error('Error storing credential:', err);
             }
-        } else {
-            console.log('Credential Management API not supported.');
         }
     };
 
@@ -1565,7 +1541,7 @@ document.addEventListener('DOMContentLoaded', () => {
         loadingSpinner.style.opacity = '0';
         setTimeout(() => {
             loadingSpinner.style.display = 'none';
-        }, 1000); // Keep spinner for 1 second before fading
+        }, 1000);
         appContainer.classList.add('fade-in');
         appContainer.style.opacity = '1';
     };
@@ -1574,7 +1550,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // SCRIPT EXECUTION & EVENT BINDING
     // -----------------------------------------------------------------------------
     
-    // Scroll button listeners
     window.addEventListener('scroll', () => {
         const isAtTop = window.scrollY < 100;
         const isAtBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 100;
@@ -1586,7 +1561,6 @@ document.addEventListener('DOMContentLoaded', () => {
     scrollDownButton.addEventListener('click', () => window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'smooth' }));
     floatingDatePickerBtn.addEventListener('click', showDatePickerModal);
 
-    // Firebase setup and authentication handling
     const firebaseConfig = {
       apiKey: "AIzaSyDzaAqT7NRAyQhTNDh8GsMKlTKNmttzIWo",
       authDomain: "work-report-fe3da.firebaseapp.com",
@@ -1610,7 +1584,6 @@ document.addEventListener('DOMContentLoaded', () => {
             userRefUnsubscribe = null;
         }
         
-        // Reload the user object to get the latest emailVerified state
         if (currentUser) {
             await currentUser.reload();
         }
@@ -1658,10 +1631,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     
                     localStorage.removeItem('workData');
                     localStorage.removeItem('reminders');
-                    console.log("Local data synced to cloud.");
                 } catch (err) {
                     console.error("Failed to sync local data on login:", err);
-                    alert("Could not sync local data. Please check your connection.");
+                    alert("Could not sync local data.");
                 } finally {
                     loadingSpinner.style.display = 'none';
                 }
@@ -1679,9 +1651,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         } else {
             if (currentUser && !currentUser.emailVerified) {
-                 showInfoModal('Verification Required', 'Please verify your email to continue. Check your inbox or spam folder for the verification link.');
+                 showInfoModal('Verification Required', 'Please verify your email to continue.');
             }
-            user = null; // Treat unverified or logged-out users as guests
+            user = null;
             workData = JSON.parse(localStorage.getItem('workData') || '{}');
             reminders = JSON.parse(localStorage.getItem('reminders') || '[]');
             initializeApp();
@@ -1692,7 +1664,6 @@ document.addEventListener('DOMContentLoaded', () => {
 <script type="module">
     import { GoogleGenAI } from "@google/genai";
 
-    // Directly use the API key provided by the user.
     const apiKey = "AIzaSyCppq-j59GI9USv1Y0v2miQEn9y_7NfIWM";
     const ai = new GoogleGenAI({ apiKey: apiKey });
 
@@ -1708,7 +1679,6 @@ document.addEventListener('DOMContentLoaded', () => {
             return response.text.trim();
         } catch (error) {
             console.error("Error calling Gemini API:", error);
-            // Provide a more specific error message if the API key is invalid.
             if (error.toString().includes('API key not valid')) {
                 return "The provided API key is not valid. Please check the key and try again.";
             }
