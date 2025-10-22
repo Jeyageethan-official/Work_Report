@@ -594,7 +594,7 @@
 </head>
 <body class="bg-gray-50 dark:bg-gray-950">
     <!-- Sign-In Page -->
-    <div id="signin-page" class="fixed inset-0 flex items-center justify-center p-4">
+    <div id="signin-page" class="fixed inset-0 flex items-center justify-center p-4" style="display: none;">
         <div class="signin-card">
             <div class="text-center mb-8">
                 <h1 class="text-3xl font-bold text-gray-800 dark:text-white">Welcome Back</h1>
@@ -625,7 +625,7 @@
     </div>
     
     <!-- Main Application Wrapper -->
-    <div id="app-wrapper">
+    <div id="app-wrapper" style="display: none;">
         <!-- Top Navigation -->
         <nav id="main-nav" class="flex items-center justify-between">
             <div class="flex items-center gap-4">
@@ -2686,7 +2686,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 if (isFirstSnapshot) {
                     isFirstSnapshot = false;
-                    showPage('dashboard-page'); // Default to dashboard page on login
+                    showPage('report-page'); // Default to report page on login
                     initializeAppForUser();
                 }
             }, err => {
