@@ -1102,17 +1102,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 const { totalHours, otHours } = calculateDayHoursAndOT(data, year, month, day);
                 const isSpecial = data.specialDays === "Poya Day" || data.specialDays === "Public Holiday";
 
-                if (totalHours > 0 || (data && data.inTime && data.outTime)) {
+                if (data && data.inTime) {
                     totalPresentDays++;
-                    totalMonthOtHours += otHours;
                 }
+
+                totalMonthOtHours += otHours;
             
                 if (data.leaveStatus === "Yes") {
                     if (data.leaveReason === "Own Leave") ownLeaves++;
-                    if (isSpecial || data.leaveReason === "Poya Day" || data.leaveReason === "Public Holiday") {
+                    if (isSpecial || data.leaveReason === "Poya Day" || data.leaveReason === "Public Holiday" || data.leaveReason === "Custom Reason") {
                         publicHolidayLeaveDays++;
                     }
-                } else if (isSpecial && totalHours === 0 && !(data && data.inTime && data.outTime)) {
+                } else if (isSpecial && !data.inTime) { // Holiday and not present
                     publicHolidayLeaveDays++;
                 }
             }
@@ -1319,7 +1320,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let statusBadge = { text: 'Absent', class: 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300' };
         if (dayData.leaveStatus === 'Yes') {
             statusBadge = { text: 'Leave', class: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300' };
-        } else if (dayData.inTime && dayData.outTime) {
+        } else if (dayData.inTime) {
             statusBadge = { text: 'Present', class: 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300' };
         }
 
@@ -1494,7 +1495,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 let statusBadge = { text: 'Absent', class: 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300' };
                 if (dayData.leaveStatus === 'Yes') {
                     statusBadge = { text: 'Leave', class: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300' };
-                } else if (dayData.inTime && dayData.outTime) {
+                } else if (dayData.inTime) {
                     statusBadge = { text: 'Present', class: 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300' };
                 }
                 badge.textContent = statusBadge.text;
@@ -2424,7 +2425,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 statusClass = 'heatmap-leave-own';
             } else if (isSpecial || (dayData.leaveStatus === 'Yes' && dayData.leaveReason !== 'Own Leave')) {
                 statusClass = 'heatmap-public-holiday';
-            } else if (dayData.inTime && dayData.outTime) {
+            } else if (dayData.inTime) {
                 statusClass = 'heatmap-present';
             } else if (isDayWeekend) {
                 statusClass = 'heatmap-weekend';
@@ -2456,7 +2457,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let statusText = 'Absent';
         if (dayData.leaveStatus === 'Yes') {
             statusText = `Leave (${dayData.leaveReason || 'N/A'})`;
-        } else if (dayData.inTime && dayData.outTime) {
+        } else if (dayData.inTime) {
             statusText = 'Present';
         }
 
@@ -2590,9 +2591,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const { totalHours } = calculateDayHoursAndOT(data, year, month, day);
             const isSpecial = data.specialDays === "Poya Day" || data.specialDays === "Public Holiday";
 
-            if ((data.leaveStatus === 'Yes' && isSpecial) || (isSpecial && totalHours === 0)) {
+            if ((data.leaveStatus === 'Yes' && (isSpecial || data.leaveReason === 'Custom Reason' || data.leaveReason === "Public Holiday"))) {
                 cumulativePublicLeaves++;
-            } else if (data.leaveStatus === 'Yes' && data.leaveReason !== 'Own Leave') {
+            } else if (isSpecial && !data.inTime) {
                 cumulativePublicLeaves++;
             }
 
@@ -2711,28 +2712,29 @@ document.addEventListener('DOMContentLoaded', () => {
         
         Object.keys(workData).filter(k => k.startsWith(monthPrefix)).sort().forEach(key => {
             const data = workData[key];
+            if (!data) return;
+
             const day = parseInt(key.split('-')[2], 10);
             const { totalHours } = calculateDayHoursAndOT(data, year, month, day);
             const isSpecial = data.specialDays === "Poya Day" || data.specialDays === "Public Holiday";
+            const formattedDate = `${months[month]} ${day}`;
 
-            if ((data.leaveStatus === 'Yes' && isSpecial) || (isSpecial && totalHours === 0)) {
-                const formattedDate = `${months[month]} ${day}`;
-                const ot = totalHours > 0 ? `${totalHours.toFixed(1)} OT hrs` : 'Holiday';
-                
-                let reasonText = data.specialDays;
-                if (data.leaveReason === 'Custom Reason' && data.customReasonDetails) {
-                    reasonText += `: ${data.customReasonDetails}`;
-                }
-
-                details.push({ date: formattedDate, reason: `${reasonText} (${ot})` });
+            // Case 1: Poya or Public Holiday
+            if (isSpecial) {
+                const ot = (data.inTime && data.outTime) ? `${totalHours.toFixed(1)} OT hrs` : 'Holiday';
+                details.push({ date: formattedDate, reason: `${data.specialDays} (${ot})` });
+            } 
+            // Case 2: Custom Reason Leave on a non-special day
+            else if (data.leaveStatus === 'Yes' && data.leaveReason === 'Custom Reason') {
+                details.push({ date: formattedDate, reason: data.customReasonDetails || 'Custom Leave' });
             }
         });
 
         const content = details.length > 0
             ? `<ul class="space-y-2">${details.map(d => `<li class="flex justify-between items-center text-sm p-2 bg-gray-50 dark:bg-gray-800/50 rounded-md"><span class="font-semibold text-gray-700 dark:text-gray-300">${d.date}</span><span class="text-gray-500 dark:text-gray-400 text-right">${d.reason}</span></li>`).join('')}</ul>`
-            : `<p class="text-center text-gray-500 dark:text-gray-400">No public holiday leaves recorded for this month.</p>`;
+            : `<p class="text-center text-gray-500 dark:text-gray-400">No public holiday or custom leaves recorded for this month.</p>`;
         
-        openModal(createModal('Public Holiday Leave Details', content));
+        openModal(createModal('Public Holiday & Custom Leave Details', content));
     };
 
 
@@ -3156,7 +3158,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (isFirstSnapshot) {
                     isFirstSnapshot = false;
-                    showPage('dashboard-page'); // Default to dashboard page on login
+                    showPage('report-page'); // Default to report page on login
                     initializeAppForUser();
                 } else {
                     // Subsequent updates from other devices, re-render current view
