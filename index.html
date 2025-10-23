@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1489,14 +1490,36 @@ document.addEventListener('DOMContentLoaded', () => {
     const handleClearMonthData = () => {
         if (window.confirm("Are you sure you want to clear all data for this month? This action cannot be undone.")) {
             const monthPrefix = `${currentDate.getFullYear()}-${currentDate.getMonth()}`;
-            Object.keys(workData).forEach(key => {
-                if (key.startsWith(monthPrefix)) delete workData[key];
+            const keysToDelete = Object.keys(workData).filter(key => key.startsWith(monthPrefix));
+
+            if (keysToDelete.length === 0) return; // No data to delete
+
+            // Immediately update local state for UI responsiveness
+            keysToDelete.forEach(key => {
+                delete workData[key];
             });
-            if(user) {
-                syncToCloud();
+
+            // Prepare and execute Firestore update if the user is logged in
+            if (user) {
+                const userRef = db.collection("users").doc(user.uid);
+                const updatePayload = {};
+                keysToDelete.forEach(key => {
+                    // Use dot notation to specify the nested fields to delete
+                    updatePayload[`workData.${key}`] = firebase.firestore.FieldValue.delete();
+                });
+                
+                userRef.update(updatePayload).catch(err => {
+                    console.error("Firestore month clear error:", err);
+                    // Optionally, inform the user that the cloud sync failed.
+                });
             } else {
+                // Handle local-only storage if the user is not logged in
                 saveLocalData();
             }
+
+            // Re-render the UI from the modified local state.
+            // The onSnapshot listener will also receive this update from the server,
+            // but rendering immediately provides a better user experience.
             renderAll();
         }
     };
