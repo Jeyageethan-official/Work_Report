@@ -18,6 +18,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
     
     <!-- PDF/Image Export Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -854,7 +855,12 @@
                         <button id="restore-backup-btn" class="w-full text-center p-3 rounded-lg font-semibold transition-colors bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700">Restore from Backup</button>
                         <button id="full-csv-export-btn" class="w-full text-center p-3 rounded-lg font-semibold transition-colors bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700">Export All as CSV</button>
                     </div>
-                    <p id="data-op-status" class="text-sm text-green-600 dark:text-green-400 mt-4 h-5"></p>
+                    <div id="backup-progress-container" class="mt-4 hidden">
+                        <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+                            <div id="backup-progress-bar" class="bg-blue-600 h-2.5 rounded-full" style="width: 0%; transition: width 0.3s ease;"></div>
+                        </div>
+                    </div>
+                    <p id="data-op-status" class="text-sm text-green-600 dark:text-green-400 mt-2 h-5 text-center"></p>
                 </div>
             </div>
         </div>
@@ -1317,7 +1323,8 @@ document.addEventListener('DOMContentLoaded', () => {
             : ["", "Poya Day", "Public Holiday", "Custom Reason", "Own Leave"];
         
         const { totalHours } = calculateDayHoursAndOT(dayData, year, month, day);
-        let statusBadge = { text: 'Absent', class: 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300' };
+        
+        let statusBadge = null;
         if (dayData.leaveStatus === 'Yes') {
             statusBadge = { text: 'Leave', class: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300' };
         } else if (dayData.inTime) {
@@ -1354,7 +1361,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="flex justify-between items-center mb-4 pb-4 border-b border-gray-200 dark:border-gray-800">
                     <div class="flex items-center gap-3">
                         <h3 class="text-lg font-semibold ${weekend ? 'text-red-500 dark:text-red-400' : 'text-gray-900 dark:text-gray-100'}">${dayName}, ${months[month]} ${day}, ${year}</h3>
-                         <div id="status-badge-${dateKey}" class="text-xs font-bold px-2 py-1 rounded-full ${statusBadge.class}">${statusBadge.text}</div>
+                         ${statusBadge ? `<div id="status-badge-${dateKey}" class="text-xs font-bold px-2 py-1 rounded-full ${statusBadge.class}">${statusBadge.text}</div>` : ''}
                     </div>
                     <div class="relative">
                         <button class="day-card-menu-btn p-1 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full">
@@ -1487,19 +1494,22 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } else if (shouldUpdateBadge) {
              const day = parseInt(dateKey.split('-')[2]);
-             const badge = document.getElementById(`status-badge-${dateKey}`);
-             if (badge) {
-                const year = currentDate.getFullYear();
-                const month = currentDate.getMonth();
+             const badgeContainer = daysContainer.querySelector(`.day-box[data-day="${day}"] .flex.items-center.gap-3`);
+             if(badgeContainer) {
+                const existingBadge = badgeContainer.querySelector(`#status-badge-${dateKey}`);
+                if (existingBadge) existingBadge.remove();
+                
                 const dayData = workData[dateKey] || {};
-                let statusBadge = { text: 'Absent', class: 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300' };
+                let statusBadge = null;
                 if (dayData.leaveStatus === 'Yes') {
                     statusBadge = { text: 'Leave', class: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300' };
                 } else if (dayData.inTime) {
                     statusBadge = { text: 'Present', class: 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300' };
                 }
-                badge.textContent = statusBadge.text;
-                badge.className = `text-xs font-bold px-2 py-1 rounded-full ${statusBadge.class}`;
+                
+                if (statusBadge) {
+                    badgeContainer.insertAdjacentHTML('beforeend', `<div id="status-badge-${dateKey}" class="text-xs font-bold px-2 py-1 rounded-full ${statusBadge.class}">${statusBadge.text}</div>`);
+                }
              }
         }
         renderSummary();
@@ -2863,25 +2873,78 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => statusEl.textContent = '', 3000);
     }
     
-    const handleFullBackup = async () => {
-         if (!user) return;
+    const handleFullBackup = () => {
+        if (!user) return;
+
         const statusEl = document.getElementById('data-op-status');
-        statusEl.textContent = 'Backing up...';
+        const backupBtn = document.getElementById('full-backup-btn');
+        const progressContainer = document.getElementById('backup-progress-container');
+        const progressBar = document.getElementById('backup-progress-bar');
+
+        backupBtn.disabled = true;
+        statusEl.textContent = 'Preparing backup...';
+        statusEl.className = 'text-sm text-gray-500 dark:text-gray-400 mt-2 h-5 text-center';
+        progressBar.style.width = '0%';
+        progressContainer.classList.remove('hidden');
+
         try {
-            const backupRef = db.collection('backups').doc(user.uid);
-            const timestamp = new Date().toISOString();
-            await backupRef.set({
-                backups: {
-                    [timestamp]: workData
+            const fullBackupData = {
+                workData,
+                reminders,
+                settings: userSettings,
+                backupDate: new Date().toISOString()
+            };
+
+            const jsonData = JSON.stringify(fullBackupData, null, 2);
+            const blob = new Blob([jsonData], { type: 'application/json' });
+            
+            const now = new Date();
+            const dateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+            const timeStr = `${String(now.getHours()).padStart(2, '0')}-${String(now.getMinutes()).padStart(2, '0')}`;
+            const fileName = `backup_${dateStr}_${timeStr}.json`;
+
+            const storageRef = storage.ref(`backups/${user.uid}/${fileName}`);
+            const uploadTask = storageRef.put(blob);
+
+            uploadTask.on('state_changed', 
+                (snapshot) => {
+                    const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                    progressBar.style.width = progress + '%';
+                    statusEl.textContent = `Backing up... (${Math.round(progress)}%)`;
+                }, 
+                (error) => {
+                    console.error("Backup failed:", error);
+                    statusEl.textContent = 'Backup failed. Please try again.';
+                    statusEl.className = 'text-sm text-red-600 dark:text-red-400 mt-2 h-5 text-center';
+                    backupBtn.disabled = false;
+                    setTimeout(() => {
+                        statusEl.textContent = '';
+                        progressContainer.classList.add('hidden');
+                    }, 4000);
+                }, 
+                () => {
+                    statusEl.textContent = 'Backup successful!';
+                    statusEl.className = 'text-sm text-green-600 dark:text-green-400 mt-2 h-5 text-center';
+                    backupBtn.disabled = false;
+                     setTimeout(() => {
+                        statusEl.textContent = '';
+                        progressContainer.classList.add('hidden');
+                    }, 3000);
                 }
-            }, { merge: true });
-            statusEl.textContent = 'Backup successful!';
+            );
+
         } catch(e) {
-            statusEl.textContent = 'Backup failed.';
-            console.error(e);
+            statusEl.textContent = 'Error preparing backup.';
+            statusEl.className = 'text-sm text-red-600 dark:text-red-400 mt-2 h-5 text-center';
+            console.error("Backup preparation failed:", e);
+            backupBtn.disabled = false;
+             setTimeout(() => {
+                statusEl.textContent = '';
+                progressContainer.classList.add('hidden');
+            }, 3000);
         }
-        setTimeout(() => statusEl.textContent = '', 3000);
-    }
+    };
+
 
     const showRestoreModal = async () => {
         const content = `<div id="restore-list-container" class="text-center p-4">Fetching backups...</div>`;
@@ -2889,26 +2952,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const container = document.getElementById('restore-list-container');
         try {
-            const backupDoc = await db.collection('backups').doc(user.uid).get();
-            if (!backupDoc.exists || !backupDoc.data().backups) {
+            const listRef = storage.ref(`backups/${user.uid}`);
+            const res = await listRef.listAll();
+
+            if (res.items.length === 0) {
                 container.innerHTML = '<p class="text-gray-500">No cloud backups found.</p>';
                 return;
             }
-            
-            const backups = backupDoc.data().backups;
-            const timestamps = Object.keys(backups).sort((a, b) => new Date(b) - new Date(a));
 
-            if (timestamps.length === 0) {
-                 container.innerHTML = '<p class="text-gray-500">No cloud backups found.</p>';
-                 return;
-            }
+            res.items.sort((a, b) => b.name.localeCompare(a.name)); // Newest first
 
-            let listHTML = '<ul class="space-y-2 text-left">';
-            timestamps.forEach(ts => {
+            let listHTML = '<ul class="space-y-2 text-left max-h-64 overflow-y-auto">';
+            res.items.forEach(itemRef => {
+                const readableName = itemRef.name
+                    .replace('backup_', '')
+                    .replace('.json', '')
+                    .replace('_', ' at ')
+                    .replace(/-/g, ':');
+                
                 listHTML += `
                     <li class="flex justify-between items-center p-2 bg-gray-100 dark:bg-gray-800 rounded-md">
-                        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">${new Date(ts).toLocaleString()}</span>
-                        <button data-timestamp="${ts}" class="restore-item-btn text-sm font-semibold bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600 transition-colors">Restore</button>
+                        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">${readableName}</span>
+                        <button data-path="${itemRef.fullPath}" class="restore-item-btn text-sm font-semibold bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600 transition-colors">Restore</button>
                     </li>
                 `;
             });
@@ -2916,25 +2981,41 @@ document.addEventListener('DOMContentLoaded', () => {
             container.innerHTML = listHTML;
 
             container.querySelectorAll('.restore-item-btn').forEach(btn => {
-                btn.onclick = () => {
+                btn.onclick = async () => {
                     if (confirm('Are you sure you want to restore this backup? This will overwrite your current work data.')) {
-                        const ts = btn.dataset.timestamp;
-                        workData = backups[ts];
-                        syncToCloud();
-                        closeModal();
-                        const statusEl = document.getElementById('data-op-status');
-                        statusEl.textContent = 'Restore successful!';
-                        setTimeout(() => statusEl.textContent = '', 3000);
-                        renderAll();
-                        renderDashboard();
+                        const path = btn.dataset.path;
+                        const fileRef = storage.ref(path);
+                        
+                        try {
+                            const url = await fileRef.getDownloadURL();
+                            const response = await fetch(url);
+                            const restoredData = await response.json();
+
+                            workData = restoredData.workData || {};
+                            reminders = restoredData.reminders || [];
+                            userSettings = restoredData.settings || { baseAnnualLeave: 35, normalWorkMinutes: 540 };
+                            
+                            await syncToCloud();
+                            
+                            closeModal();
+                            const statusEl = document.getElementById('data-op-status');
+                            statusEl.textContent = 'Restore successful!';
+                            setTimeout(() => statusEl.textContent = '', 3000);
+                            
+                            renderAll();
+                            renderDashboard();
+                        } catch (restoreError) {
+                            console.error("Restore failed:", restoreError);
+                            alert("Failed to restore data. Please check the console for errors.");
+                        }
                     }
                 };
             });
         } catch (e) {
             container.innerHTML = '<p class="text-red-500">Error fetching backups. Please try again.</p>';
-            console.error(e);
+            console.error("Error listing backups:", e);
         }
-    }
+    };
     
     const handleFullCSVExport = () => {
         const headers = ['Date', 'InTime', 'OutTime', 'MovementOut', 'MovementIn', 'TeamMembers', 'WorkLocation', 'VehicleNumber', 'KM', 'SpecialDay', 'LeaveStatus', 'LeaveReason', 'LeaveReasonDetails'];
@@ -3119,6 +3200,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
+    const storage = firebase.storage();
     let userRefUnsubscribe = null;
 
     auth.onAuthStateChanged(async (currentUser) => {
