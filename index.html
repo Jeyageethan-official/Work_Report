@@ -1572,7 +1572,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if (el.classList.contains('custom-time-input')) {
                 el.addEventListener('click', (e) => showTimePickerModal(e.target));
             }
-            const eventType = el.tagName === 'SELECT' ? 'change' : 'input';
+            // For text and number inputs, use the 'change' event which fires on blur (when the user is done typing).
+            // For select dropdowns, 'change' is also the correct event.
+            // The 'input' event fires on every keystroke, which was causing the issue.
+            const eventType = 'change';
             el.addEventListener(eventType, (e) => {
                 const { key, field } = e.target.dataset;
                 updateWorkData(key, field, e.target.value);
@@ -1863,13 +1866,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const formattedTime = `${String(selectedHour).padStart(2, '0')}:${String(selectedMinute).padStart(2, '0')}`;
             
             targetInput.value = formattedTime;
-            targetInput.dispatchEvent(new Event('input', { bubbles: true }));
+            targetInput.dispatchEvent(new Event('change', { bubbles: true }));
             closeModal();
         });
 
         document.getElementById('clear-time-btn').addEventListener('click', () => {
             targetInput.value = '';
-            targetInput.dispatchEvent(new Event('input', { bubbles: true }));
+            targetInput.dispatchEvent(new Event('change', { bubbles: true }));
             closeModal();
         });
     };
