@@ -3298,7 +3298,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             return response.text.trim();
         } catch (error) {
-            console.error("Error calling Gemini API:", error);
+            console.error("Error calling Gemini API:", error); 
             if (error.toString().includes('API key not valid')) {
                 return "The provided API key is not valid. Please check the key and try again.";
             }
