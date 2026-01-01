@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -210,7 +211,7 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            transition: background-color: 0.2s;
+            transition: background-color 0.2s;
         }
         .day-card-menu-item:hover {
              background: #f1f5f9;
@@ -607,6 +608,7 @@
   }
 }
 </script>
+<link rel="stylesheet" href="/index.css">
 </head>
 <body class="bg-gray-50 dark:bg-gray-950">
     <!-- Sign-In Page -->
@@ -1045,7 +1047,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const checkDate = new Date(year, month, day);
 
-        return checkDate.getTime() === today.getTime() ||
+        return true || checkDate.getTime() === today.getTime() ||
                checkDate.getTime() === yesterday.getTime() ||
                checkDate.getTime() === tomorrow.getTime();
     };
@@ -3306,5 +3308,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 </script>
+<script type="module" src="/index.tsx"></script>
 </body>
 </html>
