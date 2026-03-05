@@ -414,7 +414,7 @@
         }
 
         /* Dashboard & Report Pages */
-        #report-page, #dashboard-page, #settings-page {
+        #report-page, #dashboard-page, #settings-page, #ai-page {
             display: none;
             /* Switched to block for simpler layout management */
         }
@@ -556,6 +556,419 @@
         html.dark .widget-title {
             color: #9ca3af; /* gray-400 */
         }
+        .dashboard-scroll-panel {
+            max-height: 15rem;
+            overflow-y: auto;
+            overflow-x: hidden;
+            overscroll-behavior: contain;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-gutter: stable;
+            border-radius: 0.75rem;
+            background: rgba(255, 255, 255, 0.55);
+            border: 1px solid rgba(229, 231, 235, 0.8);
+            padding: 0.5rem;
+            contain: layout paint;
+            isolation: isolate;
+        }
+        html.dark .dashboard-scroll-panel {
+            background: rgba(17, 24, 39, 0.55);
+            border-color: rgba(75, 85, 99, 0.65);
+        }
+        .dashboard-list-item {
+            background: rgba(249, 250, 251, 0.9);
+            border: 1px solid rgba(229, 231, 235, 0.8);
+            border-radius: 0.5rem;
+            padding: 0.5rem;
+        }
+        html.dark .dashboard-list-item {
+            background: rgba(31, 41, 55, 0.7);
+            border-color: rgba(75, 85, 99, 0.7);
+        }
+        .dashboard-widget-chart {
+            height: 11rem;
+            min-height: 11rem;
+            position: relative;
+        }
+
+        /* ========== PREMIUM IOS RE-SKIN ========== */
+        :root {
+            --ios-primary: #007aff;
+            --ios-primary-soft: #5aa9ff;
+            --ios-bg-light: #f5f5f7;
+            --ios-bg-dark: #1c1c1e;
+            --ios-glass-light: rgba(255, 255, 255, 0.72);
+            --ios-glass-dark: rgba(36, 36, 38, 0.62);
+            --ios-border-light: rgba(255, 255, 255, 0.55);
+            --ios-border-dark: rgba(255, 255, 255, 0.12);
+            --ios-shadow: 0 16px 42px rgba(15, 23, 42, 0.12);
+            --ios-radius: 20px;
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+        body {
+            font-family: "SF Pro Display", "SF Pro Text", Inter, Roboto, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: #ffffff;
+            color: #111827;
+            min-height: 100vh;
+        }
+        html.dark body {
+            background:
+                radial-gradient(circle at 8% 10%, rgba(90, 169, 255, 0.2), transparent 38%),
+                radial-gradient(circle at 86% 4%, rgba(51, 65, 85, 0.48), transparent 40%),
+                linear-gradient(180deg, #111827 0%, var(--ios-bg-dark) 100%);
+        }
+        #app-wrapper {
+            min-height: 100vh;
+        }
+        .app-shell {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 1rem;
+            min-height: 100vh;
+            padding: 1rem;
+        }
+        .desktop-sidebar {
+            position: sticky;
+            top: 1rem;
+            height: calc(100vh - 2rem);
+            border-radius: 24px;
+            background: var(--ios-glass-light);
+            border: 1px solid var(--ios-border-light);
+            box-shadow: var(--ios-shadow);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            padding: 1.1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+            overflow-y: auto;
+            overscroll-behavior: contain;
+        }
+        html.dark .desktop-sidebar {
+            background: var(--ios-glass-dark);
+            border-color: var(--ios-border-dark);
+            box-shadow: 0 22px 48px rgba(0, 0, 0, 0.35);
+        }
+        .desktop-sidebar-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            letter-spacing: 0.01em;
+            margin: 0.5rem 0 0.8rem;
+            color: #0f172a;
+        }
+        html.dark .desktop-sidebar-title { color: #f3f4f6; }
+        .app-content-shell {
+            min-width: 0;
+            padding-bottom: 6rem;
+        }
+        #main-nav {
+            border-radius: 20px;
+            border: 1px solid var(--ios-border-light);
+            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+            margin-bottom: 0.9rem;
+            padding: 0.9rem 1.1rem;
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+        }
+        html.dark #main-nav { border-color: var(--ios-border-dark); }
+        #page-title {
+            font-size: clamp(1.1rem, 1.8vw, 1.5rem);
+            font-weight: 750;
+            letter-spacing: -0.01em;
+        }
+        .nav-button {
+            border: 1px solid transparent;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 14px;
+            padding: 0.75rem 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            font-weight: 600;
+            color: #334155;
+            transition: all 0.25s ease;
+            cursor: pointer;
+        }
+        .nav-button:hover {
+            transform: translateY(-1px) scale(1.01);
+            box-shadow: 0 14px 24px rgba(15, 23, 42, 0.1);
+            border-color: rgba(0, 122, 255, 0.24);
+            color: #0f172a;
+        }
+        .nav-button svg {
+            width: 1.05rem;
+            height: 1.05rem;
+            opacity: 0.92;
+        }
+        .nav-button.nav-item-active {
+            color: #fff;
+            background: linear-gradient(160deg, var(--ios-primary) 0%, var(--ios-primary-soft) 100%);
+            box-shadow: 0 14px 30px rgba(0, 122, 255, 0.3);
+            border-color: transparent;
+        }
+        html.dark .nav-button {
+            background: rgba(30, 41, 59, 0.42);
+            color: #cbd5e1;
+        }
+        html.dark .nav-button:hover { color: #f8fafc; }
+        .section-heading {
+            font-size: 1.05rem;
+            font-weight: 650;
+            color: #111827;
+            margin-bottom: 0.8rem;
+        }
+        html.dark .section-heading { color: #f9fafb; }
+        .widget-card,
+        .iphone-widget,
+        #report-page .day-box,
+        .signin-card {
+            border-radius: var(--ios-radius);
+            border: 1px solid var(--ios-border-light);
+            background: var(--ios-glass-light);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            box-shadow: var(--ios-shadow);
+            transition: transform 0.28s ease, box-shadow 0.28s ease, border-color 0.2s ease;
+        }
+        html.dark .widget-card,
+        html.dark .iphone-widget,
+        html.dark #report-page .day-box,
+        html.dark .signin-card {
+            background: var(--ios-glass-dark);
+            border-color: var(--ios-border-dark);
+        }
+        .widget-card:hover,
+        .iphone-widget:hover,
+        #report-page .day-box:hover {
+            transform: translateY(-4px) scale(1.01);
+            box-shadow: 0 22px 40px rgba(15, 23, 42, 0.16);
+        }
+        .widget-title {
+            font-size: 0.75rem;
+            letter-spacing: 0.12em;
+            color: #64748b;
+        }
+        .dashboard-scroll-panel {
+            background: rgba(255, 255, 255, 0.36);
+        }
+        html.dark .dashboard-scroll-panel {
+            background: rgba(30, 41, 59, 0.42);
+        }
+        .premium-input, .premium-select, .signin-input, textarea {
+            border-radius: 14px !important;
+            border: 1px solid rgba(148, 163, 184, 0.35) !important;
+            background: rgba(255, 255, 255, 0.75) !important;
+            box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.04);
+            transition: all 0.2s ease;
+        }
+        html.dark .premium-input, html.dark .premium-select, html.dark .signin-input, html.dark textarea {
+            background: rgba(17, 24, 39, 0.62) !important;
+            border-color: rgba(100, 116, 139, 0.45) !important;
+            color: #e2e8f0 !important;
+        }
+        .premium-input:focus, .premium-select:focus, .signin-input:focus, textarea:focus {
+            box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.15), 0 10px 20px rgba(0, 122, 255, 0.08) !important;
+            border-color: rgba(0, 122, 255, 0.45) !important;
+        }
+        button {
+            transition: transform 0.25s ease, box-shadow 0.25s ease, filter 0.2s ease;
+        }
+        button:hover {
+            transform: scale(1.03);
+        }
+        button:active {
+            transform: scale(0.98);
+        }
+        .ios-primary-btn {
+            background: linear-gradient(160deg, #007aff, #3f9bff);
+            color: white;
+            box-shadow: 0 12px 24px rgba(0, 122, 255, 0.28);
+            border-radius: 14px;
+        }
+        .ios-secondary-btn {
+            background: rgba(255, 255, 255, 0.5);
+            border: 1px solid rgba(148, 163, 184, 0.35);
+            border-radius: 14px;
+        }
+        html.dark .ios-secondary-btn {
+            background: rgba(30, 41, 59, 0.45);
+            border-color: rgba(100, 116, 139, 0.45);
+        }
+        #mobile-bottom-nav {
+            position: fixed;
+            left: 0.75rem;
+            right: 0.75rem;
+            bottom: max(0.75rem, env(safe-area-inset-bottom));
+            z-index: 45;
+            border-radius: 22px;
+            background: var(--ios-glass-light);
+            border: 1px solid var(--ios-border-light);
+            box-shadow: 0 18px 38px rgba(15, 23, 42, 0.18);
+            backdrop-filter: blur(22px);
+            -webkit-backdrop-filter: blur(22px);
+            padding: 0.45rem;
+            display: none;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 0.35rem;
+        }
+        html.dark #mobile-bottom-nav {
+            background: var(--ios-glass-dark);
+            border-color: var(--ios-border-dark);
+        }
+        .bottom-nav-btn {
+            border-radius: 14px;
+            border: none;
+            background: transparent;
+            color: #334155;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.15rem;
+            padding: 0.42rem 0.2rem;
+            font-size: 0.66rem;
+            font-weight: 600;
+        }
+        .bottom-nav-btn.nav-item-active {
+            color: #fff;
+            background: linear-gradient(160deg, var(--ios-primary) 0%, var(--ios-primary-soft) 100%);
+            box-shadow: 0 8px 18px rgba(0, 122, 255, 0.28);
+        }
+        .bottom-nav-btn svg {
+            width: 1.18rem;
+            height: 1.18rem;
+            opacity: 1;
+            stroke-width: 2.35;
+        }
+        .ios-switch {
+            position: relative;
+            width: 44px;
+            height: 26px;
+            appearance: none;
+            border-radius: 999px;
+            background: #cbd5e1;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .ios-switch::after {
+            content: "";
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 22px;
+            height: 22px;
+            border-radius: 999px;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+            transition: all 0.2s ease;
+        }
+        .ios-switch:checked {
+            background: #34c759;
+        }
+        .ios-switch:checked::after {
+            transform: translateX(18px);
+        }
+        .ai-chat-shell {
+            display: grid;
+            gap: 0.8rem;
+        }
+        .ai-chat-bubble {
+            border-radius: 16px;
+            padding: 0.7rem 0.85rem;
+            max-width: 92%;
+            font-size: 0.92rem;
+            line-height: 1.6;
+            white-space: pre-line;
+            text-align: left;
+        }
+        .ai-chat-bubble.user {
+            margin-left: auto;
+            color: #fff;
+            background: linear-gradient(160deg, #007aff 0%, #5aa9ff 100%);
+            box-shadow: 0 10px 22px rgba(0, 122, 255, 0.28);
+        }
+        .ai-chat-bubble.assistant {
+            margin-right: auto;
+            color: #1f2937;
+            background: rgba(241, 245, 249, 0.9);
+        }
+        html.dark .ai-chat-bubble.assistant {
+            color: #e5e7eb;
+            background: rgba(51, 65, 85, 0.72);
+        }
+        .ai-chat-loading {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.28rem;
+        }
+        .ai-chat-loading span {
+            width: 6px;
+            height: 6px;
+            border-radius: 999px;
+            background: currentColor;
+            opacity: 0.5;
+            animation: ai-dot 1s infinite ease-in-out;
+        }
+        .ai-chat-loading span:nth-child(2) { animation-delay: 0.15s; }
+        .ai-chat-loading span:nth-child(3) { animation-delay: 0.3s; }
+        @keyframes ai-dot {
+            0%, 80%, 100% { transform: scale(0.8); opacity: 0.35; }
+            40% { transform: scale(1); opacity: 1; }
+        }
+        .toast-root {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 70;
+            display: grid;
+            gap: 0.6rem;
+        }
+        .toast {
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            background: rgba(15, 23, 42, 0.92);
+            color: #f8fafc;
+            padding: 0.75rem 0.9rem;
+            min-width: 230px;
+            box-shadow: 0 12px 24px rgba(15, 23, 42, 0.32);
+            animation: fadeIn 0.25s ease-out;
+        }
+        .toast.success { border-left: 4px solid #22c55e; }
+        .toast.error { border-left: 4px solid #ef4444; }
+        .toast.info { border-left: 4px solid #38bdf8; }
+        .skeleton {
+            background: linear-gradient(90deg, rgba(148, 163, 184, 0.22) 25%, rgba(148, 163, 184, 0.42) 37%, rgba(148, 163, 184, 0.22) 63%);
+            background-size: 400% 100%;
+            animation: shimmer 1.1s linear infinite;
+            border-radius: 10px;
+        }
+        @keyframes shimmer {
+            0% { background-position: 100% 0; }
+            100% { background-position: 0 0; }
+        }
+        @media (max-width: 1023px) {
+            .app-shell {
+                grid-template-columns: 1fr;
+                padding: 0.75rem;
+            }
+            .desktop-sidebar {
+                display: none;
+            }
+            #mobile-bottom-nav {
+                display: grid;
+            }
+            .app-content-shell {
+                padding-bottom: 7.2rem;
+            }
+            #main-nav {
+                border-radius: 16px;
+                padding-inline: 0.8rem;
+            }
+            #scroll-controls {
+                right: 0.9rem;
+                bottom: calc(6.2rem + env(safe-area-inset-bottom));
+            }
+        }
 
         /* NEW iPhone-style summary widgets */
         .iphone-widget {
@@ -676,29 +1089,56 @@
 
     <!-- Main Application Wrapper -->
     <div id="app-wrapper" style="display: none;">
-        <!-- Top Navigation -->
-        <nav id="main-nav" class="flex items-center justify-between">
-            <div class="flex items-center gap-2">
-                <button id="header-back-btn" class="hidden p-2 text-gray-600 dark:text-gray-300 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" aria-label="Back to Dashboard">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+        <div class="app-shell">
+            <aside id="desktop-sidebar" class="desktop-sidebar">
+                <div class="desktop-sidebar-title">Work Suite</div>
+                <button id="nav-dashboard-btn" class="nav-button nav-item-active">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><rect x="3" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="3" width="7" height="7" rx="1.5"></rect><rect x="3" y="14" width="7" height="7" rx="1.5"></rect><rect x="14" y="14" width="7" height="7" rx="1.5"></rect></svg>
+                    <span>Dashboard</span>
                 </button>
-                <!-- Logo -->
-                <div class="flex items-center gap-2 text-xl font-bold text-gray-800 dark:text-white">
-                    <svg class="w-8 h-8 text-blue-600" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                         <g stroke="currentColor" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none">
-                            <path d="M25,15 h50 a5,5 0 0 1 5,5 v60 a5,5 0 0 1 -5,5 h-50 a5,5 0 0 1 -5,-5 v-60 a5,5 0 0 1 5,-5 z" />
-                            <path d="M35 35 H 75" />
-                            <path d="M35 50 H 75" />
-                            <path d="M35 65 H 60" />
-                        </g>
-                    </svg>
-                    <span id="page-title">Work Report</span>
-                </div>
-            </div>
-            <div id="auth-area" class="relative">
-                <!-- User menu and sidebar button will be rendered here by JS -->
-            </div>
-        </nav>
+                <button id="nav-leave-requests-btn" class="nav-button">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M4 6h16M4 12h16M4 18h10"></path></svg>
+                    <span>Leave Requests</span>
+                </button>
+                <button id="nav-calendar-btn" class="nav-button">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><rect x="3" y="4" width="18" height="18" rx="2"></rect><path d="M8 2v4M16 2v4M3 10h18"></path></svg>
+                    <span>Calendar</span>
+                </button>
+                <button id="nav-reports-btn" class="nav-button">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M4 19h16M7 16V8M12 16V5M17 16v-4"></path></svg>
+                    <span>Reports</span>
+                </button>
+                <button id="nav-ai-btn" class="nav-button">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="m12 3-2 5-5 2 5 2 2 5 2-5 5-2-5-2-2-5z"></path></svg>
+                    <span>AI Assistant</span>
+                </button>
+                <button id="nav-settings-btn" class="nav-button">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V22a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51"></path></svg>
+                    <span>Settings</span>
+                </button>
+            </aside>
+
+            <div class="app-content-shell">
+                <!-- Top Navigation -->
+                <nav id="main-nav" class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <button id="header-back-btn" class="hidden p-2 text-gray-600 dark:text-gray-300 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" aria-label="Back to Dashboard">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                        </button>
+                        <div class="flex items-center gap-2 text-xl font-bold text-gray-800 dark:text-white">
+                            <svg class="w-8 h-8 text-blue-600" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                                 <g stroke="currentColor" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none">
+                                    <path d="M25,15 h50 a5,5 0 0 1 5,5 v60 a5,5 0 0 1 -5,5 h-50 a5,5 0 0 1 -5,-5 v-60 a5,5 0 0 1 5,-5 z" />
+                                    <path d="M35 35 H 75" />
+                                    <path d="M35 50 H 75" />
+                                    <path d="M35 65 H 60" />
+                                </g>
+                            </svg>
+                            <span id="page-title">Work Report</span>
+                        </div>
+                    </div>
+                    <div id="auth-area" class="relative"></div>
+                </nav>
 
         <!-- Report Page -->
         <div id="report-page">
@@ -773,24 +1213,32 @@
                 <!-- Widgets Grid -->
                 <div class="widget-card">
                     <h3 class="widget-title mb-4">Upcoming Events (Next 7 Days)</h3>
-                    <div id="events-container" class="text-sm space-y-2"></div>
+                    <div id="events-container" class="dashboard-scroll-panel text-sm"></div>
                 </div>
                 <div class="widget-card">
                     <h3 class="widget-title mb-4">Own Leave Reason Summary</h3>
-                    <canvas id="leave-reason-chart"></canvas>
+                    <div class="dashboard-widget-chart">
+                        <canvas id="leave-reason-chart"></canvas>
+                    </div>
+                    <div id="own-leave-reason-details" class="dashboard-scroll-panel mt-3 text-sm"></div>
                 </div>
-                 <div class="widget-card">
-                    <h3 class="widget-title mb-4">Quick Export</h3>
+                <div class="widget-card">
+                    <h3 class="widget-title mb-4">Public Holiday Leaves</h3>
+                    <div id="public-holiday-summary" class="dashboard-scroll-panel text-sm"></div>
+                    <button id="public-holiday-view-all-btn" class="ios-secondary-btn w-full mt-3 py-2 text-sm font-semibold text-gray-700 dark:text-gray-200">View All Public Holiday Leaves</button>
+                </div>
+                <div class="widget-card">
+                    <h3 class="widget-title mb-4">Quick Actions</h3>
                     <div class="flex flex-col gap-3 h-full justify-center">
-                        <button id="export-pdf-shortcut" class="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-semibold text-sm transition-all bg-red-500 hover:bg-red-600 text-white">
+                        <button id="export-pdf-shortcut" class="ios-primary-btn w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-semibold text-sm">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/><path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/></svg>
                             Export PDF
                         </button>
-                        <button id="export-excel-shortcut" class="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-semibold text-sm transition-all bg-green-500 hover:bg-green-600 text-white">
-                           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/><path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/></svg>
+                        <button id="export-excel-shortcut" class="ios-secondary-btn w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-semibold text-sm dark:text-gray-100">
+                           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M14 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7z"/><path d="M14 2v5h5"/><path d="M9 11l2 3 2-3"/><path d="M15 18H9"/></svg>
                            Export Excel (CSV)
                         </button>
-                        <button id="share-shortcut-btn" class="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-semibold text-sm transition-all bg-blue-500 hover:bg-blue-600 text-white">
+                        <button id="share-shortcut-btn" class="ios-secondary-btn w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-semibold text-sm dark:text-gray-100">
                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M13.5 1a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5zm-8.5 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm11 5.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/></svg>
                             Share
                         </button>
@@ -805,7 +1253,7 @@
              <div class="space-y-8 max-w-4xl mx-auto fade-in">
                 <!-- Profile Settings Card -->
                 <div class="widget-card">
-                     <h3 class="widget-title mb-6">Profile Settings</h3>
+                     <h3 class="section-heading">Account</h3>
                      <div class="flex flex-col sm:flex-row items-center gap-6">
                          <div class="w-24 h-24 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center text-gray-400 dark:text-gray-500 text-4xl font-bold shrink-0" id="settings-user-initial">
                              U
@@ -830,7 +1278,14 @@
                 </div>
                 <!-- App Preferences Card -->
                 <div class="widget-card">
-                    <h3 class="widget-title mb-6">App Preferences</h3>
+                    <h3 class="section-heading">Theme</h3>
+                    <div class="mb-5 flex items-center justify-between p-3 rounded-xl bg-white/40 dark:bg-gray-900/35">
+                        <div>
+                            <p class="font-semibold text-gray-800 dark:text-gray-100">Use Dark Mode</p>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Automatic from system by default</p>
+                        </div>
+                        <input id="theme-toggle-ios" type="checkbox" class="ios-switch" />
+                    </div>
                      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                              <label for="settings-leave-allowance" class="font-medium text-sm text-gray-700 dark:text-gray-300">Base Annual Leave Allowance</label>
@@ -848,20 +1303,140 @@
                 </div>
                 <!-- Data Management Card -->
                 <div class="widget-card">
-                    <h3 class="widget-title mb-6">Data Management</h3>
+                    <h3 class="section-heading">Backup & Restore</h3>
+                    <div class="mb-4 p-3 rounded-xl bg-white/50 dark:bg-gray-900/40 border border-white/40 dark:border-white/10">
+                        <div class="flex items-center justify-between text-sm">
+                            <span class="text-gray-600 dark:text-gray-300">Last Backup</span>
+                            <span id="last-backup-time" class="font-semibold text-gray-800 dark:text-gray-100">Not available</span>
+                        </div>
+                        <div class="mt-2 h-2 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
+                            <div id="backup-progress-fill" class="h-full w-0 bg-gradient-to-r from-blue-500 to-cyan-400 transition-all duration-500"></div>
+                        </div>
+                    </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4">
-                        <button id="force-sync-btn" class="w-full text-center p-3 rounded-lg font-semibold transition-colors bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700">Force Sync</button>
                         <button id="full-backup-btn" class="w-full text-center p-3 rounded-lg font-semibold transition-colors bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700">Backup All Data</button>
                         <button id="restore-backup-btn" class="w-full text-center p-3 rounded-lg font-semibold transition-colors bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700">Restore from Backup</button>
-                        <button id="full-csv-export-btn" class="w-full text-center p-3 rounded-lg font-semibold transition-colors bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700">Export All as CSV</button>
                     </div>
+                    <input type="file" id="full-restore-file-input" class="hidden" accept=".json,application/json" />
                     <p id="data-op-status" class="text-sm text-green-600 dark:text-green-400 mt-4 h-5"></p>
+                </div>
+
+                <div class="widget-card">
+                    <h3 class="section-heading">AI Assistant Settings</h3>
+                    <div class="space-y-3 text-sm">
+                        <div class="flex items-center justify-between p-3 rounded-xl bg-white/40 dark:bg-gray-900/35">
+                            <div>
+                                <p class="font-semibold text-gray-800 dark:text-gray-100">Enable Voice Input</p>
+                                <p class="text-gray-500 dark:text-gray-400">Use microphone in AI assistant</p>
+                            </div>
+                            <input id="ai-voice-toggle" type="checkbox" class="ios-switch" checked />
+                        </div>
+                        <div class="flex items-center justify-between p-3 rounded-xl bg-white/40 dark:bg-gray-900/35">
+                            <div>
+                                <p class="font-semibold text-gray-800 dark:text-gray-100">Show Typing Animation</p>
+                                <p class="text-gray-500 dark:text-gray-400">Animated response feedback</p>
+                            </div>
+                            <input id="ai-typing-toggle" type="checkbox" class="ios-switch" checked />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="widget-card">
+                    <h3 class="section-heading">Notifications</h3>
+                    <div class="space-y-3 text-sm">
+                        <div class="flex items-center justify-between p-3 rounded-xl bg-white/40 dark:bg-gray-900/35">
+                            <div>
+                                <p class="font-semibold text-gray-800 dark:text-gray-100">Reminder Alerts</p>
+                                <p class="text-gray-500 dark:text-gray-400">Notify upcoming events</p>
+                            </div>
+                            <input id="notify-reminder-toggle" type="checkbox" class="ios-switch" checked />
+                        </div>
+                        <div class="flex items-center justify-between p-3 rounded-xl bg-white/40 dark:bg-gray-900/35">
+                            <div>
+                                <p class="font-semibold text-gray-800 dark:text-gray-100">Backup Completed Alerts</p>
+                                <p class="text-gray-500 dark:text-gray-400">Show success/error toasts</p>
+                            </div>
+                            <input id="notify-backup-toggle" type="checkbox" class="ios-switch" checked />
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
+        <!-- AI Page -->
+        <div id="ai-page" class="p-4 sm:p-6 lg:p-8" style="display:none;">
+            <div class="widget-card max-w-5xl mx-auto">
+                <div class="space-y-4">
+                    <div class="flex gap-2">
+                        <button id="ai-tab-translate" class="ios-primary-btn px-4 py-2 text-sm font-semibold rounded-lg">Translation</button>
+                        <button id="ai-tab-chat" class="ios-secondary-btn px-4 py-2 text-sm font-semibold rounded-lg dark:text-gray-100">Smart Chat</button>
+                    </div>
+
+                    <div id="ai-translate-panel" class="ai-chat-shell">
+                        <p class="text-sm text-gray-600 dark:text-gray-400">Type Tamil/Tanglish/English and get professional English.</p>
+                        <div id="ai-chat-thread" class="space-y-2">
+                            <div id="ai-user-preview" class="ai-chat-bubble user hidden"></div>
+                            <div id="ai-output-container" class="hidden">
+                                <div class="ai-chat-bubble assistant">
+                                    <p id="ai-output" class="whitespace-pre-wrap"></p>
+                                    <div class="flex justify-end mt-2">
+                                        <button id="copy-ai-output-btn" title="Copy to clipboard" class="ios-secondary-btn px-2 py-1 text-xs text-gray-700 dark:text-gray-200">Copy</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between items-center mb-1.5">
+                                <label for="ai-input" class="font-medium text-sm text-gray-700 dark:text-gray-300">Your Message</label>
+                                <button id="voice-input-btn" title="Speak your message" class="p-1.5 text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 rounded-full transition-colors">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line></svg>
+                                </button>
+                            </div>
+                            <textarea id="ai-input" rows="3" placeholder="e.g., naan today office kku varamatten sir wedding pokanum" class="w-full p-2 border border-gray-300 rounded-lg bg-gray-50/50 transition duration-200 premium-input dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200"></textarea>
+                        </div>
+                        <div>
+                            <label for="ai-tone-select" class="font-medium text-sm text-gray-700 dark:text-gray-300">Conversion Mode</label>
+                            <select id="ai-tone-select" class="w-full mt-1 p-2 premium-select">
+                                <option value="office_formal" selected>Office Formal</option>
+                                <option value="professional">Professional</option>
+                                <option value="friendly">Friendly Professional</option>
+                                <option value="funny_professional">Funny Professional</option>
+                                <option value="short">Short & Clear</option>
+                            </select>
+                        </div>
+                        <div id="ai-error-container" class="hidden text-sm text-red-600 dark:text-red-400 mt-2 p-3 bg-red-50 dark:bg-red-950/20 rounded-lg border border-red-200 dark:border-red-800/50"></div>
+                        <button id="generate-ai-message-btn" class="ios-primary-btn w-full flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg font-semibold text-sm">
+                            <span>Generate Professional Message</span>
+                            <div id="ai-spinner" class="loader-small hidden"></div>
+                        </button>
+                    </div>
+
+                    <div id="ai-smart-chat-panel" class="hidden space-y-3">
+                        <p class="text-sm text-gray-600 dark:text-gray-400">Full Report Assistant + Friendly Chat. Ask in Tamil / Tunglish / English.</p>
+                        <div id="smart-chat-thread" class="space-y-2 max-h-[55vh] overflow-y-auto dashboard-scroll-panel">
+                            <div class="ai-chat-bubble assistant">Hi! Ask anything about report data or casual chat. Example: "last month 17 date work location", "tell me a joke".</div>
+                        </div>
+                        <div class="flex gap-2">
+                            <input id="smart-chat-input" type="text" class="premium-input flex-1 p-2" placeholder="Ask your question..." />
+                            <button id="smart-chat-send-btn" class="ios-primary-btn px-4 py-2 rounded-lg text-sm font-semibold">Send</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+            </div>
+        </div>
+
+        <nav id="mobile-bottom-nav" aria-label="Bottom Navigation">
+            <button id="m-nav-dashboard-btn" class="bottom-nav-btn nav-item-active"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><rect x="3" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="3" width="7" height="7" rx="1.5"></rect><rect x="3" y="14" width="7" height="7" rx="1.5"></rect><rect x="14" y="14" width="7" height="7" rx="1.5"></rect></svg><span>Dashboard</span></button>
+            <button id="m-nav-calendar-btn" class="bottom-nav-btn"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><rect x="3" y="4" width="18" height="18" rx="2"></rect><path d="M8 2v4M16 2v4M3 10h18"></path></svg><span>Calendar</span></button>
+            <button id="m-nav-reports-btn" class="bottom-nav-btn"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M4 19h16M7 16V8M12 16V5M17 16v-4"></path></svg><span>Reports</span></button>
+            <button id="m-nav-ai-btn" class="bottom-nav-btn"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="m12 3-2 5-5 2 5 2 2 5 2-5 5-2-5-2-2-5z"></path></svg><span>AI</span></button>
+            <button id="m-nav-settings-btn" class="bottom-nav-btn"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82"></path></svg><span>Settings</span></button>
+        </nav>
+
         <!-- Scroll Buttons -->
-        <div class="fixed bottom-6 right-6 flex flex-col gap-3 z-40">
+        <div id="scroll-controls" class="fixed bottom-6 right-6 flex flex-col gap-3 z-50">
             <button id="floating-date-picker-btn" title="Go to Date" class="w-12 h-12 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm text-gray-700 dark:text-gray-200 rounded-full shadow-lg flex items-center justify-center hover:bg-white dark:hover:bg-gray-700 hover:text-blue-600 transition-all duration-200 hidden">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
             </button>
@@ -876,6 +1451,7 @@
     
     <!-- Modals Portal -->
     <div id="modal-root"></div>
+    <div id="toast-root" class="toast-root"></div>
 
     <!-- Loading Spinner -->
     <div id="loading-spinner" class="fixed inset-0 bg-white/80 dark:bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 transition-opacity duration-300">
@@ -916,14 +1492,21 @@ const applyTheme = (theme) => {
 
 const initTheme = () => {
     const savedTheme = localStorage.getItem('theme');
-    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const systemPrefersDark = mediaQuery.matches;
     if (savedTheme) {
         applyTheme(savedTheme);
     } else if (systemPrefersDark) {
-        applyTheme('dark');
+        document.documentElement.classList.add('dark');
     } else {
-        applyTheme('light');
+        document.documentElement.classList.remove('dark');
     }
+
+    mediaQuery.addEventListener('change', (e) => {
+        if (!localStorage.getItem('theme')) {
+            document.documentElement.classList.toggle('dark', e.matches);
+        }
+    });
 }
 
 initTheme();
@@ -958,6 +1541,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const reportPage = document.getElementById('report-page');
     const dashboardPage = document.getElementById('dashboard-page');
     const settingsPage = document.getElementById('settings-page');
+    const aiPage = document.getElementById('ai-page');
     const authArea = document.getElementById('auth-area');
     const pageTitle = document.getElementById('page-title');
     const headerContainer = document.getElementById('header-container');
@@ -974,8 +1558,57 @@ document.addEventListener('DOMContentLoaded', () => {
     // Navigation Buttons
     const viewFullReportBtn = document.getElementById('view-full-report-btn');
     const headerBackBtn = document.getElementById('header-back-btn');
+    const toastRoot = document.getElementById('toast-root');
 
     let floatingBtnListener = null;
+    const navIds = [
+        'nav-dashboard-btn', 'nav-leave-requests-btn', 'nav-calendar-btn', 'nav-reports-btn', 'nav-ai-btn', 'nav-settings-btn',
+        'm-nav-dashboard-btn', 'm-nav-calendar-btn', 'm-nav-reports-btn', 'm-nav-ai-btn', 'm-nav-settings-btn'
+    ];
+
+    const showToast = (message, type = 'info') => {
+        if (!toastRoot || !message) return;
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.textContent = message;
+        toastRoot.appendChild(toast);
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateY(-8px)';
+            toast.style.transition = 'all 0.2s ease';
+            setTimeout(() => toast.remove(), 220);
+        }, 2600);
+    };
+
+    const updateActiveNavigation = (pageId) => {
+        navIds.forEach(id => document.getElementById(id)?.classList.remove('nav-item-active'));
+        const map = {
+            'dashboard-page': ['nav-dashboard-btn', 'm-nav-dashboard-btn'],
+            'report-page': ['nav-leave-requests-btn', 'nav-reports-btn', 'm-nav-reports-btn'],
+            'settings-page': ['nav-settings-btn', 'm-nav-settings-btn'],
+            'ai-page': ['nav-ai-btn', 'm-nav-ai-btn']
+        };
+        (map[pageId] || []).forEach(id => document.getElementById(id)?.classList.add('nav-item-active'));
+    };
+
+    const initializeAppNavigation = () => {
+        const attach = (id, handler) => {
+            const el = document.getElementById(id);
+            if (el) el.onclick = handler;
+        };
+
+        attach('nav-dashboard-btn', () => showPage('dashboard-page'));
+        attach('m-nav-dashboard-btn', () => showPage('dashboard-page'));
+        attach('nav-leave-requests-btn', () => showPage('report-page'));
+        attach('nav-reports-btn', () => showPage('report-page'));
+        attach('m-nav-reports-btn', () => showPage('report-page'));
+        attach('nav-settings-btn', () => showPage('settings-page'));
+        attach('m-nav-settings-btn', () => showPage('settings-page'));
+        attach('nav-ai-btn', () => showPage('ai-page'));
+        attach('m-nav-ai-btn', () => showPage('ai-page'));
+        attach('nav-calendar-btn', showMonthPickerModal);
+        attach('m-nav-calendar-btn', showMonthPickerModal);
+    };
 
 
     // -----------------------------------------------------------------------------
@@ -984,7 +1617,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // PAGE NAVIGATION
     const showPage = (pageId) => {
-        [reportPage, dashboardPage, settingsPage].forEach(page => {
+        [reportPage, dashboardPage, settingsPage, aiPage].forEach(page => {
             if (page.id === pageId) {
                 page.style.display = 'block';
                 page.classList.add('fade-in');
@@ -993,7 +1626,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
         
-        if (pageId === 'report-page' || pageId === 'settings-page') {
+        if (pageId === 'report-page' || pageId === 'settings-page' || pageId === 'ai-page') {
             headerBackBtn.classList.remove('hidden');
         } else {
             headerBackBtn.classList.add('hidden');
@@ -1008,8 +1641,14 @@ document.addEventListener('DOMContentLoaded', () => {
              floatingDatePickerBtn.title = "Select Month";
              floatingBtnListener = showMonthPickerModal;
              renderDashboard();
+        } else if (pageId === 'ai-page') {
+             pageTitle.textContent = "AI Assistant";
+             floatingBtnListener = null;
+             floatingDatePickerBtn.classList.add('hidden');
+             setupAiPage();
         } else if (pageId === 'settings-page') {
              pageTitle.textContent = "Settings";
+             floatingBtnListener = null;
              floatingDatePickerBtn.classList.add('hidden'); // Hide on settings page
              renderSettingsPage();
         } else { // Report page
@@ -1018,10 +1657,13 @@ document.addEventListener('DOMContentLoaded', () => {
              floatingBtnListener = showDatePickerModal;
         }
 
-        floatingDatePickerBtn.addEventListener('click', floatingBtnListener);
+        if (typeof floatingBtnListener === 'function') {
+            floatingDatePickerBtn.addEventListener('click', floatingBtnListener);
+        }
         signinPage.style.display = 'none';
         signupPage.style.display = 'none';
         appWrapper.style.display = 'block';
+        updateActiveNavigation(pageId);
     };
 
     const showSigninPage = () => {
@@ -1055,6 +1697,22 @@ document.addEventListener('DOMContentLoaded', () => {
     const isWeekend = (year, month, day) => {
         const d = new Date(year, month, day).getDay();
         return d === 0 || d === 6;
+    };
+    const normalizeLeaveValue = (value) => (typeof value === 'string' ? value.trim().toUpperCase() : '');
+    const isOwnLeaveRecord = (data = {}) =>
+        normalizeLeaveValue(data.leaveStatus) === 'YES' && normalizeLeaveValue(data.leaveReason) === 'OWN LEAVE';
+    const isPublicHolidayRecord = (data = {}) => {
+        const specialDay = normalizeLeaveValue(data.specialDays);
+        const leaveStatus = normalizeLeaveValue(data.leaveStatus);
+        const leaveReason = normalizeLeaveValue(data.leaveReason);
+        return specialDay === 'PUBLIC HOLIDAY' || (leaveStatus === 'YES' && leaveReason === 'PUBLIC HOLIDAY');
+    };
+    const stabilizeScrollablePanel = (container) => {
+        if (!container || container.dataset.scrollStable === '1') return;
+        const stopPropagation = (e) => e.stopPropagation();
+        container.addEventListener('wheel', stopPropagation, { passive: true });
+        container.addEventListener('touchmove', stopPropagation, { passive: true });
+        container.dataset.scrollStable = '1';
     };
     const calculateHoursDifference = (inTime, outTime) => {
         if (!inTime || !outTime) return 0;
@@ -1124,27 +1782,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Only count stats for past and present days
                 if (entryDate > today) return; 
 
-                const { totalHours, otHours } = calculateDayHoursAndOT(data, year, month, day);
-                const isSpecial = data.specialDays === "Poya Day" || data.specialDays === "Public Holiday";
-                const isDayWeekend = isWeekend(year, month, day);
+                const { otHours } = calculateDayHoursAndOT(data, year, month, day);
+                const isSpecial = data.specialDays === "Public Holiday";
 
                 if (data && data.inTime) {
                     totalPresentDays++;
                 }
 
                 totalMonthOtHours += otHours;
-            
-                if (data.leaveStatus === "Yes") {
-                    if (data.leaveReason === "Own Leave") {
-                        ownLeaves++;
-                    }
-                    if (isSpecial || data.leaveReason === "Poya Day" || data.leaveReason === "Public Holiday" || data.leaveReason === "Custom Reason") {
-                        publicHolidayLeaveDays++;
-                    }
-                } else if (isSpecial && !data.inTime) { // Holiday and not present
-                    publicHolidayLeaveDays++;
-                } else if (!data.inTime && !isDayWeekend && !isSpecial) { // Implicit absence on a workday is an "own leave"
+
+                if (isOwnLeaveRecord(data)) {
                     ownLeaves++;
+                }
+                if (isPublicHolidayRecord(data) || (isSpecial && !data.inTime)) {
+                    publicHolidayLeaveDays++;
                 }
             }
         });
@@ -1166,12 +1817,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const entryDate = new Date(year, month, day);
                 if (entryDate > today) return; // Skip future dates
 
-                const isDayWeekend = isWeekend(year, month, day);
-                const isPublicHoliday = data.specialDays === "Poya Day" || data.specialDays === "Public Holiday";
-                
-                if (data.leaveReason === 'Own Leave') {
-                    totalLeave++;
-                } else if (!data.inTime && data.leaveStatus !== 'Yes' && !isDayWeekend && !isPublicHoliday) {
+                if (isOwnLeaveRecord(data)) {
                     totalLeave++;
                 }
             }
@@ -1262,7 +1908,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             sidebarRoot.querySelector('#sidebar-dashboard-btn').addEventListener('click', () => handleSidebarClick('dashboard-page'));
             sidebarRoot.querySelector('#sidebar-settings-btn').addEventListener('click', () => handleSidebarClick('settings-page'));
-            sidebarRoot.querySelector('#sidebar-ai-btn').addEventListener('click', () => handleSidebarClick(showAiModal));
+            sidebarRoot.querySelector('#sidebar-ai-btn').addEventListener('click', () => handleSidebarClick('ai-page'));
             sidebarRoot.querySelector('#sidebar-month-picker-btn').addEventListener('click', () => handleSidebarClick(showMonthPickerModal));
             sidebarRoot.querySelector('#sidebar-date-picker-btn').addEventListener('click', () => handleSidebarClick(showDatePickerModal));
             sidebarRoot.querySelector('#sidebar-reminder-btn').addEventListener('click', () => handleSidebarClick(showReminderModal));
@@ -1309,9 +1955,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 <button id="user-menu-btn" class="relative w-10 h-10 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center text-gray-600 dark:text-gray-300 font-semibold text-lg">
                     ${userInitial}
                 </button>
-                <button id="sidebar-open-btn" title="Open Menu" class="p-2 text-gray-600 dark:text-gray-300 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
-                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-                </button>
             </div>
             <div id="user-menu-dropdown" class="hidden">
                 <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
@@ -1335,7 +1978,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         document.addEventListener('click', () => dropdown.classList.add('hidden'));
         document.getElementById('logout-btn').addEventListener('click', showLogoutConfirmationModal);
-        document.getElementById('sidebar-open-btn').addEventListener('click', openSidebar);
     }
 
     const renderHeader = () => {
@@ -1567,12 +2209,14 @@ document.addEventListener('DOMContentLoaded', () => {
              }
         }
         renderSummary();
+        if (dashboardPage.style.display === 'block') renderDashboard();
     };
 
     
     const saveLocalData = () => {
         localStorage.setItem('workData', JSON.stringify(workData));
         localStorage.setItem('reminders', JSON.stringify(reminders));
+        localStorage.setItem('userSettings', JSON.stringify(userSettings));
     };
 
     const clearDayData = (day) => {
@@ -1606,6 +2250,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 addSingleDayCardEventListeners(newDayBox);
             }
             renderSummary();
+            if (dashboardPage.style.display === 'block') renderDashboard();
         }
     };
 
@@ -1674,7 +2319,168 @@ document.addEventListener('DOMContentLoaded', () => {
     const addSummaryEventListeners = () => {
         document.getElementById('clear-month-btn').addEventListener('click', handleClearMonthData);
         document.getElementById('backup-btn').addEventListener('click', () => handleBackup(currentDate.getFullYear(), currentDate.getMonth()));
-        document.getElementById('restore-file-input').addEventListener('change', handleRestore);
+        document.getElementById('restore-file-input').addEventListener('change', restoreBackup);
+    };
+
+    let dataOpStatusTimer = null;
+    const updateBackupUi = (progress = 0, timestamp = null) => {
+        const fill = document.getElementById('backup-progress-fill');
+        const timeEl = document.getElementById('last-backup-time');
+        if (fill) fill.style.width = `${Math.min(100, Math.max(0, progress))}%`;
+        if (timestamp && timeEl) {
+            timeEl.textContent = new Date(timestamp).toLocaleString();
+            localStorage.setItem('lastBackupTime', timestamp);
+        } else if (timeEl && !timeEl.dataset.initialized) {
+            const stored = localStorage.getItem('lastBackupTime');
+            if (stored) timeEl.textContent = new Date(stored).toLocaleString();
+            timeEl.dataset.initialized = '1';
+        }
+    };
+
+    const setDataOpStatus = (message, type = 'success') => {
+        const statusEl = document.getElementById('data-op-status');
+        if (!statusEl) return;
+
+        if (dataOpStatusTimer) {
+            clearTimeout(dataOpStatusTimer);
+            dataOpStatusTimer = null;
+        }
+
+        const classMap = {
+            success: 'text-sm text-green-600 dark:text-green-400 mt-4 h-5',
+            error: 'text-sm text-red-600 dark:text-red-400 mt-4 h-5',
+            info: 'text-sm text-gray-600 dark:text-gray-400 mt-4 h-5'
+        };
+        statusEl.className = classMap[type] || classMap.info;
+        statusEl.textContent = message;
+        if (localStorage.getItem('notifyBackupEnabled') !== 'false') {
+            showToast(message, type);
+        }
+
+        if (message) {
+            dataOpStatusTimer = setTimeout(() => {
+                statusEl.textContent = '';
+            }, 4000);
+        }
+    };
+
+    const createBackup = () => {
+        const backupDate = new Date();
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth();
+
+        return {
+            backupVersion: 1,
+            appName: 'leave-system',
+            exportedAt: backupDate.toISOString(),
+            data: {
+                workData: JSON.parse(JSON.stringify(workData || {})),
+                reminders: JSON.parse(JSON.stringify(reminders || [])),
+                userSettings: JSON.parse(JSON.stringify(userSettings || {})),
+                theme: localStorage.getItem('theme') || 'light'
+            },
+            dashboardStatistics: {
+                month: { year, month: month + 1, ...getMonthStats(year, month) },
+                annual: calculateAnnualLeaveStats()
+            }
+        };
+    };
+
+    const downloadBackupFile = (backupData) => {
+        const dateLabel = new Date().toISOString().split('T')[0];
+        const fileName = `leave-system-backup-${dateLabel}.json`;
+        const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
+        const a = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        a.href = url;
+        a.download = fileName;
+        a.click();
+        URL.revokeObjectURL(url);
+    };
+
+    const validateBackupFile = (parsedData) => {
+        if (!parsedData || typeof parsedData !== 'object') {
+            return { isValid: false, error: 'Invalid backup format.' };
+        }
+
+        const isStructuredBackup =
+            parsedData.backupVersion &&
+            parsedData.data &&
+            typeof parsedData.data === 'object' &&
+            parsedData.data.workData &&
+            typeof parsedData.data.workData === 'object';
+
+        if (isStructuredBackup) {
+            return { isValid: true, mode: 'replace' };
+        }
+
+        const keys = Object.keys(parsedData);
+        const legacyMonthShape = keys.length > 0 && keys.every(k => /^\d{4}-\d{1,2}-\d{1,2}$/.test(k));
+        if (legacyMonthShape) {
+            return { isValid: true, mode: 'merge' };
+        }
+
+        return { isValid: false, error: 'Backup file is corrupted or unsupported.' };
+    };
+
+    const loadBackupData = (backupPayload, mode = 'replace') => {
+        if (mode === 'merge') {
+            workData = { ...workData, ...backupPayload };
+            saveLocalData();
+        } else {
+            workData = backupPayload.data.workData || {};
+            reminders = Array.isArray(backupPayload.data.reminders) ? backupPayload.data.reminders : [];
+            userSettings = backupPayload.data.userSettings || { baseAnnualLeave: 35, normalWorkMinutes: 540 };
+            saveLocalData();
+            localStorage.setItem('userSettings', JSON.stringify(userSettings));
+            if (backupPayload.data.theme) applyTheme(backupPayload.data.theme);
+        }
+
+        if (user) syncToCloud();
+        renderAll();
+        if (dashboardPage.style.display === 'block') renderDashboard();
+        if (settingsPage.style.display === 'block') renderSettingsPage();
+    };
+
+    const restoreBackup = (e) => {
+        const file = e?.target?.files?.[0];
+        if (!file) return;
+        updateBackupUi(20);
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            try {
+                const parsed = JSON.parse(event.target.result);
+                updateBackupUi(45);
+                const validation = validateBackupFile(parsed);
+                if (!validation.isValid) throw new Error(validation.error);
+
+                const isReplace = validation.mode === 'replace';
+                const confirmMessage = isReplace
+                    ? 'This will replace your current data (leave records, reminders, settings). Continue?'
+                    : 'This will merge month backup data with your current records. Continue?';
+                if (!window.confirm(confirmMessage)) return;
+
+                loadBackupData(parsed, validation.mode);
+                setDataOpStatus('Backup restored successfully.', 'success');
+                updateBackupUi(100, new Date().toISOString());
+                alert('Backup restored successfully.');
+            } catch (err) {
+                console.error('Restore failed:', err);
+                setDataOpStatus(err.message || 'Restore failed. Invalid backup file.', 'error');
+                updateBackupUi(0);
+                alert(err.message || 'Restore failed. Invalid backup file.');
+            } finally {
+                if (e?.target) e.target.value = '';
+            }
+        };
+        reader.onerror = () => {
+            setDataOpStatus('Could not read the backup file.', 'error');
+            updateBackupUi(0);
+            alert('Could not read the backup file.');
+            if (e?.target) e.target.value = '';
+        };
+        reader.readAsText(file);
     };
 
     // ACTION HANDLERS
@@ -1731,29 +2537,6 @@ document.addEventListener('DOMContentLoaded', () => {
         a.download = `WorkData_${year}_${month + 1}.json`;
         a.click();
         URL.revokeObjectURL(a.href);
-    };
-
-    const handleRestore = (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = (event) => {
-            try {
-                const restoredData = JSON.parse(event.target.result);
-                workData = { ...workData, ...restoredData };
-                if(user) {
-                      syncToCloud();
-                } else {
-                    saveLocalData();
-                }
-                renderAll();
-                alert("Data restored successfully.");
-            } catch (err) {
-                alert("Error restoring data. Invalid file.");
-            }
-        };
-        reader.readAsText(file);
-        e.target.value = '';
     };
 
     const scrollToToday = () => {
@@ -2172,12 +2955,37 @@ document.addEventListener('DOMContentLoaded', () => {
 
         document.getElementById('export-pdf-btn').addEventListener('click', () => {
             closeModal();
-            showExportMonthPickerModal((year, month) => showExportPreview(year, month, 'pdf'));
+            showExportMonthPickerModal((year, month) => exportSimpleMonthPdf(year, month));
         });
         document.getElementById('export-csv-btn').addEventListener('click', () => {
             closeModal();
             showExportMonthPickerModal((year, month) => exportAsCSV(year, month));
         });
+    };
+
+    const exportSimpleMonthPdf = (year, month) => {
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+        const stats = getMonthStats(year, month);
+        const annual = calculateAnnualLeaveStats();
+
+        const lines = [
+            'Work Report Summary',
+            `${months[month]} ${year}`,
+            '',
+            `Own Leaves: ${stats.ownLeaves}`,
+            `Public Holiday Leaves: ${stats.publicHolidayLeaveDays}`,
+            `Total Present Days: ${stats.totalPresentDays}`,
+            `Total OT Hours: ${stats.totalMonthOtHours.toFixed(1)}`,
+            `Annual Total Leaves: ${annual.totalLeave}`,
+            `Annual Balance Leaves: ${annual.balanceLeave}`
+        ];
+
+        pdf.setFontSize(20);
+        pdf.text('Work Report', 20, 25);
+        pdf.setFontSize(12);
+        lines.forEach((line, index) => pdf.text(line, 20, 40 + index * 8));
+        pdf.save(`Work_Report_${year}_${month + 1}.pdf`);
     };
     
     const showExportMonthPickerModal = (onSelectCallback) => {
@@ -2221,39 +3029,422 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
 
-     const showAiModal = () => {
-        const content = `
-            <div class="space-y-4">
-                <p class="text-sm text-gray-600 dark:text-gray-400">
-                    Speak or type your leave reason in Tanglish (Tamil + English). The AI will convert it into a professional English message.
-                </p>
-                <div>
-                    <div class="flex justify-between items-center mb-1.5">
-                        <label for="ai-input" class="font-medium text-sm text-gray-700 dark:text-gray-300">Your Message</label>
-                        <button id="voice-input-btn" title="Speak your message" class="p-1.5 text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 rounded-full transition-colors">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line></svg>
-                        </button>
-                    </div>
-                    <textarea id="ai-input" rows="4" placeholder="e.g., sir naan inniku office varamudiyathu health illa" class="w-full p-2 border border-gray-300 rounded-lg bg-gray-50/50 transition duration-200 premium-input dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200"></textarea>
-                </div>
-                <div id="ai-error-container" class="hidden text-sm text-red-600 dark:text-red-400 mt-2 p-3 bg-red-50 dark:bg-red-950/20 rounded-lg border border-red-200 dark:border-red-800/50"></div>
-                <button id="generate-ai-message-btn" class="w-full flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg font-semibold text-sm shadow-sm transition-all duration-200 transform hover:scale-[1.03] bg-blue-600 text-white hover:bg-blue-700">
-                    <span>Convert to Professional English</span>
-                    <div id="ai-spinner" class="loader-small hidden"></div>
-                </button>
-                <div id="ai-output-container" class="hidden space-y-2 pt-4 border-t border-gray-200 dark:border-gray-700">
-                    <label class="font-medium text-sm text-gray-700 dark:text-gray-300">Generated Message</label>
-                    <div class="relative">
-                        <p id="ai-output" class="p-4 bg-gray-100 dark:bg-gray-800/50 rounded-lg text-gray-800 dark:text-gray-200 whitespace-pre-wrap min-h-[50px]"></p>
-                        <button id="copy-ai-output-btn" title="Copy to clipboard" class="absolute top-2 right-2 p-1.5 text-gray-500 hover:bg-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 rounded-md">
-                            <span class="copy-icon-span"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        `;
-        openModal(createModal('AI Professional Message Assistant', content));
-        
+    const normalizeChatQuery = (query) => {
+        return (query || '')
+            .toLowerCase()
+            .replace(/இந்த மாதம்|indha month|intha month/g, 'this month')
+            .replace(/கடந்த மாதம்|போன மாதம்|pona month|last monthku/g, 'last month')
+            .replace(/தேதி|நாள்|naal/g, 'date')
+            .replace(/சுருக்கம்|summary/g, 'summary')
+            .replace(/விவரம்|details/g, 'details')
+            .replace(/work location|worklocation|work place|எங்கே வேலை|எங்க வேலை/g, 'work location')
+            .replace(/விடுப்பு|லீவு|leevu/g, 'leave')
+            .replace(/ஒவர்டைம்|overtime/g, 'ot')
+            .replace(/பொயா|poya day/g, 'poya')
+            .replace(/இன்று|innaiku|inniku|iniku/g, 'today')
+            .replace(/நேற்று|nethu|netru/g, 'yesterday')
+            .replace(/\s+/g, ' ')
+            .trim();
+    };
+
+    const detectInputLanguage = (text = '') => {
+        const t = (text || '').trim();
+        if (!t) return 'english';
+        if (/[\u0B80-\u0BFF]/.test(t)) return 'tamil';
+        if (/\b(naan|nan|pona|eduthana|epdi|irukku|varamatten|venum|kku|yaar|innaiku|nethu|leevu|leaveu|solu|sollu)\b/i.test(t)) return 'tunglish';
+        return 'english';
+    };
+
+    const localizeReportText = (text = '', lang = 'english') => {
+        if (lang === 'english') return text;
+        const replacements = lang === 'tamil'
+            ? [
+                ['Date:', 'தேதி:'],
+                ['Status:', 'நிலை:'],
+                ['Work Location:', 'வேலை இடம்:'],
+                ['Leave Reason:', 'விடுப்பு காரணம்:'],
+                ['In Time:', 'உள் நேரம்:'],
+                ['Out Time:', 'வெளி நேரம்:'],
+                ['Team:', 'குழு:'],
+                ['Vehicle:', 'வாகனம்:'],
+                ['KM:', 'கி.மீ:'],
+                ['Special Day:', 'சிறப்பு நாள்:'],
+                ['Leave Details:', 'விடுப்பு விவரம்:'],
+                ['No record found.', 'பதிவு எதுவும் இல்லை.'],
+                ['No attendance entry', 'வருகை பதிவு இல்லை'],
+                ['Present', 'வருகை'],
+                ['Could you please specify the date or leave type?', 'தயவு செய்து தேதி அல்லது விடுப்பு வகையை குறிப்பிடவும்.']
+            ]
+            : [
+                ['Date:', 'Date:'],
+                ['Status:', 'Status:'],
+                ['Work Location:', 'Work Location:'],
+                ['Leave Reason:', 'Leave Reason:'],
+                ['No record found.', 'Record illa.'],
+                ['No attendance entry', 'Attendance record illa'],
+                ['Could you please specify the date or leave type?', 'Date illa leave type clear ah sollunga.']
+            ];
+
+        let localized = text;
+        replacements.forEach(([from, to]) => {
+            localized = localized.split(from).join(to);
+        });
+        if (lang === 'tunglish') {
+            localized = `Idho details:\n${localized}`;
+        }
+        return localized;
+    };
+
+    const getFriendlyReply = (query, lang = 'english') => {
+        const q = normalizeChatQuery(query);
+        const casualJoke = {
+            english: 'Why did the employee bring a ladder to work? To reach the high-level tasks.',
+            tamil: 'ஒரு ஊழியர் ஏன் வேலைக்கு ஏணி கொண்டு வந்தார் தெரியுமா? உயர்ந்த நிலை பணிகளை அடைய வேண்டும் என்பதால்.',
+            tunglish: 'Employee ladder eduthuttu office-ku yen vandhaan theriyuma? High-level tasks reach panna.'
+        };
+        if (/\b(hi|hello|hey|vanakkam|ஹாய்)\b/.test(q)) {
+            if (lang === 'tamil') return 'வணக்கம்! நான் உதவ தயாராக இருக்கிறேன். இன்று என்ன அறிக்கை பார்க்கலாம்?';
+            if (lang === 'tunglish') return 'Hi! Naan ready. Innikki enna report details venum?';
+            return 'Hi! I am ready to help. What report details do you need today?';
+        }
+        if (/\bhow are you|epdi irukka|epdi irukku|நீங்கள் எப்படி\b/.test(q)) {
+            if (lang === 'tamil') return 'நான் நன்றாக இருக்கிறேன். உங்களுக்கு தேவையான report details உடனே சொல்லலாம்.';
+            if (lang === 'tunglish') return 'Naan nalla irukken. Ungalukku venum report details ippove solluren.';
+            return 'I am doing well. I can help with any report details right away.';
+        }
+        if (/\bjoke|funny|சிரிப்பு\b/.test(q)) return casualJoke[lang] || casualJoke.english;
+        if (/\btip|advice|suggest\b/.test(q)) {
+            if (lang === 'tamil') return 'குறிப்பு: தினசரி பதிவை அதே நாளில் புதுப்பித்தால் மாதாந்திர அறிக்கைகள் மிகவும் துல்லியமாக இருக்கும்.';
+            if (lang === 'tunglish') return 'Tip: Daily report same day update panna, month summary romba accurate ah varum.';
+            return 'Tip: Update each day on the same day to keep monthly reports accurate.';
+        }
+        return '';
+    };
+
+    const getAssistantDataMap = () => window.__assistantReportData || workData || {};
+
+    const mergeWorkMaps = (...maps) => {
+        const merged = {};
+        maps.forEach(map => {
+            if (!map || typeof map !== 'object') return;
+            Object.keys(map).forEach(k => {
+                merged[k] = { ...(merged[k] || {}), ...(map[k] || {}) };
+            });
+        });
+        return merged;
+    };
+
+    const parseLocalWorkData = () => {
+        try {
+            return JSON.parse(localStorage.getItem('workData') || '{}');
+        } catch {
+            return {};
+        }
+    };
+
+    const loadAssistantDataSources = async () => {
+        const sources = [workData, parseLocalWorkData()];
+        if (user && db) {
+            try {
+                const userDoc = await db.collection('users').doc(user.uid).get();
+                const cloudUserData = userDoc.data()?.workData || {};
+                sources.push(cloudUserData);
+            } catch (e) {
+                console.warn('Could not fetch user workData for assistant:', e);
+            }
+            try {
+                const backupDoc = await db.collection('backups').doc(user.uid).get();
+                const backups = backupDoc.data()?.backups || {};
+                Object.values(backups).forEach(entry => {
+                    if (entry && typeof entry === 'object') sources.push(entry);
+                });
+            } catch (e) {
+                console.warn('Could not fetch backup workData for assistant:', e);
+            }
+        }
+        return mergeWorkMaps(...sources);
+    };
+
+    const parseMonthFromChatQuery = (query) => {
+        const q = normalizeChatQuery(query);
+        const anchor = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+        const monthMap = {
+            january: 0, jan: 0, february: 1, feb: 1, march: 2, mar: 2, april: 3, apr: 3,
+            may: 4, june: 5, jun: 5, july: 6, jul: 6, august: 7, aug: 7,
+            september: 8, sep: 8, october: 9, oct: 9, november: 10, nov: 10, december: 11, dec: 11
+        };
+
+        if (/last month|previous month/.test(q)) {
+            anchor.setMonth(anchor.getMonth() - 1);
+            return { year: anchor.getFullYear(), month: anchor.getMonth() };
+        }
+        if (/this month|current month/.test(q)) {
+            return { year: currentDate.getFullYear(), month: currentDate.getMonth() };
+        }
+
+        const ym = q.match(/\b(20\d{2})[-/](\d{1,2})\b/);
+        if (ym) return { year: Number(ym[1]), month: Math.max(0, Math.min(11, Number(ym[2]) - 1)) };
+
+        for (const [name, idx] of Object.entries(monthMap)) {
+            if (new RegExp(`\\b${name}\\b`, 'i').test(q)) {
+                const y = Number((q.match(/\b(20\d{2})\b/) || [])[1] || currentDate.getFullYear());
+                return { year: y, month: idx };
+            }
+        }
+        return { year: currentDate.getFullYear(), month: currentDate.getMonth() };
+    };
+
+    const parseDayFromChatQuery = (query) => {
+        const q = normalizeChatQuery(query);
+        const fullDate = q.match(/\b(20\d{2})[-/](\d{1,2})[-/](\d{1,2})\b/);
+        if (fullDate) return { year: Number(fullDate[1]), month: Number(fullDate[2]) - 1, day: Number(fullDate[3]), explicitDate: true };
+
+        const dayMatch = q.match(/\b(?:date)\s*(\d{1,2})\b|\b(\d{1,2})\s*(?:date)\b|\b(\d{1,2})(?:st|nd|rd|th)\b/);
+        if (dayMatch) return { day: Number(dayMatch[1] || dayMatch[2] || dayMatch[3]), explicitDate: false };
+        return null;
+    };
+
+    const getMonthKeys = (year, month, dataMap = getAssistantDataMap()) => {
+        const prefix = `${year}-${month}`;
+        return Object.keys(dataMap).filter(k => k.startsWith(prefix));
+    };
+
+    const findLastWeekdayDate = (weekday) => {
+        const d = new Date();
+        d.setHours(0, 0, 0, 0);
+        for (let i = 1; i <= 14; i++) {
+            d.setDate(d.getDate() - 1);
+            if (d.getDay() === weekday) return d;
+        }
+        return null;
+    };
+
+    const resolveRelativeDateFromQuery = (query, monthTarget) => {
+        const q = normalizeChatQuery(query);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        if (/\btoday\b/.test(q)) return today;
+        if (/\byesterday\b/.test(q)) {
+            const d = new Date(today);
+            d.setDate(d.getDate() - 1);
+            return d;
+        }
+
+        const weekdayMap = { sunday: 0, monday: 1, tuesday: 2, wednesday: 3, thursday: 4, friday: 5, saturday: 6 };
+        const weekdayMatch = q.match(/\b(last|previous|pona)\s+(sunday|monday|tuesday|wednesday|thursday|friday|saturday)\b/);
+        if (weekdayMatch) return findLastWeekdayDate(weekdayMap[weekdayMatch[2]]);
+
+        const dayInfo = parseDayFromChatQuery(q);
+        if (dayInfo?.explicitDate) return new Date(dayInfo.year, dayInfo.month, dayInfo.day);
+        if (dayInfo) return new Date(monthTarget.year, monthTarget.month, dayInfo.day);
+        return null;
+    };
+
+    const getDayDataByDate = (dateObj, dataMap = getAssistantDataMap()) => {
+        const y = dateObj.getFullYear();
+        const m = dateObj.getMonth();
+        const d = dateObj.getDate();
+        const key = `${y}-${m}-${d}`;
+        return { year: y, month: m, day: d, key, data: dataMap[key] || null };
+    };
+
+    const buildDayChatSummary = (year, month, day, dataMap = getAssistantDataMap()) => {
+        const key = `${year}-${month}-${day}`;
+        const data = dataMap[key];
+        const dateText = `${months[month]} ${day}, ${year}`;
+        if (!data) return `Date: ${dateText}\n• No record found.`;
+
+        const status = data.leaveStatus === 'Yes' ? `Leave (${data.leaveReason || 'Not specified'})` : (data.inTime ? 'Present' : 'No attendance entry');
+        return [
+            `Date: ${dateText}`,
+            `• Status: ${status}`,
+            data.inTime ? `• In: ${data.inTime}` : null,
+            data.outTime ? `• Out: ${data.outTime}` : null,
+            data.workLocation ? `• Work Location: ${data.workLocation}` : null,
+            data.teamMembers ? `• Team: ${data.teamMembers}` : null,
+            data.vehicleNumber ? `• Vehicle: ${data.vehicleNumber}` : null,
+            data.km ? `• KM: ${data.km}` : null,
+            data.specialDays ? `• Special Day: ${data.specialDays}` : null,
+            (data.leaveReasonText || data.customReasonDetails) ? `• Leave Details: ${data.leaveReasonText || data.customReasonDetails}` : null
+        ].filter(Boolean).join('\n');
+    };
+
+    const computeMonthMetricsFromDataMap = (year, month, dataMap = getAssistantDataMap()) => {
+        const monthKeys = getMonthKeys(year, month, dataMap);
+        let ownLeaves = 0, publicHolidayLeaveDays = 0, totalPresentDays = 0, totalMonthOtHours = 0;
+        monthKeys.forEach(key => {
+            const data = dataMap[key] || {};
+            const day = Number(key.split('-')[2]);
+            const { otHours } = calculateDayHoursAndOT(data, year, month, day);
+            if (data.inTime) totalPresentDays++;
+            totalMonthOtHours += otHours;
+            if (isOwnLeaveRecord(data)) ownLeaves++;
+            if (isPublicHolidayRecord(data) || ((data.specialDays === "Public Holiday") && !data.inTime)) publicHolidayLeaveDays++;
+        });
+        return { monthKeys, ownLeaves, publicHolidayLeaveDays, totalPresentDays, totalMonthOtHours };
+    };
+
+    const buildDeepMonthAnalysis = (year, month, dataMap = getAssistantDataMap()) => {
+        const { monthKeys, ownLeaves, publicHolidayLeaveDays, totalPresentDays, totalMonthOtHours } = computeMonthMetricsFromDataMap(year, month, dataMap);
+        const label = `${months[month]} ${year}`;
+
+        const poyaDays = monthKeys.filter(k => (dataMap[k]?.specialDays || '').toLowerCase() === 'poya day').length;
+        const leaveDays = monthKeys.filter(k => dataMap[k]?.leaveStatus === 'Yes');
+        const uniqueLocations = [...new Set(monthKeys.map(k => dataMap[k]?.workLocation).filter(Boolean))].slice(0, 5);
+        const leaveList = leaveDays
+            .sort((a, b) => Number(a.split('-')[2]) - Number(b.split('-')[2]))
+            .slice(0, 8)
+            .map(k => `• ${k.split('-')[2]}: ${dataMap[k]?.leaveReason || 'Leave'}`);
+
+        return [
+            `${label} Report Analysis`,
+            `• Own leaves: ${ownLeaves}`,
+            `• Public holiday leaves: ${publicHolidayLeaveDays}`,
+            `• Poya days: ${poyaDays}`,
+            `• Present days: ${totalPresentDays}`,
+            `• OT hours: ${totalMonthOtHours.toFixed(1)}`,
+            leaveList.length ? `• Leave days:\n${leaveList.join('\n')}` : '• Leave days: none',
+            uniqueLocations.length ? `• Top work locations: ${uniqueLocations.join(', ')}` : '• Work locations: no data'
+        ].join('\n');
+    };
+
+    const detectAskedField = (query) => {
+        const q = normalizeChatQuery(query);
+        if (/work location|where/.test(q)) return 'workLocation';
+        if (/leave reason|reason/.test(q)) return 'leaveReason';
+        if (/\bin\b|\bin time/.test(q)) return 'inTime';
+        if (/\bout\b|\bout time/.test(q)) return 'outTime';
+        if (/team|members/.test(q)) return 'teamMembers';
+        if (/vehicle|km/.test(q)) return 'vehicle';
+        if (/status|present|attendance|leave\?/.test(q)) return 'status';
+        return null;
+    };
+
+    const buildSpecificFieldAnswer = (dayInfo, field) => {
+        const dateText = `${months[dayInfo.month]} ${dayInfo.day}, ${dayInfo.year}`;
+        const data = dayInfo.data;
+        if (!data) return `Date: ${dateText}\n• No record found.`;
+
+        if (field === 'workLocation') return `Date: ${dateText}\n• Work Location: ${data.workLocation || 'No work location recorded'}`;
+        if (field === 'leaveReason') return `Date: ${dateText}\n• Leave Reason: ${data.leaveReason || 'No leave reason recorded'}`;
+        if (field === 'inTime') return `Date: ${dateText}\n• In Time: ${data.inTime || 'No in-time recorded'}`;
+        if (field === 'outTime') return `Date: ${dateText}\n• Out Time: ${data.outTime || 'No out-time recorded'}`;
+        if (field === 'teamMembers') return `Date: ${dateText}\n• Team: ${data.teamMembers || 'No team data recorded'}`;
+        if (field === 'vehicle') return `Date: ${dateText}\n• Vehicle: ${data.vehicleNumber || '-'}\n• KM: ${data.km || '-'}`;
+        if (field === 'status') {
+            const status = data.leaveStatus === 'Yes' ? `Leave (${data.leaveReason || 'N/A'})` : (data.inTime ? 'Present' : 'No attendance');
+            return `Date: ${dateText}\n• Status: ${status}`;
+        }
+        return buildDayChatSummary(dayInfo.year, dayInfo.month, dayInfo.day);
+    };
+
+    const buildIntentBasedMonthAnswer = (query, year, month, dataMap = getAssistantDataMap()) => {
+        const q = normalizeChatQuery(query);
+        const { monthKeys, ownLeaves, publicHolidayLeaveDays, totalPresentDays, totalMonthOtHours } = computeMonthMetricsFromDataMap(year, month, dataMap);
+        const monthLabel = `${months[month]} ${year}`;
+        const sickLeaves = monthKeys.filter(k => ((dataMap[k]?.leaveReason || '').toLowerCase().includes('sick')) && dataMap[k]?.leaveStatus === 'Yes').length;
+        const firstWeekOwn = monthKeys.filter(k => {
+            const d = Number(k.split('-')[2]);
+            return d >= 1 && d <= 7 && isOwnLeaveRecord(dataMap[k]);
+        }).length;
+        const asksOwn = /own leave|my leave|how many leave|ethana leave|leave count/.test(q);
+        const asksPublic = /public holiday|holiday/.test(q);
+        const asksSick = /sick leave|sick/.test(q);
+        const asksCombined = (asksOwn && asksPublic) || (asksOwn && asksSick) || (asksPublic && asksSick);
+
+        if (/first week|1st week/.test(q)) {
+            return `${monthLabel}\n• Own leave in first week: ${firstWeekOwn}`;
+        }
+
+        if (asksCombined) {
+            return `${monthLabel}\n• Own leave: ${ownLeaves}\n• Public holiday leave: ${publicHolidayLeaveDays}\n• Sick leave: ${sickLeaves}`;
+        }
+
+        if (asksOwn) return `${monthLabel}\n• Own leave count: ${ownLeaves}`;
+        if (/poya/.test(q)) {
+            const poya = monthKeys.filter(k => (dataMap[k]?.specialDays || '').toLowerCase() === 'poya day').length;
+            return `${monthLabel}\n• Poya day count: ${poya}`;
+        }
+        if (asksPublic) return `${monthLabel}\n• Public holiday leave count: ${publicHolidayLeaveDays}`;
+        if (asksSick) return `${monthLabel}\n• Sick leave count: ${sickLeaves}`;
+        if (/present|attendance/.test(q)) return `${monthLabel}\n• Present days: ${totalPresentDays}`;
+        if (/ot|overtime|extra hour/.test(q)) {
+            return `${monthLabel}\n• OT hours: ${totalMonthOtHours.toFixed(1)}`;
+        }
+        if (/full report|full analysis|deep/.test(q)) return buildDeepMonthAnalysis(year, month, dataMap);
+
+        if (/leave date|which date|entha date|details of leave/.test(q)) {
+            const list = monthKeys
+                .sort((a, b) => Number(a.split('-')[2]) - Number(b.split('-')[2]))
+                .filter(k => dataMap[k]?.leaveStatus === 'Yes')
+                .slice(0, 12)
+                .map(k => `• ${k.split('-')[2]}: ${dataMap[k]?.leaveReason || 'Leave'}`);
+            return list.length ? `${monthLabel}\n${list.join('\n')}` : `${monthLabel}\n• No leave dates recorded.`;
+        }
+        return buildDeepMonthAnalysis(year, month, dataMap);
+    };
+
+    const answerSingleSmartQuery = (q, dataMap, lang) => {
+        const cleaned = (q || '').trim();
+        if (!cleaned) return '';
+
+        const normalized = normalizeChatQuery(cleaned);
+        const casual = getFriendlyReply(cleaned, lang);
+        const reportIntent = /report|summary|details|month|date|day|leave|attendance|present|work location|location|ot|overtime|poya|holiday|analysis|விடுப்பு|சுருக்கம்|விவரம்|மாதம்|தேதி|நாள்|leevu|eduthana|pona/.test(normalized);
+
+        if (!reportIntent && casual) return casual;
+
+        const monthTarget = parseMonthFromChatQuery(cleaned);
+        const askedField = detectAskedField(cleaned);
+        const resolvedDate = resolveRelativeDateFromQuery(cleaned, monthTarget);
+
+        if (resolvedDate) {
+            const dayInfo = getDayDataByDate(resolvedDate, dataMap);
+            if (/who was on leave|yaar leave|who leave/.test(normalized)) {
+                const status = dayInfo.data?.leaveStatus === 'Yes' ? 'You were on leave.' : 'No leave record found.';
+                return localizeReportText(`Date: ${months[dayInfo.month]} ${dayInfo.day}, ${dayInfo.year}\n• ${status}`, lang);
+            }
+            const base = askedField ? buildSpecificFieldAnswer(dayInfo, askedField) : buildDayChatSummary(dayInfo.year, dayInfo.month, dayInfo.day, dataMap);
+            return localizeReportText(base, lang);
+        }
+
+        if (reportIntent) {
+            const reportText = localizeReportText(buildIntentBasedMonthAnswer(cleaned, monthTarget.year, monthTarget.month, dataMap), lang);
+            return casual ? `${reportText}\n\n${casual}` : reportText;
+        }
+
+        if (casual) return casual;
+        return localizeReportText('Could you please specify the date or leave type?\nExamples:\n• "last month 17 date work location"\n• "who was on leave last saturday"\n• "this month total own leave, public holiday, sick leave"', lang);
+    };
+
+    const smartAssistantReply = async (query) => {
+        const q = (query || '').trim();
+        if (!q) return 'Please type your question.';
+
+        const dataMap = await loadAssistantDataSources();
+        window.__assistantReportData = dataMap;
+
+        const lang = detectInputLanguage(q);
+        const parts = q
+            .split(/\?+|\n+/)
+            .map(s => s.trim())
+            .filter(Boolean);
+
+        const answers = parts.length ? parts.map(part => answerSingleSmartQuery(part, dataMap, lang)).filter(Boolean) : [answerSingleSmartQuery(q, dataMap, lang)];
+        return answers.join('\n\n');
+    };
+
+    let aiPageInitialized = false;
+
+    const setupAiPage = () => {
+        if (aiPageInitialized) return;
+        aiPageInitialized = true;
+
+        const tabTranslate = document.getElementById('ai-tab-translate');
+        const tabChat = document.getElementById('ai-tab-chat');
+        const translatePanel = document.getElementById('ai-translate-panel');
+        const chatPanel = document.getElementById('ai-smart-chat-panel');
         const inputEl = document.getElementById('ai-input');
         const outputContainer = document.getElementById('ai-output-container');
         const outputEl = document.getElementById('ai-output');
@@ -2261,27 +3452,59 @@ document.addEventListener('DOMContentLoaded', () => {
         const generateBtn = document.getElementById('generate-ai-message-btn');
         const voiceBtn = document.getElementById('voice-input-btn');
         const copyBtn = document.getElementById('copy-ai-output-btn');
+        const toneSelect = document.getElementById('ai-tone-select');
         const errorContainer = document.getElementById('ai-error-container');
+        const userPreview = document.getElementById('ai-user-preview');
+        const chatThread = document.getElementById('smart-chat-thread');
+        const chatInput = document.getElementById('smart-chat-input');
+        const chatSend = document.getElementById('smart-chat-send-btn');
+
+        const setTab = (mode) => {
+            const isTranslate = mode === 'translate';
+            translatePanel.classList.toggle('hidden', !isTranslate);
+            chatPanel.classList.toggle('hidden', isTranslate);
+            tabTranslate.className = isTranslate ? 'ios-primary-btn px-4 py-2 text-sm font-semibold rounded-lg' : 'ios-secondary-btn px-4 py-2 text-sm font-semibold rounded-lg dark:text-gray-100';
+            tabChat.className = !isTranslate ? 'ios-primary-btn px-4 py-2 text-sm font-semibold rounded-lg' : 'ios-secondary-btn px-4 py-2 text-sm font-semibold rounded-lg dark:text-gray-100';
+        };
+        tabTranslate.onclick = () => setTab('translate');
+        tabChat.onclick = () => setTab('chat');
+
+        const typeText = (el, text) => new Promise(resolve => {
+            const typingEnabled = localStorage.getItem('aiTypingEnabled') !== 'false';
+            if (!typingEnabled) {
+                el.textContent = text;
+                resolve();
+                return;
+            }
+            el.textContent = '';
+            let i = 0;
+            const tick = () => {
+                el.textContent += text[i++] || '';
+                if (i < text.length) requestAnimationFrame(tick);
+                else resolve();
+            };
+            requestAnimationFrame(tick);
+        });
 
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        if (!SpeechRecognition) {
+        const isSecureMicContext = window.isSecureContext || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+        const voiceEnabled = localStorage.getItem('aiVoiceEnabled') !== 'false';
+        if (!SpeechRecognition || !voiceEnabled) {
             voiceBtn.style.display = 'none';
         } else {
             const recognition = new SpeechRecognition();
             recognition.lang = 'ta-IN';
             recognition.interimResults = true;
-            recognition.continuous = true;
+            recognition.continuous = false;
+            recognition.maxAlternatives = 1;
             let isListening = false;
 
             recognition.onresult = (event) => {
                 let interimTranscript = '';
                 let finalTranscript = '';
                 for (let i = event.resultIndex; i < event.results.length; ++i) {
-                    if (event.results[i].isFinal) {
-                        finalTranscript += event.results[i][0].transcript;
-                    } else {
-                        interimTranscript += event.results[i][0].transcript;
-                    }
+                    if (event.results[i].isFinal) finalTranscript += event.results[i][0].transcript;
+                    else interimTranscript += event.results[i][0].transcript;
                 }
                 inputEl.value = finalTranscript + interimTranscript;
             };
@@ -2291,55 +3514,162 @@ document.addEventListener('DOMContentLoaded', () => {
             recognition.onerror = (event) => {
                 isListening = false;
                 voiceBtn.classList.remove('voice-btn-listening');
-                errorContainer.textContent = `Speech recognition error: ${event.error}. Please try again.`;
+                const errorMap = {
+                    'not-allowed': 'Microphone permission blocked. Browser settings-la mic allow pannunga.',
+                    'service-not-allowed': 'Speech service blocked. Browser settings-la permission allow pannunga.',
+                    'no-speech': 'Voice detect aagala. Konjam clear-ah pesi try pannunga.',
+                    'audio-capture': 'Microphone device detect aagala. Mic connect pannitu retry pannunga.'
+                };
+                errorContainer.textContent = errorMap[event.error] || `Voice typing error: ${event.error}.`;
                 errorContainer.classList.remove('hidden');
             };
 
-            voiceBtn.addEventListener('click', () => {
+            const getPermissionState = async () => {
+                try {
+                    if (navigator.permissions?.query) {
+                        const status = await navigator.permissions.query({ name: 'microphone' });
+                        return status.state;
+                    }
+                } catch (_) {}
+                return 'unknown';
+            };
+
+            const requestMicPermission = async () => {
+                if (!navigator.mediaDevices?.getUserMedia) {
+                    return { ok: false, reason: 'unsupported' };
+                }
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    stream.getTracks().forEach(track => track.stop());
+                    return { ok: true };
+                } catch (e) {
+                    if (e?.name === 'NotAllowedError' || e?.name === 'PermissionDeniedError') return { ok: false, reason: 'denied' };
+                    if (e?.name === 'NotFoundError' || e?.name === 'DevicesNotFoundError') return { ok: false, reason: 'no_device' };
+                    return { ok: false, reason: 'failed' };
+                }
+            };
+
+            voiceBtn.addEventListener('click', async () => {
                 errorContainer.classList.add('hidden');
                 if (isListening) {
                     recognition.stop();
-                } else {
-                    try { recognition.start(); } catch(e) {
-                         errorContainer.textContent = `Could not start voice recognition.`;
-                         errorContainer.classList.remove('hidden');
+                    return;
+                }
+
+                if (!isSecureMicContext) {
+                    errorContainer.textContent = 'Mic use panna HTTPS or localhost venum. Secure URL-la open pannunga.';
+                    errorContainer.classList.remove('hidden');
+                    return;
+                }
+
+                const permissionResult = await requestMicPermission();
+                if (!permissionResult.ok) {
+                    const state = await getPermissionState();
+                    if (permissionResult.reason === 'denied' || state === 'denied') {
+                        errorContainer.textContent = 'Microphone permission denied. Browser settings-la site mic permission "Allow" pannunga, appuram retry pannunga.';
+                    } else if (permissionResult.reason === 'no_device') {
+                        errorContainer.textContent = 'Microphone device கிடைக்கவில்லை. Device mic check pannunga.';
+                    } else if (permissionResult.reason === 'unsupported') {
+                        errorContainer.textContent = 'இந்த browser microphone API support pannala.';
+                    } else {
+                        errorContainer.textContent = 'Microphone permission request fail aayiduchu. மீண்டும் முயற்சி செய்யவும்.';
                     }
+                    errorContainer.classList.remove('hidden');
+                    return;
+                }
+
+                try {
+                    recognition.start();
+                } catch (e) {
+                    console.error('Microphone start failed:', e);
+                    errorContainer.textContent = 'Voice recognition start aagala. Permission allow pannitu மீண்டும் try pannunga.';
+                    errorContainer.classList.remove('hidden');
                 }
             });
         }
-        
+
         generateBtn.addEventListener('click', async () => {
             errorContainer.classList.add('hidden');
             const userInput = inputEl.value.trim();
             if (!userInput) return;
 
+            userPreview.textContent = userInput;
+            userPreview.classList.remove('hidden');
             spinner.classList.remove('hidden');
             generateBtn.disabled = true;
 
             try {
-                const result = await window.generateProfessionalMessage(userInput);
-                outputEl.textContent = result;
+                const selectedMode = toneSelect?.value || 'office_formal';
+                const result = await window.generateProfessionalMessage(userInput, selectedMode);
                 outputContainer.classList.remove('hidden');
+                await typeText(outputEl, result);
             } catch (error) {
                 console.error(error);
-                outputEl.textContent = 'Sorry, an error occurred. Please try again.';
                 outputContainer.classList.remove('hidden');
+                await typeText(outputEl, 'Sorry, there was an error. Please try again.');
             } finally {
                 spinner.classList.add('hidden');
                 generateBtn.disabled = false;
             }
         });
 
-        copyBtn.addEventListener('click', () => {
-            navigator.clipboard.writeText(outputEl.textContent).then(() => {
-                copyBtn.innerHTML = 'Copied!';
+        copyBtn?.addEventListener('click', () => {
+            navigator.clipboard.writeText(outputEl.textContent || '').then(() => {
+                copyBtn.textContent = 'Copied!';
                 copyBtn.disabled = true;
                 setTimeout(() => {
-                    copyBtn.innerHTML = `<span class="copy-icon-span"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></span>`;
+                    copyBtn.textContent = 'Copy';
                     copyBtn.disabled = false;
-                }, 2000);
+                }, 1800);
             });
         });
+
+        const pushChatBubble = (text, role) => {
+            const bubble = document.createElement('div');
+            bubble.className = `ai-chat-bubble ${role === 'user' ? 'user' : 'assistant'}`;
+            bubble.textContent = text;
+            chatThread.appendChild(bubble);
+            chatThread.scrollTop = chatThread.scrollHeight;
+            return bubble;
+        };
+        const pushLoadingBubble = () => {
+            const bubble = document.createElement('div');
+            bubble.className = 'ai-chat-bubble assistant';
+            bubble.innerHTML = `<div class="ai-chat-loading"><span></span><span></span><span></span></div>`;
+            chatThread.appendChild(bubble);
+            chatThread.scrollTop = chatThread.scrollHeight;
+            return bubble;
+        };
+        const sendSmartChat = async () => {
+            const q = (chatInput.value || '').trim();
+            if (!q) return;
+            pushChatBubble(q, 'user');
+            chatInput.value = '';
+            chatInput.disabled = true;
+            chatSend.disabled = true;
+
+            const loadingBubble = pushLoadingBubble();
+            const wait = 2000 + Math.floor(Math.random() * 1000);
+            await new Promise(resolve => setTimeout(resolve, wait));
+
+            const answer = await smartAssistantReply(q);
+            loadingBubble.remove();
+            pushChatBubble(answer, 'assistant');
+            chatInput.disabled = false;
+            chatSend.disabled = false;
+            chatInput.focus();
+        };
+        chatSend.onclick = sendSmartChat;
+        chatInput.onkeydown = (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                sendSmartChat();
+            }
+        };
+    };
+
+    const showAiModal = () => {
+        showPage('ai-page');
     };
 
     const showExportPreview = (year, month) => {
@@ -2452,6 +3782,7 @@ document.addEventListener('DOMContentLoaded', () => {
         renderHeatMap(year, month);
         renderUpcomingEvents();
         renderLeaveReasonChart(year, month);
+        renderPublicHolidaySummary(year, month);
         renderMonthlyLeaveTrendChart(year, month);
         addDashboardEventListeners();
 
@@ -2500,9 +3831,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const isDayWeekend = isWeekend(year, month, day);
             const isSpecial = dayData.specialDays === "Poya Day" || dayData.specialDays === "Public Holiday";
 
-            if (dayData.leaveReason === 'Own Leave') {
+            if (isOwnLeaveRecord(dayData)) {
                 statusClass = 'heatmap-leave-own';
-            } else if (isSpecial || (dayData.leaveStatus === 'Yes' && dayData.leaveReason !== 'Own Leave')) {
+            } else if (isPublicHolidayRecord(dayData) || isSpecial) {
                 statusClass = 'heatmap-public-holiday';
             } else if (dayData.inTime) {
                 statusClass = 'heatmap-present';
@@ -2566,6 +3897,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const renderUpcomingEvents = () => {
         const container = document.getElementById('events-container');
+        stabilizeScrollablePanel(container);
         const now = new Date();
         now.setHours(0,0,0,0);
         const sevenDaysLater = new Date();
@@ -2582,7 +3914,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         container.innerHTML = upcoming.map(r => `
-            <div class="flex items-center gap-3">
+            <div class="dashboard-list-item flex items-center gap-3 mb-2 last:mb-0">
                 <div class="text-center bg-gray-100 dark:bg-gray-700 p-2 rounded-md">
                     <div class="font-bold text-sm">${new Date(r.date).getDate()}</div>
                     <div class="text-xs">${months[new Date(r.date).getMonth()].substring(0,3)}</div>
@@ -2597,18 +3929,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const renderLeaveReasonChart = (year, month) => {
         const ctx = document.getElementById('leave-reason-chart').getContext('2d');
+        const summaryContainer = document.getElementById('own-leave-reason-details');
+        stabilizeScrollablePanel(summaryContainer);
         const monthPrefix = `${year}-${month}`;
         const reasonCounts = {};
+        const reasonEntries = [];
         
         Object.keys(workData).filter(k => k.startsWith(monthPrefix)).forEach(key => {
             const data = workData[key];
-            if (data.leaveReason === 'Own Leave' && data.leaveReasonText) {
-                const reason = data.leaveReasonText.trim();
+            if (!isOwnLeaveRecord(data)) return;
+
+            const day = parseInt(key.split('-')[2], 10);
+            const reason = (data.leaveReasonText || '').trim() || 'No details';
+            const formattedDate = `${months[month]} ${day}`;
+            reasonEntries.push({ date: formattedDate, reason });
+
+            if (reason !== 'No details') {
                 reasonCounts[reason] = (reasonCounts[reason] || 0) + 1;
             }
         });
         
         const sortedReasons = Object.entries(reasonCounts).sort((a, b) => b[1] - a[1]).slice(0, 3);
+        const totalOwnLeaveDays = reasonEntries.length;
         
         if (leaveReasonChartInstance) leaveReasonChartInstance.destroy();
         
@@ -2616,9 +3958,17 @@ document.addEventListener('DOMContentLoaded', () => {
         const existingP = parent.querySelector('p');
         if (existingP) existingP.remove();
 
+        if (summaryContainer) {
+            const detailsHTML = reasonEntries.length
+                ? `<div class="font-semibold text-gray-700 dark:text-gray-300">Total Own Leave Days: ${totalOwnLeaveDays}</div>
+                   <ul class="space-y-1 mt-2">${reasonEntries.map(entry => `<li class="dashboard-list-item flex justify-between gap-2"><span class="font-medium text-gray-700 dark:text-gray-300">${entry.date}</span><span class="text-right text-gray-500 dark:text-gray-400">${entry.reason}</span></li>`).join('')}</ul>`
+                : `<p class="text-gray-500 dark:text-gray-400">No own leave entries this month.</p>`;
+            summaryContainer.innerHTML = detailsHTML;
+        }
+
         if(sortedReasons.length === 0) {
             ctx.canvas.style.display = 'none';
-            parent.insertAdjacentHTML('beforeend', `<p class="text-gray-500 text-center py-4">No 'Own Leave' reasons recorded.</p>`);
+            parent.insertAdjacentHTML('beforeend', `<p class="text-gray-500 text-center py-4">No own leave reason distribution to chart.</p>`);
             return;
         }
         ctx.canvas.style.display = 'block';
@@ -2643,6 +3993,36 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
 
+    const renderPublicHolidaySummary = (year, month) => {
+        const container = document.getElementById('public-holiday-summary');
+        if (!container) return;
+        stabilizeScrollablePanel(container);
+
+        const monthPrefix = `${year}-${month}`;
+        const entries = Object.keys(workData)
+            .filter(k => k.startsWith(monthPrefix))
+            .sort((a, b) => parseInt(a.split('-')[2], 10) - parseInt(b.split('-')[2], 10))
+            .map(key => ({ key, data: workData[key] || {} }))
+            .filter(({ data }) => isPublicHolidayRecord(data))
+            .map(({ key, data }) => {
+                const day = parseInt(key.split('-')[2], 10);
+                return {
+                    date: `${months[month]} ${day}`,
+                    detail: data.leaveReasonText || data.customReasonDetails || data.specialDays || data.leaveReason || 'Public Holiday'
+                };
+            });
+
+        if (entries.length === 0) {
+            container.innerHTML = `<p class="text-gray-500 dark:text-gray-400 py-4 text-center">No public holiday leaves this month.</p>`;
+            return;
+        }
+
+        container.innerHTML = entries
+            .slice(0, 5)
+            .map(entry => `<div class="dashboard-list-item mb-2 last:mb-0"><div class="font-semibold text-gray-700 dark:text-gray-200">${entry.date}</div><div class="text-gray-500 dark:text-gray-400">${entry.detail}</div></div>`)
+            .join('');
+    };
+
     const renderMonthlyLeaveTrendChart = (year, month) => {
         const ctx = document.getElementById('monthly-leave-trend-chart')?.getContext('2d');
         if (!ctx) return;
@@ -2663,17 +4043,15 @@ document.addEventListener('DOMContentLoaded', () => {
             const dateKey = `${year}-${month}-${day}`;
             const data = workData[dateKey] || {};
             
-            if (data.leaveReason === 'Own Leave') {
+            if (isOwnLeaveRecord(data)) {
                 cumulativeOwnLeaves++;
             }
 
-            const { totalHours } = calculateDayHoursAndOT(data, year, month, day);
-            const isSpecial = data.specialDays === "Poya Day" || data.specialDays === "Public Holiday";
-
-            if ((data.leaveStatus === 'Yes' && (isSpecial || data.leaveReason === 'Custom Reason' || data.leaveReason === "Public Holiday"))) {
+            if (isPublicHolidayRecord(data)) {
                 cumulativePublicLeaves++;
-            } else if (isSpecial && !data.inTime) {
-                cumulativePublicLeaves++;
+            } else {
+                const isSpecial = data.specialDays === "Public Holiday";
+                if (isSpecial && !data.inTime) cumulativePublicLeaves++;
             }
 
             ownLeaveData.push(cumulativeOwnLeaves);
@@ -2709,7 +4087,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         pointHoverRadius: 6,
                     },
                     {
-                        label: 'Cumulative Public & Other Leaves',
+                        label: 'Cumulative Public Holiday Leaves',
                         data: publicLeaveData,
                         borderColor: 'rgb(251, 191, 36)', // amber-400
                         backgroundColor: publicLeaveGradient,
@@ -2769,7 +4147,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         Object.keys(workData).filter(k => k.startsWith(monthPrefix)).sort().forEach(key => {
             const data = workData[key];
-             if (data.leaveReason === 'Own Leave') {
+             if (isOwnLeaveRecord(data)) {
                 const day = parseInt(key.split('-')[2], 10);
                 const formattedDate = `${months[month]} ${day}`;
                 details.push({ date: formattedDate, reason: data.leaveReasonText || 'No details' });
@@ -2777,7 +4155,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         const content = details.length > 0
-            ? `<ul class="space-y-2">${details.map(d => `<li class="flex justify-between items-center text-sm p-2 bg-gray-50 dark:bg-gray-800/50 rounded-md"><span class="font-semibold text-gray-700 dark:text-gray-300">${d.date}</span><span class="text-gray-500 dark:text-gray-400 text-right">${d.reason}</span></li>`).join('')}</ul>`
+            ? `<p class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Total Own Leave Days: ${details.length}</p><ul class="space-y-2">${details.map(d => `<li class="flex justify-between items-center text-sm p-2 bg-gray-50 dark:bg-gray-800/50 rounded-md"><span class="font-semibold text-gray-700 dark:text-gray-300">${d.date}</span><span class="text-gray-500 dark:text-gray-400 text-right">${d.reason}</span></li>`).join('')}</ul>`
             : `<p class="text-center text-gray-500 dark:text-gray-400">No own leaves recorded for this month.</p>`;
         
         openModal(createModal('Own Leave Details', content));
@@ -2794,41 +4172,41 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!data) return;
 
             const day = parseInt(key.split('-')[2], 10);
-            const { totalHours } = calculateDayHoursAndOT(data, year, month, day);
-            const isSpecial = data.specialDays === "Poya Day" || data.specialDays === "Public Holiday";
             const formattedDate = `${months[month]} ${day}`;
+            const isPublicHoliday = isPublicHolidayRecord(data);
 
-            // Case 1: Poya or Public Holiday
-            if (isSpecial) {
-                const ot = (data.inTime && data.outTime) ? `${totalHours.toFixed(1)} OT hrs` : 'Holiday';
-                details.push({ date: formattedDate, reason: `${data.specialDays} (${ot})` });
-            } 
-            // Case 2: Custom Reason Leave on a non-special day
-            else if (data.leaveStatus === 'Yes' && data.leaveReason === 'Custom Reason') {
-                details.push({ date: formattedDate, reason: data.customReasonDetails || 'Custom Leave' });
+            if (isPublicHoliday) {
+                const description =
+                    data.leaveReasonText ||
+                    data.customReasonDetails ||
+                    data.specialDays ||
+                    data.leaveReason ||
+                    'Public Holiday';
+                details.push({ date: formattedDate, reason: description });
             }
         });
 
         const content = details.length > 0
-            ? `<ul class="space-y-2">${details.map(d => `<li class="flex justify-between items-center text-sm p-2 bg-gray-50 dark:bg-gray-800/50 rounded-md"><span class="font-semibold text-gray-700 dark:text-gray-300">${d.date}</span><span class="text-gray-500 dark:text-gray-400 text-right">${d.reason}</span></li>`).join('')}</ul>`
-            : `<p class="text-center text-gray-500 dark:text-gray-400">No public holiday or custom leaves recorded for this month.</p>`;
+            ? `<ul class="space-y-2">${details.map(d => `<li class="text-sm p-2 bg-gray-50 dark:bg-gray-800/50 rounded-md"><div class="font-semibold text-gray-700 dark:text-gray-300">Leave Date: ${d.date}</div><div class="text-gray-500 dark:text-gray-400">Leave Details: ${d.reason}</div></li>`).join('')}</ul>`
+            : `<p class="text-center text-gray-500 dark:text-gray-400">No public holiday leave records for this month.</p>`;
         
-        openModal(createModal('Public Holiday & Custom Leave Details', content));
+        openModal(createModal('Public Holiday Leave Details', content));
     };
 
 
     const addDashboardEventListeners = () => {
-        document.getElementById('export-pdf-shortcut').addEventListener('click', () => {
+        document.getElementById('export-pdf-shortcut').onclick = () => {
             showExportMonthPickerModal((year, month) => showExportPreview(year, month));
-        });
-        document.getElementById('export-excel-shortcut').addEventListener('click', () => {
+        };
+        document.getElementById('export-excel-shortcut').onclick = () => {
             showExportMonthPickerModal((year, month) => exportAsCSV(year, month));
-        });
-        document.getElementById('share-shortcut-btn').addEventListener('click', handleShare);
+        };
+        document.getElementById('share-shortcut-btn').onclick = handleShare;
         
-        document.getElementById('view-all-own-leaves').addEventListener('click', showOwnLeaveDetailsModal);
-        document.getElementById('view-all-public-leaves').addEventListener('click', showPublicHolidayDetailsModal);
-    }
+        document.getElementById('view-all-own-leaves').onclick = showOwnLeaveDetailsModal;
+        document.getElementById('view-all-public-leaves').onclick = showPublicHolidayDetailsModal;
+        document.getElementById('public-holiday-view-all-btn').onclick = showPublicHolidayDetailsModal;
+    };
 
     // DASHBOARD END
 
@@ -2849,6 +4227,12 @@ document.addEventListener('DOMContentLoaded', () => {
         // Preferences
         document.getElementById('settings-leave-allowance').value = userSettings.baseAnnualLeave || 35;
         document.getElementById('settings-work-hours').value = (userSettings.normalWorkMinutes || 540) / 60;
+        document.getElementById('theme-toggle-ios').checked = document.documentElement.classList.contains('dark');
+        document.getElementById('ai-voice-toggle').checked = localStorage.getItem('aiVoiceEnabled') !== 'false';
+        document.getElementById('ai-typing-toggle').checked = localStorage.getItem('aiTypingEnabled') !== 'false';
+        document.getElementById('notify-reminder-toggle').checked = localStorage.getItem('notifyReminderEnabled') !== 'false';
+        document.getElementById('notify-backup-toggle').checked = localStorage.getItem('notifyBackupEnabled') !== 'false';
+        updateBackupUi(0);
         
         addSettingsEventListeners();
     };
@@ -2857,10 +4241,14 @@ document.addEventListener('DOMContentLoaded', () => {
         // Use .onclick to avoid multiple listeners
         document.getElementById('save-profile-btn').onclick = handleSaveProfile;
         document.getElementById('save-preferences-btn').onclick = handleSavePreferences;
-        document.getElementById('force-sync-btn').onclick = handleForceSync;
+        document.getElementById('theme-toggle-ios').onchange = (e) => applyTheme(e.target.checked ? 'dark' : 'light');
+        document.getElementById('ai-voice-toggle').onchange = (e) => localStorage.setItem('aiVoiceEnabled', String(e.target.checked));
+        document.getElementById('ai-typing-toggle').onchange = (e) => localStorage.setItem('aiTypingEnabled', String(e.target.checked));
+        document.getElementById('notify-reminder-toggle').onchange = (e) => localStorage.setItem('notifyReminderEnabled', String(e.target.checked));
+        document.getElementById('notify-backup-toggle').onchange = (e) => localStorage.setItem('notifyBackupEnabled', String(e.target.checked));
         document.getElementById('full-backup-btn').onclick = handleFullBackup;
         document.getElementById('restore-backup-btn').onclick = showRestoreModal;
-        document.getElementById('full-csv-export-btn').onclick = handleFullCSVExport;
+        document.getElementById('full-restore-file-input').onchange = restoreBackup;
     };
 
     const handleSaveProfile = async () => {
@@ -2923,8 +4311,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const handleForceSync = async () => {
         if (!user) return;
-        const statusEl = document.getElementById('data-op-status');
-        statusEl.textContent = 'Syncing...';
+        setDataOpStatus('Syncing...', 'info');
+        updateBackupUi(30);
         try {
             const userRef = db.collection('users').doc(user.uid);
             const doc = await userRef.get();
@@ -2932,88 +4320,41 @@ document.addEventListener('DOMContentLoaded', () => {
             workData = data?.workData || {};
             reminders = data?.reminders || [];
             userSettings = data?.settings || { baseAnnualLeave: 35, normalWorkMinutes: 540 };
-            statusEl.textContent = 'Sync complete!';
+            saveLocalData();
+            setDataOpStatus('Sync complete!', 'success');
+            updateBackupUi(100);
             renderAll();
             renderDashboard();
         } catch(e) {
-            statusEl.textContent = 'Sync failed.';
+            setDataOpStatus('Sync failed.', 'error');
+            updateBackupUi(0);
             console.error(e);
         }
-        setTimeout(() => statusEl.textContent = '', 3000);
-    }
+    };
     
-    const handleFullBackup = async () => {
-         if (!user) return;
-        const statusEl = document.getElementById('data-op-status');
-        statusEl.textContent = 'Backing up...';
+    const handleFullBackup = () => {
         try {
-            const backupRef = db.collection('backups').doc(user.uid);
-            const timestamp = new Date().toISOString();
-            await backupRef.set({
-                backups: {
-                    [timestamp]: workData
-                }
-            }, { merge: true });
-            statusEl.textContent = 'Backup successful!';
-        } catch(e) {
-            statusEl.textContent = 'Backup failed.';
-            console.error(e);
-        }
-        setTimeout(() => statusEl.textContent = '', 3000);
-    }
-
-    const showRestoreModal = async () => {
-        const content = `<div id="restore-list-container" class="text-center p-4">Fetching backups...</div>`;
-        openModal(createModal('Restore from Cloud Backup', content, 'restore-modal'));
-
-        const container = document.getElementById('restore-list-container');
-        try {
-            const backupDoc = await db.collection('backups').doc(user.uid).get();
-            if (!backupDoc.exists || !backupDoc.data().backups) {
-                container.innerHTML = '<p class="text-gray-500">No cloud backups found.</p>';
-                return;
-            }
-            
-            const backups = backupDoc.data().backups;
-            const timestamps = Object.keys(backups).sort((a, b) => new Date(b) - new Date(a));
-
-            if (timestamps.length === 0) {
-                 container.innerHTML = '<p class="text-gray-500">No cloud backups found.</p>';
-                 return;
-            }
-
-            let listHTML = '<ul class="space-y-2 text-left">';
-            timestamps.forEach(ts => {
-                listHTML += `
-                    <li class="flex justify-between items-center p-2 bg-gray-100 dark:bg-gray-800 rounded-md">
-                        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">${new Date(ts).toLocaleString()}</span>
-                        <button data-timestamp="${ts}" class="restore-item-btn text-sm font-semibold bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600 transition-colors">Restore</button>
-                    </li>
-                `;
-            });
-            listHTML += '</ul>';
-            container.innerHTML = listHTML;
-
-            container.querySelectorAll('.restore-item-btn').forEach(btn => {
-                btn.onclick = () => {
-                    if (confirm('Are you sure you want to restore this backup? This will overwrite your current work data.')) {
-                        const ts = btn.dataset.timestamp;
-                        workData = backups[ts];
-                        syncToCloud();
-                        closeModal();
-                        const statusEl = document.getElementById('data-op-status');
-                        statusEl.textContent = 'Restore successful!';
-                        setTimeout(() => statusEl.textContent = '', 3000);
-                        renderAll();
-                        renderDashboard();
-                    }
-                };
-            });
+            updateBackupUi(25);
+            const backupData = createBackup();
+            updateBackupUi(65);
+            downloadBackupFile(backupData);
+            setDataOpStatus('Backup exported. Choose iCloud Drive in the download dialog to save it.', 'success');
+            updateBackupUi(100, backupData.exportedAt);
         } catch (e) {
-            container.innerHTML = '<p class="text-red-500">Error fetching backups. Please try again.</p>';
-            console.error(e);
+            console.error('Backup export failed:', e);
+            setDataOpStatus('Backup failed. Please try again.', 'error');
+            updateBackupUi(0);
         }
-    }
+    };
+
+    const showRestoreModal = () => {
+        const fileInput = document.getElementById('full-restore-file-input');
+        if (!fileInput) {
+            setDataOpStatus('Restore input not available.', 'error');
+            return;
+        }
+        fileInput.click();
+    };
     
     const handleFullCSVExport = () => {
         const headers = ['Date', 'InTime', 'OutTime', 'MovementOut', 'MovementIn', 'TeamMembers', 'WorkLocation', 'VehicleNumber', 'KM', 'SpecialDay', 'LeaveStatus', 'LeaveReason', 'LeaveReasonDetails'];
@@ -3072,81 +4413,32 @@ document.addEventListener('DOMContentLoaded', () => {
     const handleShare = async () => {
         const year = currentDate.getFullYear();
         const month = currentDate.getMonth();
-        const fileName = `Work_Report_${year}_${month + 1}.pdf`;
+        const stats = getMonthStats(year, month);
+        const summaryText = [
+            `Work Report - ${months[month]} ${year}`,
+            `Own Leaves: ${stats.ownLeaves}`,
+            `Public Holiday Leaves: ${stats.publicHolidayLeaveDays}`,
+            `Total Present Days: ${stats.totalPresentDays}`,
+            `Total OT Hours: ${stats.totalMonthOtHours.toFixed(1)}`
+        ].join('\n');
 
-        // Check for Web Share API support
-        if (!navigator.share || !navigator.canShare) {
-            alert("Sharing is not supported on this browser. Please try exporting as PDF.");
+        if (navigator.share) {
+            try {
+                await navigator.share({
+                    title: `Work Report for ${months[month]} ${year}`,
+                    text: summaryText
+                });
+            } catch (error) {
+                console.error('Sharing cancelled/failed:', error);
+            }
             return;
         }
 
-        loadingSpinner.style.display = 'flex';
-        
         try {
-            // Create a temporary, off-screen element for rendering
-            const tempContainer = document.createElement('div');
-            tempContainer.style.position = 'absolute';
-            tempContainer.style.left = '-9999px';
-            tempContainer.style.top = '0';
-            tempContainer.innerHTML = document.querySelector('#report-page').innerHTML;
-            document.body.appendChild(tempContainer);
-            
-            // This is a simplified render. A proper one would rebuild the content.
-            // For now, let's generate the PDF from a dedicated export element structure.
-            const exportEl = document.createElement('div');
-            exportEl.innerHTML = `
-                <div id="share-export-content" class="p-4 bg-white text-black" style="font-size: 18px; width: 1200px;">
-                    <!-- Re-using existing export preview structure -->
-                </div>
-            `;
-            const daysInMonth = getDaysInMonth(year, month);
-            const tableRows = Array.from({ length: daysInMonth }, (_, i) => {
-                const day = i + 1;
-                const dateKey = `${year}-${month}-${day}`;
-                const dayData = workData[dateKey] || {};
-                const formattedDate = `${String(day).padStart(2, '0')}.${String(month + 1).padStart(2, '0')}.${year}`;
-                return `<tr><td style="padding:4px; border:1px solid #ccc;">${formattedDate}</td><td style="padding:4px; border:1px solid #ccc;">${dayData.inTime || '-'}</td><td style="padding:4px; border:1px solid #ccc;">${dayData.outTime || '-'}</td><td style="padding:4px; border:1px solid #ccc;">${dayData.leaveStatus || 'No'}</td><td style="padding:4px; border:1px solid #ccc;">${dayData.leaveReason || '-'}</td></tr>`;
-            }).join('');
-            
-            exportEl.querySelector('#share-export-content').innerHTML = `
-                <div style="text-align: center; margin-bottom: 1rem; font-size: 20px;">
-                    <h2 style="font-size: 1.25rem; font-weight: bold;">Work Data Sheet</h2>
-                    <h3 style="font-size: 1.125rem; font-weight: 600;">${months[month]} ${year}</h3>
-                </div>
-                <table style="width: 100%; border-collapse: collapse;">
-                    <thead style="background-color: #f3f4f6;">
-                        <tr>
-                            ${['Day', 'In', 'Out', 'Leave', 'Reason'].map(h => `<th style="padding:4px; border:1px solid #ccc; font-weight: 600;">${h}</th>`).join('')}
-                        </tr>
-                    </thead>
-                    <tbody style="text-align: center;">${tableRows}</tbody>
-                </table>`;
-            document.body.appendChild(exportEl);
-
-            const canvas = await html2canvas(exportEl.querySelector('#share-export-content'), { scale: 2, useCORS: true });
-            const { jsPDF } = window.jspdf;
-            const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-            pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, pdf.internal.pageSize.getWidth(), pdf.internal.pageSize.getHeight());
-            const pdfBlob = pdf.output('blob');
-
-            const file = new File([pdfBlob], fileName, { type: 'application/pdf' });
-            
-            if (navigator.canShare({ files: [file] })) {
-                await navigator.share({
-                    files: [file],
-                    title: `Work Report for ${months[month]} ${year}`,
-                    text: `Here is the work report for ${months[month]} ${year}.`,
-                });
-            } else {
-                alert("Cannot share PDF files on this browser.");
-            }
-            document.body.removeChild(exportEl);
-
+            await navigator.clipboard.writeText(summaryText);
+            alert('Summary copied to clipboard.');
         } catch (error) {
-            console.error('Sharing failed:', error);
-            alert('Could not share the report. Please try again.');
-        } finally {
-            loadingSpinner.style.display = 'none';
+            alert('Sharing is not supported on this browser.');
         }
     };
 
@@ -3169,15 +4461,16 @@ document.addEventListener('DOMContentLoaded', () => {
     // -----------------------------------------------------------------------------
     // SCRIPT EXECUTION & EVENT BINDING
     // -----------------------------------------------------------------------------
+    initializeAppNavigation();
     
     window.addEventListener('scroll', () => {
         const isAtTop = window.scrollY < 100;
-        const isAtBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 100;
         const onSettings = settingsPage.style.display === 'block';
+        const onAiPage = aiPage.style.display === 'block';
 
         scrollUpButton.classList.toggle('hidden', isAtTop);
-        floatingDatePickerBtn.classList.toggle('hidden', isAtTop || onSettings);
-        scrollDownButton.classList.toggle('hidden', isAtBottom);
+        floatingDatePickerBtn.classList.toggle('hidden', isAtTop || onSettings || onAiPage);
+        scrollDownButton.classList.remove('hidden');
     });
     scrollUpButton.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
     scrollDownButton.addEventListener('click', () => window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'smooth' }));
@@ -3214,17 +4507,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const userRef = db.collection("users").doc(user.uid);
             
-            if (localStorage.getItem('workData') || localStorage.getItem('reminders')) {
+            if (localStorage.getItem('workData') || localStorage.getItem('reminders') || localStorage.getItem('userSettings')) {
                 try {
                     const localWorkData = JSON.parse(localStorage.getItem('workData') || '{}');
                     const localReminders = JSON.parse(localStorage.getItem('reminders') || '[]');
+                    const localUserSettings = JSON.parse(localStorage.getItem('userSettings') || '{}');
                     const doc = await userRef.get();
                     const cloudData = doc.data() || {};
                     const mergedWorkData = { ...(cloudData.workData || {}), ...localWorkData };
                     const uniqueReminders = [...new Set([...(cloudData.reminders || []), ...localReminders].map(JSON.stringify))].map(JSON.parse);
-                    await userRef.set({ workData: mergedWorkData, reminders: uniqueReminders }, { merge: true });
+                    const mergedSettings = { ...(cloudData.settings || {}), ...localUserSettings };
+                    await userRef.set({ workData: mergedWorkData, reminders: uniqueReminders, settings: mergedSettings }, { merge: true });
                     localStorage.removeItem('workData');
                     localStorage.removeItem('reminders');
+                    localStorage.removeItem('userSettings');
                 } catch (err) { console.error("Failed to sync local data:", err); }
             }
 
@@ -3270,7 +4566,7 @@ document.addEventListener('DOMContentLoaded', () => {
             user = null;
             workData = JSON.parse(localStorage.getItem('workData') || '{}');
             reminders = JSON.parse(localStorage.getItem('reminders') || '[]');
-            userSettings = { baseAnnualLeave: 35, normalWorkMinutes: 540 };
+            userSettings = JSON.parse(localStorage.getItem('userSettings') || '{"baseAnnualLeave":35,"normalWorkMinutes":540}');
             
             appWrapper.style.display = 'none';
             signupPage.style.display = 'none';
@@ -3289,22 +4585,131 @@ document.addEventListener('DOMContentLoaded', () => {
     const apiKey = "AIzaSyCppq-j59GI9USv1Y0v2miQEn9y_7NfIWM";
     const ai = new GoogleGenAI({ apiKey: apiKey });
 
-    window.generateProfessionalMessage = async (userInput) => {
+    const modePrompts = {
+        office_formal: "Convert into a polite office-ready formal message addressed to manager/team.",
+        professional: "Convert into a clean professional English message with neutral tone.",
+        friendly: "Convert into a polite friendly professional message.",
+        funny_professional: "Convert into a light, funny but respectful professional message suitable for office chat.",
+        short: "Convert into a short and clear professional sentence in plain English."
+    };
+
+    const normalizeTanglishToEnglish = (input = "") => {
+        let output = (input || "").toLowerCase();
+        const replacements = [
+            [/[\u0B80-\u0BFF]+/g, " "], // remove tamil script for fallback parser path
+            [/inniku|iniku|indru/g, "today"],
+            [/naalaiku|naalaikku/g, "tomorrow"],
+            [/naan|nan|njan/g, "i"],
+            [/office\s*kku|office\s*ku/g, "office"],
+            [/varamatten|varamtten|varamatan|vara maten|vara maatten|varamaaten|varamaten/g, "will not come"],
+            [/vara mudiyathu|vara mudiyala|varamudiyathu|varamudiyala|come mudiyathu/g, "cannot come"],
+            [/pokanum|poganum|poganum sir/g, "need to go"],
+            [/weddingukku|wedding ku/g, "wedding"],
+            [/udambu sari illa|health illa|sick|fever/g, "not feeling well"],
+            [/leave venum|need leave|leave venum sir/g, "need leave"],
+            [/late agum|late aagum/g, "will be late"],
+            [/sir/g, "sir"],
+            [/please/g, "please"]
+        ];
+        replacements.forEach(([regex, value]) => {
+            output = output.replace(regex, value);
+        });
+        return output.replace(/\s+/g, " ").trim();
+    };
+
+    const buildProfessionalEnglishFromIntent = (normalizedInput = "") => {
+        const text = normalizedInput;
+        const hasToday = /\btoday\b/.test(text);
+        const hasTomorrow = /\btomorrow\b/.test(text);
+        const cannotCome = /\b(cannot come|will not come|unable to come|not come)\b/.test(text);
+        const needsLeave = /\bneed leave\b/.test(text);
+        const isWedding = /\bwedding\b/.test(text);
+        const isHealth = /\bnot feeling well|sick|fever\b/.test(text);
+        const isLate = /\bwill be late\b/.test(text);
+        const dayRef = hasToday ? "today" : hasTomorrow ? "tomorrow" : "today";
+
+        if (isLate) {
+            return `Dear Sir, I would like to inform you that I will be late to the office ${dayRef} due to unavoidable circumstances.`;
+        }
+        if (isWedding && (cannotCome || needsLeave)) {
+            return `Dear Sir, I will not be able to come to the office ${dayRef} as I need to attend a wedding function. Kindly grant me leave.`;
+        }
+        if (isHealth && (cannotCome || needsLeave)) {
+            return `Dear Sir, I am not feeling well and will not be able to come to the office ${dayRef}. Kindly grant me leave.`;
+        }
+        if (cannotCome || needsLeave) {
+            return `Dear Sir, I will not be able to come to the office ${dayRef} due to personal reasons. Kindly grant me leave.`;
+        }
+
+        return `Dear Sir, I will not be able to come to the office ${dayRef} due to personal reasons. Kindly grant me leave.`;
+    };
+
+    const containsTanglishTokens = (text = "") => {
+        const t = (text || "").toLowerCase();
+        return /[\u0B80-\u0BFF]|varam\w*ten|pokanum|poganum|naan|inniku|naalaiku|office kku|udambu|venum|mudiyathu|mudiyala|sir i today/.test(t);
+    };
+
+    const applyTone = (baseEnglish, mode = "office_formal") => {
+        if (mode === "short") {
+            return baseEnglish.replace(/^Dear Sir,\s*/i, "").replace(/\s*Kindly grant me leave\.?$/i, ".").trim();
+        }
+        if (mode === "friendly") {
+            return baseEnglish
+                .replace(/^Dear Sir,/i, "Hi Team,")
+                .replace(/Kindly grant me leave\./i, "Thanks for your understanding.");
+        }
+        if (mode === "funny_professional") {
+            return baseEnglish
+                .replace(/^Dear Sir,/i, "Dear Sir,")
+                .replace(/Kindly grant me leave\./i, "Kindly grant me leave. I will be back soon and catch up quickly.");
+        }
+        if (mode === "professional") {
+            return baseEnglish
+                .replace(/^Dear Sir,/i, "I would like to inform you that")
+                .replace(/Kindly grant me leave\./i, "Thank you for your understanding.");
+        }
+        return baseEnglish;
+    };
+
+    const fallbackConvert = (userInput, mode = "office_formal") => {
+        const normalized = normalizeTanglishToEnglish(userInput);
+        const professional = buildProfessionalEnglishFromIntent(normalized);
+        return applyTone(professional, mode);
+    };
+
+    window.generateProfessionalMessage = async (userInput, mode = "office_formal") => {
         try {
-            const prompt = `You are an expert in converting informal 'Tanglish' (a mix of Tamil and English) text into professional, formal English. Convert the following message into a polite and professional English sentence suitable for a workplace context. Do not add any explanations, preamble, or markdown formatting. Just provide the converted sentence as plain text. Tanglish message: "${userInput}"`;
+            const styleInstruction = modePrompts[mode] || modePrompts.office_formal;
+            const prompt = `You are an expert in converting informal Tanglish (Tamil + English) text into polished English.
+${styleInstruction}
+The input may be in Tamil script, Tanglish, or mixed Tamil+English.
+Translate the meaning into natural English first, then apply the selected style.
+Return only the converted message, no markdown, no explanation.
+Input: "${userInput}"`;
 
-            const response = await ai.models.generateContent({
-                model: 'gemini-2.5-flash',
-                contents: prompt,
-            });
+            const models = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'];
+            for (const model of models) {
+                try {
+                    const response = await ai.models.generateContent({
+                        model,
+                        contents: prompt,
+                    });
+                    const text = response?.text?.trim();
+                    if (text) {
+                        if (containsTanglishTokens(text)) {
+                            return fallbackConvert(userInput, mode);
+                        }
+                        return text;
+                    }
+                } catch (modelErr) {
+                    console.warn(`Model ${model} failed:`, modelErr);
+                }
+            }
 
-            return response.text.trim();
+            return fallbackConvert(userInput, mode);
         } catch (error) {
             console.error("Error calling Gemini API:", error); 
-            if (error.toString().includes('API key not valid')) {
-                return "The provided API key is not valid. Please check the key and try again.";
-            }
-            return "Sorry, there was an error processing your request. Please try again.";
+            return fallbackConvert(userInput, mode);
         }
     };
 </script>
