@@ -8568,7 +8568,7 @@ Input: "${userInput}"`;
                     console.warn(`Model ${model} failed:`, modelErr);
                 }
             }
-
+ 
             return fallbackConvert(userInput, mode);
         } catch (error) {
             console.error("Error calling Gemini API:", error); 
