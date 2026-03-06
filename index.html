@@ -7,6 +7,10 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
+    <meta name="theme-color" content="#007aff" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <link rel="manifest" href="./manifest.webmanifest" />
     <title>Work Report</title>
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cg stroke='%233b82f6' stroke-width='8' stroke-linecap='round' stroke-linejoin='round' fill='none'%3E%3Cpath d='M25,15 h50 a5,5 0 0 1 5,5 v60 a5,5 0 0 1 -5,5 h-50 a5,5 0 0 1 -5,-5 v-60 a5,5 0 0 1 5,-5 z'/%3E%3Cpath d='M35 35 H 75'/%3E%3Cpath d='M35 50 H 75'/%3E%3Cpath d='M35 65 H 60'/%3E%3C/g%3E%3C/svg%3E" type="image/svg+xml">
     <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cg stroke='%233b82f6' stroke-width='8' stroke-linecap='round' stroke-linejoin='round' fill='none'%3E%3Cpath d='M25,15 h50 a5,5 0 0 1 5,5 v60 a5,5 0 0 1 -5,5 h-50 a5,5 0 0 1 -5,-5 v-60 a5,5 0 0 1 5,-5 z'/%3E%3Cpath d='M35 35 H 75'/%3E%3Cpath d='M35 50 H 75'/%3E%3Cpath d='M35 65 H 60'/%3E%3C/g%3E%3C/svg%3E">
@@ -3341,6 +3345,91 @@ const lightenHex = (hex, amt = 0.25) => {
     return `#${[mix(r), mix(g), mix(b)].map(v => v.toString(16).padStart(2, '0')).join('')}`;
 };
 
+const OFFLINE_DB_NAME = 'workReportOfflineDb';
+const OFFLINE_DB_VERSION = 1;
+const OFFLINE_STATE_STORE = 'app_state';
+const OFFLINE_CACHE_KEYS = {
+    WORK_DATA: 'workData',
+    REMINDERS: 'reminders',
+    SETTINGS: 'userSettings',
+    LAST_UID: 'lastActiveUid',
+    VIEW_MONTH: 'currentViewMonth',
+    SYNC_QUEUE: 'offlineSyncQueueV1'
+};
+
+const openOfflineDb = () => new Promise((resolve, reject) => {
+    if (!('indexedDB' in window)) {
+        resolve(null);
+        return;
+    }
+    const request = indexedDB.open(OFFLINE_DB_NAME, OFFLINE_DB_VERSION);
+    request.onupgradeneeded = (event) => {
+        const db = event.target.result;
+        if (!db.objectStoreNames.contains(OFFLINE_STATE_STORE)) {
+            db.createObjectStore(OFFLINE_STATE_STORE, { keyPath: 'key' });
+        }
+    };
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+});
+
+const idbSetValue = async (key, value) => {
+    try {
+        const db = await openOfflineDb();
+        if (!db) return;
+        await new Promise((resolve, reject) => {
+            const tx = db.transaction(OFFLINE_STATE_STORE, 'readwrite');
+            tx.objectStore(OFFLINE_STATE_STORE).put({ key, value, updatedAt: Date.now() });
+            tx.oncomplete = () => resolve();
+            tx.onerror = () => reject(tx.error);
+        });
+        db.close();
+    } catch (err) {
+        console.warn('IndexedDB write skipped:', err);
+    }
+};
+
+const idbGetValue = async (key) => {
+    try {
+        const db = await openOfflineDb();
+        if (!db) return null;
+        const value = await new Promise((resolve, reject) => {
+            const tx = db.transaction(OFFLINE_STATE_STORE, 'readonly');
+            const req = tx.objectStore(OFFLINE_STATE_STORE).get(key);
+            req.onsuccess = () => resolve(req.result ? req.result.value : null);
+            req.onerror = () => reject(req.error);
+        });
+        db.close();
+        return value;
+    } catch (err) {
+        console.warn('IndexedDB read skipped:', err);
+        return null;
+    }
+};
+
+const hydrateLocalStorageFromIndexedDb = async () => {
+    const keys = Object.values(OFFLINE_CACHE_KEYS);
+    for (const key of keys) {
+        if (localStorage.getItem(key) !== null) continue;
+        const value = await idbGetValue(key);
+        if (value === null || value === undefined) continue;
+        if (typeof value === 'string') {
+            localStorage.setItem(key, value);
+        } else {
+            localStorage.setItem(key, JSON.stringify(value));
+        }
+    }
+};
+
+const mirrorLocalStorageKeyToIndexedDb = (key, rawValue) => {
+    if (rawValue === null || rawValue === undefined) return;
+    let parsed = rawValue;
+    try {
+        parsed = JSON.parse(rawValue);
+    } catch (_) {}
+    idbSetValue(key, parsed);
+};
+
 const applyAccentColor = (accent = '#007aff') => {
     const normalized = /^#[0-9a-fA-F]{6}$/.test(String(accent || '')) ? accent : '#007aff';
     const root = document.documentElement;
@@ -3411,7 +3500,8 @@ const initTheme = () => {
 initTheme();
 document.documentElement.classList.toggle('reduce-motion', localStorage.getItem('reduceMotion') === 'true');
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    await hydrateLocalStorageFromIndexedDb();
 
     // -----------------------------------------------------------------------------
     // STATE MANAGEMENT & GLOBAL VARIABLES
@@ -3645,7 +3735,9 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const writeSyncQueue = (queue) => {
-        localStorage.setItem(SYNC_QUEUE_KEY, JSON.stringify(queue || []));
+        const serialized = JSON.stringify(queue || []);
+        localStorage.setItem(SYNC_QUEUE_KEY, serialized);
+        mirrorLocalStorageKeyToIndexedDb(OFFLINE_CACHE_KEYS.SYNC_QUEUE, serialized);
     };
 
     const enqueueSyncTask = (task) => {
@@ -4493,6 +4585,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const uid = user?.uid || null;
         if (uid) {
             localStorage.setItem(LAST_ACTIVE_UID_KEY, uid);
+            mirrorLocalStorageKeyToIndexedDb(OFFLINE_CACHE_KEYS.LAST_UID, uid);
         }
         const workDataStr = JSON.stringify(workData || {});
         const remindersStr = JSON.stringify(reminders || []);
@@ -4501,6 +4594,9 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('workData', workDataStr);
         localStorage.setItem('reminders', remindersStr);
         localStorage.setItem('userSettings', settingsStr);
+        mirrorLocalStorageKeyToIndexedDb(OFFLINE_CACHE_KEYS.WORK_DATA, workDataStr);
+        mirrorLocalStorageKeyToIndexedDb(OFFLINE_CACHE_KEYS.REMINDERS, remindersStr);
+        mirrorLocalStorageKeyToIndexedDb(OFFLINE_CACHE_KEYS.SETTINGS, settingsStr);
         if (uid) {
             localStorage.setItem(getScopedStorageKey('workData', uid), workDataStr);
             localStorage.setItem(getScopedStorageKey('reminders', uid), remindersStr);
@@ -8170,6 +8266,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         renderSignedOutAuthState();
     });
+
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js').catch((err) => {
+                console.warn('Service worker registration failed:', err);
+            });
+        });
+    }
 });
 </script>
 <script type="module">
