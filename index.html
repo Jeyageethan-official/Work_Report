@@ -3159,6 +3159,28 @@
                        <p id="preferences-save-status" class="text-sm text-green-600 dark:text-green-400 flex items-center"></p>
                     </div>
                 </div>
+                <div class="widget-card">
+                    <h3 class="section-heading">PDF Export Heading</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                       <div class="md:col-span-2">
+                            <label for="settings-pdf-title" class="font-medium text-sm text-gray-700 dark:text-gray-300">Heading Title</label>
+                            <input type="text" id="settings-pdf-title" class="w-full mt-1 p-2 border border-gray-300 rounded-lg bg-gray-50/50 premium-input dark:bg-gray-800/50 dark:border-gray-700" placeholder="Work Data Sheet" />
+                       </div>
+                       <div>
+                            <label for="settings-pdf-name" class="font-medium text-sm text-gray-700 dark:text-gray-300">Name</label>
+                            <input type="text" id="settings-pdf-name" class="w-full mt-1 p-2 border border-gray-300 rounded-lg bg-gray-50/50 premium-input dark:bg-gray-800/50 dark:border-gray-700" placeholder="T.Jeyaraman" />
+                       </div>
+                       <div>
+                            <label for="settings-pdf-service-no" class="font-medium text-sm text-gray-700 dark:text-gray-300">Service No</label>
+                            <input type="text" id="settings-pdf-service-no" class="w-full mt-1 p-2 border border-gray-300 rounded-lg bg-gray-50/50 premium-input dark:bg-gray-800/50 dark:border-gray-700" placeholder="016696" />
+                       </div>
+                    </div>
+                    <div class="mt-4 flex gap-3">
+                       <button id="save-pdf-heading-btn" class="px-5 py-2 rounded-lg font-semibold text-sm shadow-sm transition-all bg-blue-600 text-white hover:bg-blue-700">Save PDF Heading</button>
+                       <button id="reset-pdf-heading-btn" class="ios-secondary-btn px-4 py-2 rounded-lg text-sm font-semibold dark:text-gray-100">Reset Default</button>
+                       <p id="pdf-heading-save-status" class="text-sm text-green-600 dark:text-green-400 flex items-center"></p>
+                    </div>
+                </div>
                 <!-- Data Management Card -->
                 <div class="widget-card">
                     <h3 class="section-heading">Backup & Restore</h3>
@@ -3602,6 +3624,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     const LAST_ACTIVE_UID_KEY = 'lastActiveUid';
     const LAST_USER_PROFILE_KEY = 'lastUserProfile';
     const CURRENT_VIEW_MONTH_KEY = 'currentViewMonth';
+    const PDF_HEADING_TITLE_KEY = 'pdfHeadingTitle';
+    const PDF_HEADING_NAME_KEY = 'pdfHeadingName';
+    const PDF_HEADING_SERVICE_KEY = 'pdfHeadingServiceNo';
     let syncInProgress = false;
     let syncBannerTimer = null;
 
@@ -3664,6 +3689,22 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (textEl && active) textEl.textContent = message;
         loadingSpinner.style.display = 'none';
         loadingSpinner.style.opacity = '0';
+    };
+
+    const getPdfHeadingConfig = (opts = {}) => {
+        const storedTitle = (localStorage.getItem(PDF_HEADING_TITLE_KEY) || '').trim();
+        const storedName = (localStorage.getItem(PDF_HEADING_NAME_KEY) || '').trim();
+        const storedService = (localStorage.getItem(PDF_HEADING_SERVICE_KEY) || '').trim();
+        const fallbackName = opts.displayName || user?.displayName || 'T.Jeyaraman';
+        const title = (opts.title || storedTitle || 'Work Data Sheet').trim();
+        const name = (opts.name || opts.displayName || storedName || fallbackName).trim();
+        const serviceNo = (opts.serviceNo || storedService || '016696').trim();
+        return {
+            title,
+            name,
+            serviceNo,
+            subtitle: `Name: ${name} | Service No: ${serviceNo}`
+        };
     };
 
     const updateDesktopFloatingAnchors = () => {
@@ -6649,6 +6690,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const buildMonthPdfWrapper = (year, month, options = {}) => {
         const wrapper = document.createElement('div');
+        const headingConfig = getPdfHeadingConfig({
+            title: options.title,
+            name: options.name,
+            displayName: options.displayName,
+            serviceNo: options.serviceNo
+        });
         wrapper.id = 'direct-export-content';
         wrapper.style.position = 'fixed';
         wrapper.style.left = '-9999px';
@@ -6709,8 +6756,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         wrapper.innerHTML = `
             <div style="text-align:center;font-size:12px;line-height:1.1;margin-bottom:0.5cm;">
-                <h2 style="font-size:18px;font-weight:700;margin:0 0 6px;">Work Data Sheet</h2>
-                <p style="font-size:14px;font-weight:600;margin:0 0 4px;">Name: ${options.displayName || user?.displayName || 'T.Jeyaraman'} | Service No: ${options.serviceNo || '016696'}</p>
+                <h2 style="font-size:18px;font-weight:700;margin:0 0 6px;">${headingConfig.title}</h2>
+                <p style="font-size:14px;font-weight:600;margin:0 0 4px;">${headingConfig.subtitle}</p>
                 <h3 style="font-size:14px;font-weight:600;margin:0;">${months[month]} ${year}</h3>
             </div>
             <table style="width:100%;table-layout:fixed;border-collapse:collapse;border:1px solid #9ca3af;font-size:11px;color:#1f2937;">
@@ -6791,6 +6838,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     const showExportPreview = (year, month) => {
+        const headingConfig = getPdfHeadingConfig();
         const daysInMonth = getDaysInMonth(year, month);
 
         const tableRows = Array.from({ length: daysInMonth }, (_, i) => {
@@ -6834,8 +6882,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                     </div>
                     <div id="export-content" class="p-2 bg-white text-black" style="font-size: 12px; line-height: 1.25;">
                         <div class="text-center" style="font-size: 12px; line-height: 1.1; margin-bottom: 0.5cm;">
-                            <h2 class="text-lg font-bold">Work Data Sheet</h2>
-                            <p class="text-sm font-semibold">Name: ${user.displayName || 'T.Jeyaraman'} | Service No: 016696</p>
+                            <h2 class="text-lg font-bold">${headingConfig.title}</h2>
+                            <p class="text-sm font-semibold">${headingConfig.subtitle}</p>
                             <h3 class="text-sm font-semibold">${months[month]} ${year}</h3>
                         </div>
                         <div class="overflow-x-auto">
@@ -7415,6 +7463,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('settings-work-hours').value = (userSettings.normalWorkMinutes || 540) / 60;
         document.getElementById('theme-toggle-ios').checked = document.documentElement.classList.contains('dark');
         document.getElementById('settings-accent-color').value = localStorage.getItem('accentColor') || '#007aff';
+        const pdfHeading = getPdfHeadingConfig();
+        document.getElementById('settings-pdf-title').value = pdfHeading.title;
+        document.getElementById('settings-pdf-name').value = pdfHeading.name;
+        document.getElementById('settings-pdf-service-no').value = pdfHeading.serviceNo;
         document.getElementById('notify-reminder-toggle').checked = localStorage.getItem('notifyReminderEnabled') !== 'false';
         document.getElementById('notify-backup-toggle').checked = localStorage.getItem('notifyBackupEnabled') !== 'false';
         document.getElementById('reduce-motion-toggle').checked = localStorage.getItem('reduceMotion') === 'true';
@@ -7432,6 +7484,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('theme-toggle-ios').onchange = (e) => applyTheme(e.target.checked ? 'dark' : 'light');
         document.getElementById('settings-accent-color').onchange = (e) => applyAccentColor(e.target.value);
         document.getElementById('settings-accent-reset').onclick = () => applyAccentColor('#007aff');
+        document.getElementById('save-pdf-heading-btn').onclick = handleSavePdfHeading;
+        document.getElementById('reset-pdf-heading-btn').onclick = resetPdfHeadingDefaults;
         document.getElementById('notify-reminder-toggle').onchange = (e) => {
             localStorage.setItem('notifyReminderEnabled', String(e.target.checked));
             refreshReminderBell();
@@ -7506,6 +7560,43 @@ document.addEventListener('DOMContentLoaded', async () => {
             console.error('Preferences update error:', error);
         }
         setTimeout(() => statusEl.textContent = '', 3000);
+    };
+
+    const handleSavePdfHeading = () => {
+        const titleInput = document.getElementById('settings-pdf-title');
+        const nameInput = document.getElementById('settings-pdf-name');
+        const serviceInput = document.getElementById('settings-pdf-service-no');
+        const statusEl = document.getElementById('pdf-heading-save-status');
+        const title = (titleInput?.value || '').trim() || 'Work Data Sheet';
+        const name = (nameInput?.value || '').trim() || (user?.displayName || 'T.Jeyaraman');
+        const serviceNo = (serviceInput?.value || '').trim() || '016696';
+
+        localStorage.setItem(PDF_HEADING_TITLE_KEY, title);
+        localStorage.setItem(PDF_HEADING_NAME_KEY, name);
+        localStorage.setItem(PDF_HEADING_SERVICE_KEY, serviceNo);
+
+        if (titleInput) titleInput.value = title;
+        if (nameInput) nameInput.value = name;
+        if (serviceInput) serviceInput.value = serviceNo;
+        if (statusEl) {
+            statusEl.textContent = 'Saved';
+            setTimeout(() => { statusEl.textContent = ''; }, 2200);
+        }
+        showToast('PDF heading saved.', 'success');
+    };
+
+    const resetPdfHeadingDefaults = () => {
+        localStorage.removeItem(PDF_HEADING_TITLE_KEY);
+        localStorage.removeItem(PDF_HEADING_NAME_KEY);
+        localStorage.removeItem(PDF_HEADING_SERVICE_KEY);
+        const defaults = getPdfHeadingConfig();
+        const titleInput = document.getElementById('settings-pdf-title');
+        const nameInput = document.getElementById('settings-pdf-name');
+        const serviceInput = document.getElementById('settings-pdf-service-no');
+        if (titleInput) titleInput.value = defaults.title;
+        if (nameInput) nameInput.value = defaults.name;
+        if (serviceInput) serviceInput.value = defaults.serviceNo;
+        showToast('PDF heading reset to default.', 'info');
     };
 
     const handleForceSync = async () => {
