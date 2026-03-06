@@ -3337,6 +3337,7 @@ const OFFLINE_CACHE_KEYS = {
     REMINDERS: 'reminders',
     SETTINGS: 'userSettings',
     LAST_UID: 'lastActiveUid',
+    LAST_PROFILE: 'lastUserProfile',
     VIEW_MONTH: 'currentViewMonth',
     SYNC_QUEUE: 'offlineSyncQueueV1'
 };
@@ -3550,6 +3551,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const offlineSyncBanner = document.getElementById('offline-sync-banner');
     const SYNC_QUEUE_KEY = 'offlineSyncQueueV1';
     const LAST_ACTIVE_UID_KEY = 'lastActiveUid';
+    const LAST_USER_PROFILE_KEY = 'lastUserProfile';
     const CURRENT_VIEW_MONTH_KEY = 'currentViewMonth';
     let syncInProgress = false;
     let syncBannerTimer = null;
@@ -3583,19 +3585,36 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     };
 
+    const persistLastUserProfile = (profileLike) => {
+        if (!profileLike) return;
+        const payload = {
+            uid: profileLike.uid || localStorage.getItem(LAST_ACTIVE_UID_KEY) || '',
+            displayName: profileLike.displayName || profileLike.name || 'User',
+            email: profileLike.email || '',
+            photoURL: profileLike.photoURL || ''
+        };
+        const serialized = JSON.stringify(payload);
+        localStorage.setItem(LAST_USER_PROFILE_KEY, serialized);
+        mirrorLocalStorageKeyToIndexedDb(OFFLINE_CACHE_KEYS.LAST_PROFILE, serialized);
+    };
+
+    const getStoredLastUserProfile = () => {
+        const parsed = safeJsonParse(localStorage.getItem(LAST_USER_PROFILE_KEY), null);
+        if (!parsed || typeof parsed !== 'object') return null;
+        return {
+            uid: parsed.uid || '',
+            displayName: parsed.displayName || parsed.name || 'User',
+            email: parsed.email || '',
+            photoURL: parsed.photoURL || ''
+        };
+    };
+
     const setAuthLoading = (active, message = 'Signing you in...') => {
         if (!loadingSpinner) return;
         const textEl = document.getElementById('loading-status-text');
-        if (active) {
-            if (textEl) textEl.textContent = message;
-            loadingSpinner.style.display = 'flex';
-            loadingSpinner.style.opacity = '1';
-        } else {
-            loadingSpinner.style.opacity = '0';
-            setTimeout(() => {
-                if (loadingSpinner.style.opacity === '0') loadingSpinner.style.display = 'none';
-            }, 140);
-        }
+        if (textEl && active) textEl.textContent = message;
+        loadingSpinner.style.display = 'none';
+        loadingSpinner.style.opacity = '0';
     };
 
     const updateDesktopFloatingAnchors = () => {
@@ -4993,6 +5012,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!firebaseUser) return;
         user = firebaseUser;
         localStorage.setItem(LAST_ACTIVE_UID_KEY, firebaseUser.uid);
+        persistLastUserProfile(firebaseUser);
         signinPage.style.display = 'none';
         signupPage.style.display = 'none';
         appWrapper.style.display = 'block';
@@ -7398,6 +7418,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 await user.updateProfile({ displayName: newName });
             }
             user.displayName = newName;
+            persistLastUserProfile(user);
 
             showToast(navigator.onLine ? 'Profile Saved!' : 'Saved offline. Will sync when online.', 'success');
             renderMainNav(user); // Update header
@@ -7897,8 +7918,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     const initializeAppForUser = () => {
         renderAll();
         scrollToToday();
-        loadingSpinner.style.opacity = '0';
-        setTimeout(() => { loadingSpinner.style.display = 'none'; }, 300);
+        if (loadingSpinner) {
+            loadingSpinner.style.display = 'none';
+            loadingSpinner.style.opacity = '0';
+        }
         appContainer.classList.add('fade-in');
         appContainer.style.opacity = '1';
     };
@@ -8024,9 +8047,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         reminders = localCache.reminders || [];
         userSettings = localCache.userSettings || { baseAnnualLeave: 35, normalWorkMinutes: 540 };
 
-        const fallbackProfile = {
-            displayName: 'Offline Mode',
-            email: 'local@device',
+        const storedProfile = getStoredLastUserProfile();
+        const fallbackProfile = storedProfile || {
+            uid: fallbackUid || '',
+            displayName: 'User',
+            email: '',
             photoURL: ''
         };
         renderMainNav(fallbackProfile);
@@ -8158,6 +8183,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const enterAuthenticatedState = async (firebaseUser) => {
         user = firebaseUser;
         localStorage.setItem(LAST_ACTIVE_UID_KEY, firebaseUser.uid);
+        persistLastUserProfile(firebaseUser);
         signinPage.style.display = 'none';
         signupPage.style.display = 'none';
         appWrapper.style.display = 'block';
