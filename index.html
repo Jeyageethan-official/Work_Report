@@ -16,32 +16,16 @@
     <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cg stroke='%233b82f6' stroke-width='8' stroke-linecap='round' stroke-linejoin='round' fill='none'%3E%3Cpath d='M25,15 h50 a5,5 0 0 1 5,5 v60 a5,5 0 0 1 -5,5 h-50 a5,5 0 0 1 -5,-5 v-60 a5,5 0 0 1 5,-5 z'/%3E%3Cpath d='M35 35 H 75'/%3E%3Cpath d='M35 50 H 75'/%3E%3Cpath d='M35 65 H 60'/%3E%3C/g%3E%3C/svg%3E">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        (function forceFreshLoadForEachOpen() {
+        (function keepOfflineStartupStable() {
             try {
-                const url = new URL(window.location.href);
-                if (!url.searchParams.has('_cb')) {
-                    url.searchParams.set('_cb', Date.now().toString());
-                    window.location.replace(url.toString());
-                    return;
-                }
                 const cleanUrl = new URL(window.location.href);
                 if (cleanUrl.searchParams.has('_cb')) {
                     cleanUrl.searchParams.delete('_cb');
                     window.history.replaceState({}, '', cleanUrl.toString());
                 }
                 window.addEventListener('pageshow', (evt) => {
-                    if (evt.persisted) window.location.reload();
+                    if (evt.persisted && navigator.onLine) window.location.reload();
                 });
-                if ('serviceWorker' in navigator) {
-                    navigator.serviceWorker.getRegistrations()
-                        .then(registrations => registrations.forEach(reg => reg.unregister()))
-                        .catch(() => {});
-                }
-                if ('caches' in window) {
-                    caches.keys()
-                        .then(keys => Promise.all(keys.map(k => caches.delete(k))))
-                        .catch(() => {});
-                }
             } catch (_) {}
         })();
     </script>
