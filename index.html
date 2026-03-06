@@ -853,12 +853,15 @@
             scroll-behavior: smooth;
             background: #f5f5f7;
             overscroll-behavior-y: none;
+            min-height: 100%;
+            height: 100%;
         }
         body {
             font-family: "SF Pro Display", "SF Pro Text", Inter, Roboto, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
             background: #ffffff;
             color: #111827;
             min-height: 100vh;
+            min-height: -webkit-fill-available;
             overscroll-behavior-y: none;
         }
         html.dark {
@@ -881,6 +884,7 @@
         }
         #app-wrapper {
             min-height: 100vh;
+            min-height: -webkit-fill-available;
             padding-left: var(--safe-left);
             padding-right: var(--safe-right);
             padding-bottom: var(--safe-bottom);
@@ -1002,7 +1006,7 @@
         }
         html.dark #main-nav::before { content: none; }
         #main-nav.nav-scrolled {
-            background: rgba(255, 255, 255, 0.72);
+            background: rgba(255, 255, 255, 0.95);
             border-color: rgba(148, 163, 184, 0.2);
             backdrop-filter: blur(22px) saturate(1.08);
             -webkit-backdrop-filter: blur(22px) saturate(1.08);
@@ -1010,7 +1014,7 @@
         }
         #main-nav.nav-scrolled::before { content: none; }
         html.dark #main-nav.nav-scrolled {
-            background: rgba(15, 23, 42, 0.72);
+            background: rgba(11, 18, 32, 0.96);
             border-color: rgba(100, 116, 139, 0.28);
             box-shadow: 0 12px 28px rgba(0, 0, 0, 0.32);
         }
@@ -2196,7 +2200,7 @@
         }
         html.dark #mobile-bottom-nav::after { content: none; }
         #mobile-bottom-nav.nav-scrolled {
-            background: rgba(255, 255, 255, 0.72);
+            background: rgba(255, 255, 255, 0.95);
             border-color: rgba(148, 163, 184, 0.2);
             backdrop-filter: blur(22px) saturate(1.08);
             -webkit-backdrop-filter: blur(22px) saturate(1.08);
@@ -2238,16 +2242,16 @@
         }
         #safe-top-overlay.is-scrolled,
         #safe-bottom-overlay.is-scrolled {
-            background: rgba(255, 255, 255, 0.72);
+            background: rgba(255, 255, 255, 0.96);
             backdrop-filter: blur(22px) saturate(1.08);
             -webkit-backdrop-filter: blur(22px) saturate(1.08);
         }
         html.dark #safe-top-overlay.is-scrolled,
         html.dark #safe-bottom-overlay.is-scrolled {
-            background: rgba(15, 23, 42, 0.72);
+            background: rgba(11, 18, 32, 0.96);
         }
         html.dark #mobile-bottom-nav.nav-scrolled {
-            background: rgba(15, 23, 42, 0.72);
+            background: rgba(11, 18, 32, 0.96);
             border-color: rgba(100, 116, 139, 0.28);
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
         }
@@ -6736,6 +6740,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const formattedDate = row.date || '-';
             const weekendClass = isWeekendFromDdMmYyyy(formattedDate) ? 'color:#ef4444;font-weight:700;' : '';
             const leaveYes = String(row.leaveStatus || '').toLowerCase() === 'yes';
+            const reasonText = row.leaveReason || '-';
             return `
                 <tr>
                     <td style="border:1px solid #9ca3af;padding:8px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;${weekendClass}">${formattedDate}</td>
@@ -6749,7 +6754,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     <td style="border:1px solid #9ca3af;padding:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${row.km || '-'}</td>
                     <td style="border:1px solid #9ca3af;padding:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${row.specialDays || '-'}</td>
                     <td style="border:1px solid #9ca3af;padding:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;${leaveYes ? 'color:#1E90FF;font-weight:700;' : ''}">${row.leaveStatus || 'No'}</td>
-                    <td style="border:1px solid #9ca3af;padding:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${row.leaveReason || '-'}</td>
+                    <td style="border:1px solid #9ca3af;padding:6px 5px;white-space:normal;word-break:break-word;line-height:1.12;font-size:10px;max-height:2.25em;overflow:hidden;">${reasonText}</td>
                 </tr>
             `;
         }).join('');
@@ -6866,7 +6871,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     <td class="px-1.5 py-2 whitespace-nowrap" style="border:1px solid #9ca3af;">${dayData.km || '-'}</td>
                     <td class="px-1.5 py-2 whitespace-nowrap" style="border:1px solid #9ca3af;">${dayData.specialDays || '-'}</td>
                     <td class="px-1.5 py-2 whitespace-nowrap" style="border:1px solid #9ca3af;">${leaveStatusHTML}</td>
-                    <td class="px-1.5 py-2 whitespace-nowrap" style="border:1px solid #9ca3af;">${dayData.leaveReason || '-'}</td>
+                    <td class="px-1.5 py-1" style="border:1px solid #9ca3af;white-space:normal;word-break:break-word;line-height:1.12;font-size:10px;max-height:2.25em;overflow:hidden;">${dayData.leaveReason || '-'}</td>
                 </tr>`;
         }).join('');
 
