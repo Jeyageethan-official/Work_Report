@@ -3476,6 +3476,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const offlineSyncBanner = document.getElementById('offline-sync-banner');
     const SYNC_QUEUE_KEY = 'offlineSyncQueueV1';
     const LAST_ACTIVE_UID_KEY = 'lastActiveUid';
+    const CURRENT_VIEW_MONTH_KEY = 'currentViewMonth';
     let syncInProgress = false;
     let syncBannerTimer = null;
 
@@ -3495,6 +3496,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const updateHeaderMonthLabel = () => {
         if (!headerMonthLabel) return;
         headerMonthLabel.textContent = `${months[currentDate.getMonth()].slice(0, 3)} ${currentDate.getFullYear()}`;
+        localStorage.setItem(CURRENT_VIEW_MONTH_KEY, `${currentDate.getFullYear()}-${currentDate.getMonth()}`);
     };
 
     const setGoogleAuthButtonsDisabled = (disabled) => {
@@ -3628,8 +3630,7 @@ document.addEventListener('DOMContentLoaded', () => {
         offlineSyncBanner.style.display = 'none';
         offlineSyncBanner.textContent = '';
         if (!mode || !text) return;
-        const compactText = mode === 'offline' ? 'Offline mode' : 'Online mode';
-        offlineSyncBanner.textContent = compactText;
+        offlineSyncBanner.textContent = text;
         offlineSyncBanner.classList.add(mode);
         offlineSyncBanner.style.display = 'inline-flex';
     };
@@ -3787,6 +3788,14 @@ document.addEventListener('DOMContentLoaded', () => {
         headerExportBtn?.addEventListener('click', () => showPage('download-page'));
         updateHeaderMonthLabel();
 
+    };
+
+    const restoreLastViewedMonth = () => {
+        const raw = localStorage.getItem(CURRENT_VIEW_MONTH_KEY);
+        if (!raw) return;
+        const [y, m] = String(raw).split('-').map(Number);
+        if (!Number.isFinite(y) || !Number.isFinite(m) || m < 0 || m > 11) return;
+        currentDate = new Date(y, m, 1);
     };
 
 
@@ -7818,6 +7827,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // SCRIPT EXECUTION & EVENT BINDING
     // -----------------------------------------------------------------------------
     initializeAppNavigation();
+    restoreLastViewedMonth();
+    updateHeaderMonthLabel();
 
     const handleNetworkState = () => {
         if (navigator.onLine) {
@@ -7917,6 +7928,37 @@ document.addEventListener('DOMContentLoaded', () => {
         addSignupEventListeners();
         setGoogleAuthButtonsDisabled(false);
         setAuthLoading(false);
+    };
+
+    const enterOfflineLocalState = () => {
+        const fallbackUid = localStorage.getItem(LAST_ACTIVE_UID_KEY) || null;
+        const localCache = loadLocalDataForUser(fallbackUid);
+        const hasLocalData =
+            Object.keys(localCache.workData || {}).length > 0 ||
+            (Array.isArray(localCache.reminders) && localCache.reminders.length > 0) ||
+            Object.keys(localCache.userSettings || {}).length > 0;
+        if (!hasLocalData) return false;
+
+        user = null;
+        workData = localCache.workData || {};
+        reminders = localCache.reminders || [];
+        userSettings = localCache.userSettings || { baseAnnualLeave: 35, normalWorkMinutes: 540 };
+
+        const fallbackProfile = {
+            displayName: 'Offline Mode',
+            email: 'local@device',
+            photoURL: ''
+        };
+        renderMainNav(fallbackProfile);
+        signinPage.style.display = 'none';
+        signupPage.style.display = 'none';
+        appWrapper.style.display = 'block';
+        showPage('report-page');
+        initializeAppForUser();
+        setSyncBanner('offline', 'Offline Mode – Data will sync when connection is available');
+        setGoogleAuthButtonsDisabled(false);
+        setAuthLoading(false);
+        return true;
     };
 
     const upsertFirestoreUserProfile = async (firebaseUser) => {
@@ -8123,6 +8165,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         localStorage.removeItem(GOOGLE_AUTH_FLAG);
         localStorage.removeItem(GOOGLE_AUTH_TS);
+        if (!navigator.onLine && enterOfflineLocalState()) {
+            return;
+        }
         renderSignedOutAuthState();
     });
 });
