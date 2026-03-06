@@ -216,6 +216,79 @@
         html.dark .loader-text {
              color: #d1d5db; /* gray-300 */
         }
+        #boot-splash {
+            position: fixed;
+            inset: 0;
+            z-index: 120;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
+            transition: opacity 0.28s ease, visibility 0.28s ease;
+        }
+        html.dark #boot-splash {
+            background: linear-gradient(180deg, #0b1220 0%, #0f172a 100%);
+        }
+        #boot-splash.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+        .boot-splash-shell {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.8rem;
+            text-align: center;
+            padding: 1rem 1.25rem;
+        }
+        .boot-logo-wrap {
+            position: relative;
+            width: 92px;
+            height: 92px;
+            display: grid;
+            place-items: center;
+            border-radius: 22px;
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(148, 163, 184, 0.25);
+            box-shadow: 0 14px 30px rgba(15, 23, 42, 0.14);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+        html.dark .boot-logo-wrap {
+            background: rgba(15, 23, 42, 0.65);
+            border-color: rgba(96, 165, 250, 0.25);
+            box-shadow: 0 14px 30px rgba(2, 6, 23, 0.52);
+        }
+        .boot-logo-wrap::after {
+            content: "";
+            position: absolute;
+            inset: -8px;
+            border-radius: 28px;
+            border: 2px solid rgba(59, 130, 246, 0.22);
+            animation: bootPulse 1.3s ease-in-out infinite;
+        }
+        @keyframes bootPulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.05); opacity: 0.9; }
+        }
+        .boot-title {
+            font-size: 1.05rem;
+            font-weight: 750;
+            color: #0f172a;
+            letter-spacing: 0.01em;
+        }
+        html.dark .boot-title {
+            color: #f8fafc;
+        }
+        .boot-status {
+            font-size: 0.82rem;
+            color: #64748b;
+            min-height: 1.1rem;
+        }
+        html.dark .boot-status {
+            color: #94a3b8;
+        }
 
         .break-words {
             word-break: break-word;
@@ -2882,6 +2955,24 @@
         </div>
     </div>
 
+    <div id="boot-splash" aria-live="polite" aria-label="App starting">
+        <div class="boot-splash-shell">
+            <div class="boot-logo-wrap">
+                <svg class="animated-logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <g class="logo-stroke-color" stroke="var(--slt-blue)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none">
+                        <path class="draw-stroke doc-outline" d="M25,15 h50 a5,5 0 0 1 5,5 v60 a5,5 0 0 1 -5,5 h-50 a5,5 0 0 1 -5,-5 v-60 a5,5 0 0 1 5,-5 z" />
+                        <path class="draw-stroke text-line1" d="M35 35 H 75" />
+                        <path class="draw-stroke text-line2" d="M35 48 H 75" />
+                        <path class="draw-stroke text-line3" d="M35 61 H 60" />
+                        <path class="draw-stroke checkmark" d="M40 75 L50 82 L70 65" />
+                    </g>
+                </svg>
+            </div>
+            <div class="boot-title">Work Report</div>
+            <div id="boot-splash-status" class="boot-status">Starting...</div>
+        </div>
+    </div>
+
     <!-- Main Application Wrapper -->
         <div id="app-wrapper" style="display: none;">
         <div class="app-shell">
@@ -3612,6 +3703,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     const modalRoot = document.getElementById('modal-root');
     const sidebarRoot = document.getElementById('sidebar-root');
     const loadingSpinner = document.getElementById('loading-spinner');
+    const bootSplash = document.getElementById('boot-splash');
+    const bootSplashStatus = document.getElementById('boot-splash-status');
+    const bootSplashStartAt = Date.now();
     const appContainer = document.getElementById('app-container');
     const scrollUpButton = document.getElementById('scrollUpButton');
     const scrollDownButton = document.getElementById('scrollDownButton');
@@ -3671,6 +3765,23 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     };
 
+    let bootSplashHidden = false;
+    const setBootSplashStatus = (message = 'Starting...') => {
+        if (!bootSplashStatus) return;
+        bootSplashStatus.textContent = message;
+    };
+    const hideBootSplash = (delayMs = 0) => {
+        if (!bootSplash || bootSplashHidden) return;
+        bootSplashHidden = true;
+        const elapsed = Date.now() - bootSplashStartAt;
+        const minVisibleMs = 650;
+        const waitMs = Math.max(delayMs, minVisibleMs - elapsed, 0);
+        window.setTimeout(() => {
+            bootSplash.classList.add('hidden');
+            window.setTimeout(() => bootSplash.remove(), 340);
+        }, waitMs);
+    };
+
     const persistLastUserProfile = (profileLike) => {
         if (!profileLike) return;
         const payload = {
@@ -3699,6 +3810,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!loadingSpinner) return;
         const textEl = document.getElementById('loading-status-text');
         if (textEl && active) textEl.textContent = message;
+        if (active) setBootSplashStatus(message);
         loadingSpinner.style.display = 'none';
         loadingSpinner.style.opacity = '0';
     };
@@ -7948,6 +8060,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         } finally {
             loadingSpinner.style.opacity = '0';
             loadingSpinner.style.display = 'none';
+            hideBootSplash();
         }
     };
 
@@ -8184,6 +8297,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         addSignupEventListeners();
         setGoogleAuthButtonsDisabled(false);
         setAuthLoading(false);
+        hideBootSplash();
     };
 
     const enterOfflineLocalState = () => {
@@ -8216,6 +8330,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         setSyncBanner('offline', 'Offline Mode – Data will sync when connection is available');
         setGoogleAuthButtonsDisabled(false);
         setAuthLoading(false);
+        hideBootSplash();
         return true;
     };
 
@@ -8347,6 +8462,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         renderMainNav(firebaseUser);
         showPage('report-page');
         initializeAppForUser();
+        hideBootSplash();
         await upsertFirestoreUserProfile(firebaseUser);
         await startSignedInDataSync(firebaseUser);
     };
