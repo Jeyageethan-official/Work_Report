@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1, user-scalable=no" />
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
@@ -79,6 +79,7 @@
             font-family: 'Inter', sans-serif;
             transition: background 0.3s ease;
             overflow-x: hidden;
+            touch-action: manipulation;
         }
         /* Smoother theme transitions */
         body, .bg-white, .bg-gray-50, .dark .dark\:bg-gray-900, .dark .dark\:bg-gray-950, .premium-input, .premium-select {
@@ -2576,6 +2577,8 @@
                 padding-right: calc(0.8rem + var(--safe-right));
                 min-height: 56px;
                 top: var(--safe-top);
+                background: rgba(255, 255, 255, 0.98);
+                box-shadow: none;
             }
             #app-wrapper {
                 padding-top: 0 !important;
@@ -2584,6 +2587,7 @@
                 display: block !important;
                 height: var(--safe-top);
                 background: rgba(255, 255, 255, 0.98);
+                border-bottom: 0;
             }
             #safe-bottom-overlay {
                 display: block;
@@ -2593,6 +2597,10 @@
             }
             html.dark #safe-top-overlay {
                 background: rgba(17, 24, 39, 0.98);
+            }
+            html.dark #main-nav {
+                background: rgba(17, 24, 39, 0.98);
+                border-bottom-color: rgba(100, 116, 139, 0.35);
             }
             #safe-top-overlay,
             #safe-bottom-overlay {
