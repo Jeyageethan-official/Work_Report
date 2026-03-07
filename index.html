@@ -4210,7 +4210,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const GOOGLE_AUTH_TS = 'wr_google_redirect_started_at';
     const GOOGLE_AUTH_MAX_WAIT_MS = 25000;
     const HOSTED_WEB_APP_URL = 'https://work-report-fe3da.web.app/';
-    const FIREBASE_PROJECT_ID = 'work-report-fe3da';
     const getAppBaseUrl = () => `${window.location.origin}${window.location.pathname}`;
     const updateHeaderMonthLabel = () => {
         if (!headerMonthLabel) return;
@@ -6001,39 +6000,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         const userCredential = await auth.createUserWithEmailAndPassword(email, password);
         if (fullName) await userCredential.user.updateProfile({ displayName: fullName });
         await createUserProfileOnSignup(userCredential.user, fullName);
-        try {
-            await sendCustomAuthEmail({
-                type: 'verifyEmail',
-                email: userCredential.user.email || email,
-                displayName: fullName || userCredential.user.displayName || ''
-            });
-        } catch (verifyErr) {
-            console.warn('Custom verification email failed, fallback to Firebase template:', verifyErr);
-            await userCredential.user.sendEmailVerification(getActionCodeSettings());
-        }
+        await userCredential.user.sendEmailVerification(getActionCodeSettings());
         await auth.signOut();
     };
 
     const performPasswordReset = async (email) => {
-        try {
-            await sendCustomAuthEmail({ type: 'resetPassword', email });
-        } catch (err) {
-            console.warn('Custom reset email failed, fallback to Firebase template:', err);
-            await auth.sendPasswordResetEmail(email, getActionCodeSettings());
-        }
-    };
-
-    const sendCustomAuthEmail = async ({ type, email, displayName = '' }) => {
-        const endpoint = `https://us-central1-${FIREBASE_PROJECT_ID}.cloudfunctions.net/sendAuthEmail`;
-        const response = await fetch(endpoint, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ type, email, displayName })
-        });
-        const json = await response.json().catch(() => ({}));
-        if (!response.ok || json?.ok !== true) {
-            throw new Error(json?.error || 'custom-auth-email-failed');
-        }
+        await auth.sendPasswordResetEmail(email, getActionCodeSettings());
     };
 
     const openForgotPasswordModal = () => {
@@ -9685,18 +9657,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
             if (isPasswordUserUnverified(currentUser)) {
                 try {
-                    await sendCustomAuthEmail({
-                        type: 'verifyEmail',
-                        email: currentUser.email || '',
-                        displayName: currentUser.displayName || ''
-                    });
+                    await currentUser.sendEmailVerification(getActionCodeSettings());
                 } catch (verifyErr) {
-                    console.warn('Custom verification resend failed, fallback to Firebase template:', verifyErr);
-                    try {
-                        await currentUser.sendEmailVerification(getActionCodeSettings());
-                    } catch (fallbackErr) {
-                        console.warn('Fallback verification send failed:', fallbackErr);
-                    }
+                    console.warn('Email verification resend failed:', verifyErr);
                 }
                 await auth.signOut();
                 localStorage.removeItem(GOOGLE_AUTH_FLAG);
