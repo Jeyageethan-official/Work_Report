@@ -1676,30 +1676,83 @@
             overflow: hidden;
             transition: max-height 0.28s ease;
         }
-        .pdf-columns-editor-head,
-        .pdf-column-editor-row {
-            display: grid;
-            grid-template-columns: 1.35fr 1.35fr 0.8fr 0.7fr 0.8fr;
-            gap: 0.55rem;
-            align-items: end;
+        .pdf-grid-wrap {
+            border: 1px solid rgba(148, 163, 184, 0.35);
+            border-radius: 14px;
+            overflow: hidden;
+            background: rgba(255,255,255,0.6);
         }
-        .pdf-columns-editor-head {
-            font-size: 0.72rem;
+        html.dark .pdf-grid-wrap {
+            background: rgba(15, 23, 42, 0.45);
+            border-color: rgba(71, 85, 105, 0.55);
+        }
+        .pdf-grid-table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+            font-size: 12px;
+        }
+        .pdf-grid-table thead th {
+            background: rgba(226, 232, 240, 0.65);
+            color: #0f172a;
             font-weight: 700;
-            letter-spacing: 0.02em;
-            color: #475569;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.45);
+            border-right: 1px solid rgba(148, 163, 184, 0.35);
+            padding: 0.45rem 0.35rem;
+            text-align: left;
         }
-        html.dark .pdf-columns-editor-head { color: #94a3b8; }
-        @media (max-width: 767px) {
-            .pdf-columns-editor-head { display: none; }
-            .pdf-column-editor-row {
-                grid-template-columns: 1fr 1fr;
-                gap: 0.5rem;
-                align-items: center;
-            }
-            .pdf-column-editor-row .pdf-col-field.wide {
-                grid-column: 1 / -1;
-            }
+        html.dark .pdf-grid-table thead th {
+            background: rgba(30, 41, 59, 0.65);
+            color: #e2e8f0;
+            border-bottom-color: rgba(71, 85, 105, 0.75);
+            border-right-color: rgba(71, 85, 105, 0.6);
+        }
+        .pdf-grid-table tbody td {
+            border-right: 1px solid rgba(148, 163, 184, 0.35);
+            border-bottom: 1px solid rgba(148, 163, 184, 0.28);
+            padding: 0.25rem;
+            vertical-align: middle;
+        }
+        html.dark .pdf-grid-table tbody td {
+            border-right-color: rgba(71, 85, 105, 0.6);
+            border-bottom-color: rgba(71, 85, 105, 0.45);
+        }
+        .pdf-grid-table th:last-child,
+        .pdf-grid-table td:last-child { border-right: none; }
+        .pdf-grid-control {
+            width: 100%;
+            height: 32px;
+            border: 1px solid rgba(148, 163, 184, 0.45);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 0 0.4rem;
+            font-size: 12px;
+            color: #0f172a;
+        }
+        html.dark .pdf-grid-control {
+            background: rgba(30, 41, 59, 0.75);
+            border-color: rgba(71, 85, 105, 0.8);
+            color: #e2e8f0;
+        }
+        .pdf-grid-checkbox {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--ios-primary);
+        }
+        .pdf-grid-remove {
+            width: 100%;
+            height: 32px;
+            border-radius: 8px;
+            border: 1px solid rgba(148, 163, 184, 0.45);
+            background: rgba(248, 250, 252, 0.95);
+            font-size: 12px;
+            font-weight: 700;
+            color: #334155;
+        }
+        html.dark .pdf-grid-remove {
+            background: rgba(15, 23, 42, 0.75);
+            border-color: rgba(71, 85, 105, 0.8);
+            color: #e2e8f0;
         }
         #settings-page .widget-card:not(.is-open) .settings-accordion-toggle {
             margin-bottom: 0;
@@ -3569,16 +3622,27 @@
                             <h4 class="font-semibold text-gray-800 dark:text-gray-100">Columns (Easy Table Editor)</h4>
                             <button id="settings-pdf-add-column-btn" class="ios-secondary-btn px-3 py-1.5 rounded-lg text-xs font-semibold dark:text-gray-100">+ Add Column</button>
                         </div>
-                        <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">Edit directly in this table. Source change pannina header and width auto update aagum.</p>
-                        <div class="rounded-xl border border-slate-200/70 dark:border-slate-700/60 bg-white/50 dark:bg-gray-900/35 p-3">
-                            <div class="pdf-columns-editor-head mb-2 px-1">
-                                <div>Source</div>
-                                <div>Header</div>
-                                <div>Width</div>
-                                <div>Visible</div>
-                                <div>Action</div>
-                            </div>
-                            <div id="settings-pdf-columns-builder" class="space-y-2"></div>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">Spreadsheet style editor: table-laye click panni edit pannalaam.</p>
+                        <div class="pdf-grid-wrap">
+                            <table class="pdf-grid-table">
+                                <colgroup>
+                                    <col style="width:24%">
+                                    <col style="width:31%">
+                                    <col style="width:16%">
+                                    <col style="width:12%">
+                                    <col style="width:17%">
+                                </colgroup>
+                                <thead>
+                                    <tr>
+                                        <th>Source</th>
+                                        <th>Header</th>
+                                        <th>Width</th>
+                                        <th>Show</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="settings-pdf-columns-builder"></tbody>
+                            </table>
                         </div>
                     </div>
                     <div class="mt-4 flex gap-3 flex-wrap">
@@ -8048,30 +8112,25 @@ document.addEventListener('DOMContentLoaded', async () => {
             <option value="${opt.key}" ${opt.key === selected ? 'selected' : ''}>${opt.label}</option>
         `).join('');
         container.innerHTML = settings.columns.map((col, index) => `
-            <div data-col-index="${index}" class="pdf-column-editor-row rounded-lg border border-slate-200/70 dark:border-slate-700/60 p-2 bg-white/40 dark:bg-gray-900/30">
-                <div class="pdf-col-field">
-                    <label class="text-[11px] font-semibold text-slate-600 dark:text-slate-300 md:hidden mb-1 block">Source</label>
-                    <select class="pdf-col-source w-full p-2 border border-gray-300 rounded-lg bg-gray-50/70 premium-select dark:bg-gray-800/50 dark:border-gray-700">
+            <tr data-col-index="${index}">
+                <td>
+                    <select class="pdf-col-source pdf-grid-control">
                         ${optionsMarkup(col.source)}
                     </select>
-                </div>
-                <div class="pdf-col-field">
-                    <label class="text-[11px] font-semibold text-slate-600 dark:text-slate-300 md:hidden mb-1 block">Header</label>
-                    <input type="text" class="pdf-col-label w-full p-2 border border-gray-300 rounded-lg bg-gray-50/70 premium-input dark:bg-gray-800/50 dark:border-gray-700" value="${escapeHtml(col.label).replace(/"/g, '&quot;')}" />
-                </div>
-                <div class="pdf-col-field">
-                    <label class="text-[11px] font-semibold text-slate-600 dark:text-slate-300 md:hidden mb-1 block">Width</label>
-                    <input type="number" min="2" max="35" step="0.5" class="pdf-col-width w-full p-2 border border-gray-300 rounded-lg bg-gray-50/70 premium-input dark:bg-gray-800/50 dark:border-gray-700" value="${col.width}" />
-                </div>
-                <div class="pdf-col-field">
-                    <label class="text-[11px] font-semibold text-slate-600 dark:text-slate-300 md:hidden mb-1 block">Visible</label>
-                    <input type="checkbox" class="pdf-col-visible ios-switch" ${col.visible ? 'checked' : ''} />
-                </div>
-                <div class="pdf-col-field wide">
-                    <label class="text-[11px] font-semibold text-slate-600 dark:text-slate-300 md:hidden mb-1 block">Action</label>
-                    <button class="pdf-col-remove ios-secondary-btn px-3 py-1.5 rounded-lg text-xs font-semibold dark:text-gray-100">Remove</button>
-                </div>
-            </div>
+                </td>
+                <td>
+                    <input type="text" class="pdf-col-label pdf-grid-control" value="${escapeHtml(col.label).replace(/"/g, '&quot;')}" />
+                </td>
+                <td>
+                    <input type="number" min="2" max="35" step="0.5" class="pdf-col-width pdf-grid-control" value="${col.width}" />
+                </td>
+                <td style="text-align:center;">
+                    <input type="checkbox" class="pdf-col-visible pdf-grid-checkbox" ${col.visible ? 'checked' : ''} />
+                </td>
+                <td>
+                    <button class="pdf-col-remove pdf-grid-remove">Remove</button>
+                </td>
+            </tr>
         `).join('');
     };
 
