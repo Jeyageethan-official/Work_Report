@@ -1824,11 +1824,6 @@
             margin-top: 0.45rem;
         }
         html.dark .pdf-resize-note { color: #94a3b8; }
-        .pdf-cell-selected {
-            outline: 2px solid rgba(37, 99, 235, 0.9);
-            outline-offset: -2px;
-            background: rgba(191, 219, 254, 0.35) !important;
-        }
         #settings-page .widget-card:not(.is-open) .settings-accordion-toggle {
             margin-bottom: 0;
         }
@@ -3531,7 +3526,7 @@
                         <button id="settings-nav-account" class="settings-nav-row"><span>Account</span><span>›</span></button>
                         <button id="settings-nav-theme" class="settings-nav-row"><span>Theme</span><span>›</span></button>
                         <button id="settings-nav-work-policy" class="settings-nav-row"><span>Work Policy</span><span>›</span></button>
-                        <button id="settings-nav-pdf" class="settings-nav-row"><span>Table Editor</span><span>›</span></button>
+                        <button id="settings-nav-pdf" class="settings-nav-row"><span>PDF Export Heading</span><span>›</span></button>
                     </div>
                 </div>
 
@@ -3614,9 +3609,7 @@
                 </div>
 
                 <div id="settings-panel-pdf" class="settings-detail-panel" style="display:none;">
-                    <h3 class="section-heading">Table Editor</h3>
-                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-3">Excel style table design + PDF heading customization.</p>
-                    <h4 class="font-semibold text-sm text-gray-700 dark:text-gray-300 mb-2">PDF Heading</h4>
+                    <h3 class="section-heading">PDF Export Heading</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                        <div class="md:col-span-2">
                             <label for="settings-pdf-title" class="font-medium text-sm text-gray-700 dark:text-gray-300">Heading Title</label>
@@ -3644,14 +3637,6 @@
                         <div>
                             <label for="settings-pdf-header-bg" class="font-medium text-sm text-gray-700 dark:text-gray-300">Header Background</label>
                             <input type="color" id="settings-pdf-header-bg" class="w-full mt-1 h-11 p-1 border border-gray-300 rounded-lg bg-gray-50/50 premium-input dark:bg-gray-800/50 dark:border-gray-700" />
-                        </div>
-                        <div>
-                            <label for="settings-pdf-theme-preset" class="font-medium text-sm text-gray-700 dark:text-gray-300">Table Theme Preset</label>
-                            <select id="settings-pdf-theme-preset" class="w-full mt-1 p-2 border border-gray-300 rounded-lg bg-gray-50/50 premium-select dark:bg-gray-800/50 dark:border-gray-700">
-                                <option value="classic">Classic</option>
-                                <option value="blue">Blue Grid</option>
-                                <option value="mono">Mono Clean</option>
-                            </select>
                         </div>
                         <div>
                             <label for="settings-pdf-header-text" class="font-medium text-sm text-gray-700 dark:text-gray-300">Header Text Color</label>
@@ -8177,7 +8162,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             ['settings-nav-account', 'settings-panel-account', 'Account'],
             ['settings-nav-theme', 'settings-panel-theme', 'Theme'],
             ['settings-nav-work-policy', 'settings-panel-work-policy', 'Work Policy'],
-            ['settings-nav-pdf', 'settings-panel-pdf', 'Table Editor'],
+            ['settings-nav-pdf', 'settings-panel-pdf', 'PDF Export Heading'],
             ['settings-nav-backup', 'settings-panel-backup', 'Backup & Restore'],
             ['settings-nav-notifications', 'settings-panel-notifications', 'Notifications'],
             ['settings-nav-experience', 'settings-panel-experience', 'App Experience']
@@ -8227,8 +8212,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         const source = useful.length ? useful : rows;
         return source.slice(0, count);
     };
-    let pdfEditorSampleRows = null;
-    let pdfEditorSelectedCell = null;
 
     const renderPdfResizeEditor = (settings) => {
         const host = document.getElementById('settings-pdf-resize-editor');
@@ -8243,14 +8226,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         const total = visibleCols.reduce((sum, c) => sum + Number(c.width || 0), 0) || 1;
         const colGroup = visibleCols.map(c => `<col style="width:${((c.width / total) * 100).toFixed(4)}%">`).join('');
         const headerCells = visibleCols.map((c, i) => {
-            const safeLabel = escapeHtml((c.label || getFieldMeta(c.source).label).replace(/\n/g, ' '));
+            const safeLabel = formatPdfHeaderLabel(c.label || getFieldMeta(c.source).label, c.source).replace(/<br>/g, ' / ');
             const handle = i < visibleCols.length - 1 ? `<span class="pdf-col-resize-handle" data-visible-index="${i}"></span>` : '';
-            return `<th><span class="pdf-editor-header-label" contenteditable="true" data-col-id="${c.id}">${safeLabel}</span>${handle}</th>`;
+            return `<th>${safeLabel}${handle}</th>`;
         }).join('');
-        if (!Array.isArray(pdfEditorSampleRows) || !pdfEditorSampleRows.length) {
-            pdfEditorSampleRows = getPdfDesignerPreviewRows(5);
-        }
-        const body = (pdfEditorSampleRows || []).map((r, rowIdx) => `<tr>${visibleCols.map(c => `<td class="${pdfEditorSelectedCell === `${rowIdx}-${c.id}` ? 'pdf-cell-selected' : ''}" contenteditable="true" data-row="${rowIdx}" data-col-id="${c.id}">${escapeHtml(r[c.source] ?? '-')}</td>`).join('')}</tr>`).join('');
+        const previewRows = getPdfDesignerPreviewRows(3);
+        const body = previewRows.map(r => `<tr>${visibleCols.map(c => `<td>${escapeHtml(r[c.source] ?? '-')}</td>`).join('')}</tr>`).join('');
         host.innerHTML = `
             <table class="pdf-resize-table">
                 <colgroup>${colGroup}</colgroup>
@@ -8263,36 +8244,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const bindPdfResizeHandles = () => {
         const host = document.getElementById('settings-pdf-resize-editor');
         if (!host) return;
-        host.querySelectorAll('.pdf-editor-header-label').forEach((labelEl) => {
-            labelEl.oninput = () => {
-                const colId = labelEl.dataset.colId;
-                if (!colId) return;
-                const next = collectPdfTableSettingsFromEditor();
-                const target = next.columns.find(c => c.id === colId);
-                if (target) target.label = labelEl.textContent.trim() || getFieldMeta(target.source).label;
-                savePdfTableSettings(next);
-                renderPdfTableSettingsEditor();
-            };
-        });
-        host.querySelectorAll('td[data-row][data-col-id]').forEach((cell) => {
-            cell.onfocus = () => {
-                pdfEditorSelectedCell = `${cell.dataset.row}-${cell.dataset.colId}`;
-                cell.classList.add('pdf-cell-selected');
-            };
-            cell.onblur = () => {
-                const rowIndex = Number(cell.dataset.row);
-                const colId = cell.dataset.colId;
-                const next = collectPdfTableSettingsFromEditor();
-                const col = next.columns.find(c => c.id === colId);
-                if (!Number.isFinite(rowIndex) || !col || !Array.isArray(pdfEditorSampleRows) || !pdfEditorSampleRows[rowIndex]) return;
-                pdfEditorSampleRows[rowIndex][col.source] = (cell.textContent || '').trim() || '-';
-            };
-            cell.onclick = () => {
-                pdfEditorSelectedCell = `${cell.dataset.row}-${cell.dataset.colId}`;
-                host.querySelectorAll('td[data-row][data-col-id]').forEach(td => td.classList.remove('pdf-cell-selected'));
-                cell.classList.add('pdf-cell-selected');
-            };
-        });
         host.querySelectorAll('.pdf-col-resize-handle').forEach((handle) => {
             handle.onpointerdown = (ev) => {
                 ev.preventDefault();
@@ -8479,35 +8430,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             };
             el.onchange = el.oninput;
         });
-        const themePresetEl = document.getElementById('settings-pdf-theme-preset');
-        if (themePresetEl) {
-            themePresetEl.onchange = () => {
-                const preset = themePresetEl.value;
-                const set = (id, value) => {
-                    const el = document.getElementById(id);
-                    if (el) el.value = value;
-                };
-                if (preset === 'blue') {
-                    set('settings-pdf-header-bg', '#dbeafe');
-                    set('settings-pdf-header-text', '#1e3a8a');
-                    set('settings-pdf-text-color', '#0f172a');
-                    set('settings-pdf-border-color', '#93c5fd');
-                } else if (preset === 'mono') {
-                    set('settings-pdf-header-bg', '#f3f4f6');
-                    set('settings-pdf-header-text', '#111827');
-                    set('settings-pdf-text-color', '#111827');
-                    set('settings-pdf-border-color', '#9ca3af');
-                } else {
-                    set('settings-pdf-header-bg', '#f3f4f6');
-                    set('settings-pdf-header-text', '#1f2937');
-                    set('settings-pdf-text-color', '#1f2937');
-                    set('settings-pdf-border-color', '#9ca3af');
-                }
-                const live = collectPdfTableSettingsFromEditor();
-                renderPdfResizeEditor(live);
-                bindPdfResizeHandles();
-            };
-        }
         const columnsBuilder = document.getElementById('settings-pdf-columns-builder');
         if (columnsBuilder && columnsBuilder.dataset.bound !== '1') {
             columnsBuilder.addEventListener('click', (e) => {
