@@ -1754,6 +1754,76 @@
             border-color: rgba(71, 85, 105, 0.8);
             color: #e2e8f0;
         }
+        .pdf-resize-wrap {
+            margin-top: 0.9rem;
+            border: 1px solid rgba(148, 163, 184, 0.35);
+            border-radius: 14px;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.66);
+        }
+        html.dark .pdf-resize-wrap {
+            border-color: rgba(71, 85, 105, 0.6);
+            background: rgba(15, 23, 42, 0.5);
+        }
+        .pdf-resize-table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+            font-size: 11px;
+        }
+        .pdf-resize-table th,
+        .pdf-resize-table td {
+            border-right: 1px solid rgba(148, 163, 184, 0.35);
+            border-bottom: 1px solid rgba(148, 163, 184, 0.28);
+            padding: 0.4rem 0.35rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            position: relative;
+        }
+        .pdf-resize-table th:last-child,
+        .pdf-resize-table td:last-child { border-right: none; }
+        .pdf-resize-table thead th {
+            background: rgba(226, 232, 240, 0.7);
+            font-weight: 700;
+            color: #0f172a;
+        }
+        html.dark .pdf-resize-table thead th {
+            background: rgba(30, 41, 59, 0.75);
+            color: #e2e8f0;
+            border-right-color: rgba(71, 85, 105, 0.65);
+            border-bottom-color: rgba(71, 85, 105, 0.6);
+        }
+        html.dark .pdf-resize-table td {
+            border-right-color: rgba(71, 85, 105, 0.55);
+            border-bottom-color: rgba(71, 85, 105, 0.45);
+        }
+        .pdf-col-resize-handle {
+            position: absolute;
+            top: 0;
+            right: -6px;
+            width: 12px;
+            height: 100%;
+            cursor: col-resize;
+            touch-action: none;
+            z-index: 4;
+        }
+        .pdf-col-resize-handle::after {
+            content: "";
+            position: absolute;
+            right: 5px;
+            top: 20%;
+            bottom: 20%;
+            width: 2px;
+            border-radius: 999px;
+            background: rgba(59, 130, 246, 0.75);
+        }
+        .pdf-resize-note {
+            font-size: 11px;
+            color: #64748b;
+            margin-top: 0.45rem;
+        }
+        html.dark .pdf-resize-note { color: #94a3b8; }
         #settings-page .widget-card:not(.is-open) .settings-accordion-toggle {
             margin-bottom: 0;
         }
@@ -3644,6 +3714,8 @@
                                 <tbody id="settings-pdf-columns-builder"></tbody>
                             </table>
                         </div>
+                        <div id="settings-pdf-resize-editor" class="pdf-resize-wrap"></div>
+                        <p class="pdf-resize-note">Column border line-ai drag pannina width direct-aa change aagum (mouse/touch both support).</p>
                     </div>
                     <div class="mt-4 flex gap-3 flex-wrap">
                         <button id="save-pdf-table-settings-btn" class="px-5 py-2 rounded-lg font-semibold text-sm shadow-sm transition-all bg-blue-600 text-white hover:bg-blue-700">Save Table Settings</button>
@@ -8134,6 +8206,89 @@ document.addEventListener('DOMContentLoaded', async () => {
         `).join('');
     };
 
+    const getPdfDesignerPreviewRows = (count = 3) => {
+        const rows = getPdfMonthRowSource(currentDate.getFullYear(), currentDate.getMonth()) || [];
+        const useful = rows.filter(hasRowDataForPdf);
+        const source = useful.length ? useful : rows;
+        return source.slice(0, count);
+    };
+
+    const renderPdfResizeEditor = (settings) => {
+        const host = document.getElementById('settings-pdf-resize-editor');
+        if (!host) return;
+        const visibleCols = settings.columns
+            .map((col, index) => ({ ...col, index }))
+            .filter(col => col.visible);
+        if (!visibleCols.length) {
+            host.innerHTML = `<div class="p-3 text-sm text-slate-500 dark:text-slate-400">No visible columns.</div>`;
+            return;
+        }
+        const total = visibleCols.reduce((sum, c) => sum + Number(c.width || 0), 0) || 1;
+        const colGroup = visibleCols.map(c => `<col style="width:${((c.width / total) * 100).toFixed(4)}%">`).join('');
+        const headerCells = visibleCols.map((c, i) => {
+            const safeLabel = formatPdfHeaderLabel(c.label || getFieldMeta(c.source).label, c.source).replace(/<br>/g, ' / ');
+            const handle = i < visibleCols.length - 1 ? `<span class="pdf-col-resize-handle" data-visible-index="${i}"></span>` : '';
+            return `<th>${safeLabel}${handle}</th>`;
+        }).join('');
+        const previewRows = getPdfDesignerPreviewRows(3);
+        const body = previewRows.map(r => `<tr>${visibleCols.map(c => `<td>${escapeHtml(r[c.source] ?? '-')}</td>`).join('')}</tr>`).join('');
+        host.innerHTML = `
+            <table class="pdf-resize-table">
+                <colgroup>${colGroup}</colgroup>
+                <thead><tr>${headerCells}</tr></thead>
+                <tbody>${body || `<tr>${visibleCols.map(() => '<td>-</td>').join('')}</tr>`}</tbody>
+            </table>
+        `;
+    };
+
+    const bindPdfResizeHandles = () => {
+        const host = document.getElementById('settings-pdf-resize-editor');
+        if (!host) return;
+        host.querySelectorAll('.pdf-col-resize-handle').forEach((handle) => {
+            handle.onpointerdown = (ev) => {
+                ev.preventDefault();
+                const startX = ev.clientX;
+                const visibleIndex = Number(handle.dataset.visibleIndex);
+                const tableEl = host.querySelector('.pdf-resize-table');
+                const tableWidth = tableEl?.getBoundingClientRect()?.width || 0;
+                if (!Number.isFinite(visibleIndex) || visibleIndex < 0 || tableWidth <= 0) return;
+                const baseSettings = collectPdfTableSettingsFromEditor();
+                const visibleRefs = baseSettings.columns.map((col, idx) => ({ col, idx })).filter(item => item.col.visible);
+                if (visibleIndex >= visibleRefs.length - 1) return;
+                const leftRef = visibleRefs[visibleIndex];
+                const rightRef = visibleRefs[visibleIndex + 1];
+                const totalVisibleUnits = visibleRefs.reduce((sum, ref) => sum + Number(ref.col.width || 0), 0) || 1;
+                const leftStart = Number(leftRef.col.width || 0);
+                const rightStart = Number(rightRef.col.width || 0);
+                const minWidth = 2;
+
+                const move = (mv) => {
+                    const deltaPx = mv.clientX - startX;
+                    const deltaUnits = (deltaPx / tableWidth) * totalVisibleUnits;
+                    let nextLeft = leftStart + deltaUnits;
+                    const maxLeft = leftStart + rightStart - minWidth;
+                    nextLeft = Math.max(minWidth, Math.min(maxLeft, nextLeft));
+                    const nextRight = leftStart + rightStart - nextLeft;
+
+                    const next = collectPdfTableSettingsFromEditor();
+                    const refs = next.columns.map((col, idx) => ({ col, idx })).filter(item => item.col.visible);
+                    if (!refs[visibleIndex] || !refs[visibleIndex + 1]) return;
+                    next.columns[refs[visibleIndex].idx].width = Number(nextLeft.toFixed(2));
+                    next.columns[refs[visibleIndex + 1].idx].width = Number(nextRight.toFixed(2));
+                    savePdfTableSettings(next);
+                    renderPdfTableSettingsEditor();
+                };
+
+                const up = () => {
+                    window.removeEventListener('pointermove', move);
+                    window.removeEventListener('pointerup', up);
+                };
+                window.addEventListener('pointermove', move);
+                window.addEventListener('pointerup', up);
+            };
+        });
+    };
+
     const renderPdfTableSettingsEditor = () => {
         const settings = getPdfTableSettings();
         const bindValue = (id, value) => {
@@ -8154,6 +8309,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         const includeToggle = document.getElementById('settings-pdf-include-empty-rows');
         if (includeToggle) includeToggle.checked = settings.includeEmptyRows;
         renderPdfColumnsBuilder(settings);
+        renderPdfResizeEditor(settings);
+        bindPdfResizeHandles();
     };
 
     const collectPdfTableSettingsFromEditor = () => {
@@ -8250,6 +8407,29 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('save-pdf-table-settings-btn').onclick = handleSavePdfTableSettings;
         document.getElementById('reset-pdf-table-settings-btn').onclick = resetPdfTableSettingsDefaults;
         document.getElementById('settings-pdf-add-column-btn').onclick = handleAddPdfTableColumn;
+        [
+            'settings-pdf-header-bg',
+            'settings-pdf-header-text',
+            'settings-pdf-text-color',
+            'settings-pdf-border-color',
+            'settings-pdf-border-width',
+            'settings-pdf-header-font-size',
+            'settings-pdf-row-font-size',
+            'settings-pdf-cell-padding-x',
+            'settings-pdf-cell-padding-y',
+            'settings-pdf-header-padding-x',
+            'settings-pdf-header-padding-y',
+            'settings-pdf-include-empty-rows'
+        ].forEach((id) => {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.oninput = () => {
+                const live = collectPdfTableSettingsFromEditor();
+                renderPdfResizeEditor(live);
+                bindPdfResizeHandles();
+            };
+            el.onchange = el.oninput;
+        });
         const columnsBuilder = document.getElementById('settings-pdf-columns-builder');
         if (columnsBuilder && columnsBuilder.dataset.bound !== '1') {
             columnsBuilder.addEventListener('click', (e) => {
@@ -8269,15 +8449,24 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
             columnsBuilder.addEventListener('change', (e) => {
                 const sourceEl = e.target.closest('.pdf-col-source');
-                if (!sourceEl) return;
-                const row = sourceEl.closest('[data-col-index]');
-                if (!row) return;
-                const source = getFieldMeta(sourceEl.value).key;
-                const meta = getFieldMeta(source);
-                const labelInput = row.querySelector('.pdf-col-label');
-                const widthInput = row.querySelector('.pdf-col-width');
-                if (labelInput) labelInput.value = meta.label;
-                if (widthInput) widthInput.value = String(meta.width);
+                if (sourceEl) {
+                    const row = sourceEl.closest('[data-col-index]');
+                    if (!row) return;
+                    const source = getFieldMeta(sourceEl.value).key;
+                    const meta = getFieldMeta(source);
+                    const labelInput = row.querySelector('.pdf-col-label');
+                    const widthInput = row.querySelector('.pdf-col-width');
+                    if (labelInput) labelInput.value = meta.label;
+                    if (widthInput) widthInput.value = String(meta.width);
+                }
+                const live = collectPdfTableSettingsFromEditor();
+                renderPdfResizeEditor(live);
+                bindPdfResizeHandles();
+            });
+            columnsBuilder.addEventListener('input', () => {
+                const live = collectPdfTableSettingsFromEditor();
+                renderPdfResizeEditor(live);
+                bindPdfResizeHandles();
             });
             columnsBuilder.dataset.bound = '1';
         }
