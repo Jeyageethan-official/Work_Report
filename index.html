@@ -3481,6 +3481,60 @@
                        <button id="reset-pdf-heading-btn" class="ios-secondary-btn px-4 py-2 rounded-lg text-sm font-semibold dark:text-gray-100">Reset Default</button>
                        <p id="pdf-heading-save-status" class="text-sm text-green-600 dark:text-green-400 flex items-center"></p>
                     </div>
+
+                    <div class="my-5 border-t border-slate-200/70 dark:border-slate-700/70"></div>
+
+                    <h3 class="section-heading">PDF Table Designer</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="settings-pdf-header-bg" class="font-medium text-sm text-gray-700 dark:text-gray-300">Header Background</label>
+                            <input type="color" id="settings-pdf-header-bg" class="w-full mt-1 h-11 p-1 border border-gray-300 rounded-lg bg-gray-50/50 premium-input dark:bg-gray-800/50 dark:border-gray-700" />
+                        </div>
+                        <div>
+                            <label for="settings-pdf-header-text" class="font-medium text-sm text-gray-700 dark:text-gray-300">Header Text Color</label>
+                            <input type="color" id="settings-pdf-header-text" class="w-full mt-1 h-11 p-1 border border-gray-300 rounded-lg bg-gray-50/50 premium-input dark:bg-gray-800/50 dark:border-gray-700" />
+                        </div>
+                        <div>
+                            <label for="settings-pdf-text-color" class="font-medium text-sm text-gray-700 dark:text-gray-300">Row Text Color</label>
+                            <input type="color" id="settings-pdf-text-color" class="w-full mt-1 h-11 p-1 border border-gray-300 rounded-lg bg-gray-50/50 premium-input dark:bg-gray-800/50 dark:border-gray-700" />
+                        </div>
+                        <div>
+                            <label for="settings-pdf-border-color" class="font-medium text-sm text-gray-700 dark:text-gray-300">Border Color</label>
+                            <input type="color" id="settings-pdf-border-color" class="w-full mt-1 h-11 p-1 border border-gray-300 rounded-lg bg-gray-50/50 premium-input dark:bg-gray-800/50 dark:border-gray-700" />
+                        </div>
+                        <div>
+                            <label for="settings-pdf-border-width" class="font-medium text-sm text-gray-700 dark:text-gray-300">Border Width (px)</label>
+                            <input type="number" id="settings-pdf-border-width" min="0.5" max="3" step="0.1" class="w-full mt-1 p-2 border border-gray-300 rounded-lg bg-gray-50/50 premium-input dark:bg-gray-800/50 dark:border-gray-700" />
+                        </div>
+                        <div>
+                            <label for="settings-pdf-header-font-size" class="font-medium text-sm text-gray-700 dark:text-gray-300">Header Font Size (px)</label>
+                            <input type="number" id="settings-pdf-header-font-size" min="8" max="14" step="0.1" class="w-full mt-1 p-2 border border-gray-300 rounded-lg bg-gray-50/50 premium-input dark:bg-gray-800/50 dark:border-gray-700" />
+                        </div>
+                        <div>
+                            <label for="settings-pdf-row-font-size" class="font-medium text-sm text-gray-700 dark:text-gray-300">Row Font Size (px)</label>
+                            <input type="number" id="settings-pdf-row-font-size" min="8" max="14" step="0.1" class="w-full mt-1 p-2 border border-gray-300 rounded-lg bg-gray-50/50 premium-input dark:bg-gray-800/50 dark:border-gray-700" />
+                        </div>
+                        <div class="flex items-center justify-between rounded-xl border border-slate-200/70 dark:border-slate-700/60 px-3 py-2 mt-1">
+                            <div>
+                                <p class="font-medium text-sm text-gray-700 dark:text-gray-300">Show All Month Rows</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">Off means only filled rows will appear in PDF.</p>
+                            </div>
+                            <input id="settings-pdf-include-empty-rows" type="checkbox" class="ios-switch" checked />
+                        </div>
+                    </div>
+
+                    <div class="mt-5">
+                        <div class="flex items-center justify-between mb-2">
+                            <h4 class="font-semibold text-gray-800 dark:text-gray-100">Columns (Add / Edit / Remove)</h4>
+                            <button id="settings-pdf-add-column-btn" class="ios-secondary-btn px-3 py-1.5 rounded-lg text-xs font-semibold dark:text-gray-100">+ Add Column</button>
+                        </div>
+                        <div id="settings-pdf-columns-builder" class="space-y-2"></div>
+                    </div>
+                    <div class="mt-4 flex gap-3 flex-wrap">
+                        <button id="save-pdf-table-settings-btn" class="px-5 py-2 rounded-lg font-semibold text-sm shadow-sm transition-all bg-blue-600 text-white hover:bg-blue-700">Save Table Settings</button>
+                        <button id="reset-pdf-table-settings-btn" class="ios-secondary-btn px-4 py-2 rounded-lg text-sm font-semibold dark:text-gray-100">Reset Table Default</button>
+                        <p id="pdf-table-save-status" class="text-sm text-green-600 dark:text-green-400 flex items-center"></p>
+                    </div>
                 </div>
 
                 <div id="settings-panel-backup" class="settings-detail-panel" style="display:none;">
@@ -3931,6 +3985,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const PDF_HEADING_TITLE_KEY = 'pdfHeadingTitle';
     const PDF_HEADING_NAME_KEY = 'pdfHeadingName';
     const PDF_HEADING_SERVICE_KEY = 'pdfHeadingServiceNo';
+    const PDF_TABLE_SETTINGS_KEY = 'pdfTableSettingsV1';
     let syncInProgress = false;
     let syncBannerTimer = null;
 
@@ -4029,6 +4084,93 @@ document.addEventListener('DOMContentLoaded', async () => {
             serviceNo,
             subtitle: `Name: ${name} | Service No: ${serviceNo}`
         };
+    };
+
+    const PDF_TABLE_FIELD_OPTIONS = [
+        { key: 'date', label: 'Day', width: 10 },
+        { key: 'inTime', label: 'In Time', width: 7 },
+        { key: 'outTime', label: 'Out Time', width: 7 },
+        { key: 'movementOut', label: 'Movement\nOut Time', width: 9 },
+        { key: 'movementIn', label: 'Movement\nIn Time', width: 9 },
+        { key: 'teamMembers', label: 'Team Members', width: 9 },
+        { key: 'workLocation', label: 'Work Location', width: 8 },
+        { key: 'vehicleNumber', label: 'Vehicle Number', width: 8 },
+        { key: 'km', label: 'KM\nReading', width: 6 },
+        { key: 'specialDays', label: 'Present Special Day', width: 7 },
+        { key: 'leaveStatus', label: 'Leave Status', width: 6 },
+        { key: 'leaveReason', label: 'Leave Reason', width: 14 }
+    ];
+
+    const escapeHtml = (value) => String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+
+    const clampNumber = (value, min, max, fallback) => {
+        const parsed = Number(value);
+        if (!Number.isFinite(parsed)) return fallback;
+        return Math.min(max, Math.max(min, parsed));
+    };
+
+    const createDefaultPdfTableSettings = () => ({
+        headerBg: '#f3f4f6',
+        headerTextColor: '#1f2937',
+        tableTextColor: '#1f2937',
+        borderColor: '#9ca3af',
+        borderWidth: 1,
+        headerFontSize: 9.6,
+        rowFontSize: 10,
+        includeEmptyRows: true,
+        columns: PDF_TABLE_FIELD_OPTIONS.map((f, i) => ({
+            id: `col_${f.key}_${i}`,
+            source: f.key,
+            label: f.label,
+            width: f.width,
+            visible: true
+        }))
+    });
+
+    const getFieldMeta = (source) => PDF_TABLE_FIELD_OPTIONS.find(f => f.key === source) || PDF_TABLE_FIELD_OPTIONS[0];
+
+    const sanitizePdfTableSettings = (raw) => {
+        const fallback = createDefaultPdfTableSettings();
+        if (!raw || typeof raw !== 'object') return fallback;
+        const safeColor = (v, fb) => (/^#[0-9a-fA-F]{6}$/.test(String(v || '').trim()) ? String(v).trim() : fb);
+        const colsRaw = Array.isArray(raw.columns) && raw.columns.length > 0 ? raw.columns : fallback.columns;
+        const columns = colsRaw.map((col, idx) => {
+            const source = getFieldMeta(String(col?.source || '')).key;
+            return {
+                id: String(col?.id || `col_${source}_${idx}`),
+                source,
+                label: String(col?.label || getFieldMeta(source).label).slice(0, 48),
+                width: clampNumber(col?.width, 2, 35, getFieldMeta(source).width),
+                visible: col?.visible !== false
+            };
+        }).filter(Boolean);
+        return {
+            headerBg: safeColor(raw.headerBg, fallback.headerBg),
+            headerTextColor: safeColor(raw.headerTextColor, fallback.headerTextColor),
+            tableTextColor: safeColor(raw.tableTextColor, fallback.tableTextColor),
+            borderColor: safeColor(raw.borderColor, fallback.borderColor),
+            borderWidth: clampNumber(raw.borderWidth, 0.5, 3, fallback.borderWidth),
+            headerFontSize: clampNumber(raw.headerFontSize, 8, 14, fallback.headerFontSize),
+            rowFontSize: clampNumber(raw.rowFontSize, 8, 14, fallback.rowFontSize),
+            includeEmptyRows: raw.includeEmptyRows !== false,
+            columns: columns.length ? columns : fallback.columns
+        };
+    };
+
+    const getPdfTableSettings = () => {
+        const parsed = safeJsonParse(localStorage.getItem(PDF_TABLE_SETTINGS_KEY), null);
+        return sanitizePdfTableSettings(parsed);
+    };
+
+    const savePdfTableSettings = (settings) => {
+        const clean = sanitizePdfTableSettings(settings);
+        localStorage.setItem(PDF_TABLE_SETTINGS_KEY, JSON.stringify(clean));
+        return clean;
     };
 
     const updateDesktopFloatingAnchors = () => {
@@ -5189,6 +5331,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                 workData: JSON.parse(JSON.stringify(workData || {})),
                 reminders: JSON.parse(JSON.stringify(reminders || [])),
                 userSettings: JSON.parse(JSON.stringify(userSettings || {})),
+                pdfHeading: {
+                    title: localStorage.getItem(PDF_HEADING_TITLE_KEY) || '',
+                    name: localStorage.getItem(PDF_HEADING_NAME_KEY) || '',
+                    serviceNo: localStorage.getItem(PDF_HEADING_SERVICE_KEY) || ''
+                },
+                pdfTableSettings: JSON.parse(JSON.stringify(getPdfTableSettings())),
                 theme: localStorage.getItem('theme') || 'light',
                 accentColor: localStorage.getItem('accentColor') || '#007aff',
                 reduceMotion: localStorage.getItem('reduceMotion') === 'true',
@@ -5246,6 +5394,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             workData = backupPayload.data.workData || {};
             reminders = Array.isArray(backupPayload.data.reminders) ? backupPayload.data.reminders : [];
             userSettings = backupPayload.data.userSettings || { baseAnnualLeave: 35, normalWorkMinutes: 540 };
+            const heading = backupPayload.data.pdfHeading || {};
+            localStorage.setItem(PDF_HEADING_TITLE_KEY, String(heading.title || ''));
+            localStorage.setItem(PDF_HEADING_NAME_KEY, String(heading.name || ''));
+            localStorage.setItem(PDF_HEADING_SERVICE_KEY, String(heading.serviceNo || ''));
+            const restoredPdfTable = sanitizePdfTableSettings(backupPayload.data.pdfTableSettings || createDefaultPdfTableSettings());
+            localStorage.setItem(PDF_TABLE_SETTINGS_KEY, JSON.stringify(restoredPdfTable));
             saveLocalData();
             localStorage.setItem('userSettings', JSON.stringify(userSettings));
             if (backupPayload.data.theme) applyTheme(backupPayload.data.theme);
@@ -7009,6 +7163,93 @@ document.addEventListener('DOMContentLoaded', async () => {
         return isWeekend(yyyy, mm, dd);
     };
 
+    const getPdfMonthRowSource = (year, month, options = {}) => {
+        const useExternalRows = Array.isArray(options.rows) && options.rows.length > 0;
+        if (useExternalRows) {
+            return options.rows.map((row) => ({
+                date: row.date || '-',
+                inTime: row.inTime || '-',
+                outTime: row.outTime || '-',
+                movementOut: row.movementOut || '-',
+                movementIn: row.movementIn || '-',
+                teamMembers: row.teamMembers || '-',
+                workLocation: row.workLocation || '-',
+                vehicleNumber: row.vehicleNumber || '-',
+                km: row.km || '-',
+                specialDays: row.specialDays || '-',
+                leaveStatus: row.leaveStatus || 'No',
+                leaveReason: row.leaveReason || '-'
+            }));
+        }
+        const daysInMonth = getDaysInMonth(year, month);
+        return Array.from({ length: daysInMonth }, (_, i) => {
+            const day = i + 1;
+            const dateKey = `${year}-${month}-${day}`;
+            const d = workData[dateKey] || {};
+            return {
+                date: `${String(day).padStart(2, '0')}.${String(month + 1).padStart(2, '0')}.${year}`,
+                inTime: d.inTime || '-',
+                outTime: d.outTime || '-',
+                movementOut: d.movementOut || '-',
+                movementIn: d.movementIn || '-',
+                teamMembers: d.teamMembers || '-',
+                workLocation: d.workLocation || '-',
+                vehicleNumber: d.vehicleNumber || '-',
+                km: d.km || '-',
+                specialDays: d.specialDays || '-',
+                leaveStatus: d.leaveStatus || 'No',
+                leaveReason: d.leaveReason || '-'
+            };
+        });
+    };
+
+    const hasRowDataForPdf = (row = {}) => {
+        const fields = ['inTime', 'outTime', 'movementOut', 'movementIn', 'teamMembers', 'workLocation', 'vehicleNumber', 'km', 'specialDays', 'leaveStatus', 'leaveReason'];
+        return fields.some((k) => {
+            const value = String(row[k] ?? '').trim();
+            if (!value || value === '-') return false;
+            if (k === 'leaveStatus' && value.toLowerCase() === 'no') return false;
+            return true;
+        });
+    };
+
+    const renderPdfTableMarkup = (rowSource, tableSettings) => {
+        const cfg = sanitizePdfTableSettings(tableSettings);
+        const visibleColumns = cfg.columns.filter(col => col.visible);
+        const columns = visibleColumns.length ? visibleColumns : cfg.columns.slice(0, 1);
+        const widthTotal = columns.reduce((sum, col) => sum + Number(col.width || 0), 0) || 1;
+        const colgroupHtml = columns.map((col) => `<col style="width:${((col.width / widthTotal) * 100).toFixed(4)}%">`).join('');
+        const border = `${cfg.borderWidth}px solid ${cfg.borderColor}`;
+
+        const headerHtml = columns.map((col) => {
+            const safeLabel = escapeHtml(col.label || getFieldMeta(col.source).label).replace(/\n/g, '<br>');
+            return `<th style="border:${border};padding:6px 4px;font-weight:700;white-space:normal;word-break:keep-all;line-height:1.1;font-size:${cfg.headerFontSize}px;">${safeLabel}</th>`;
+        }).join('');
+
+        const rowHtml = rowSource.map((row) => {
+            return `<tr>${columns.map((col) => {
+                const source = col.source;
+                const rawValue = row[source] ?? '-';
+                const textValue = rawValue === '' ? '-' : String(rawValue);
+                let extraStyle = '';
+                if (source === 'date' && isWeekendFromDdMmYyyy(textValue)) extraStyle += 'color:#ef4444;font-weight:700;';
+                if (source === 'leaveStatus' && String(textValue).toLowerCase() === 'yes') extraStyle += 'color:#1E90FF;font-weight:700;';
+                if (source === 'leaveReason') {
+                    return `<td style="border:${border};padding:6px 4px;white-space:normal;line-height:1.15;font-size:${cfg.rowFontSize}px;overflow:hidden;word-break:break-word;${extraStyle}">${escapeHtml(textValue)}</td>`;
+                }
+                return `<td style="border:${border};padding:6px 4px;white-space:nowrap;font-size:${cfg.rowFontSize}px;overflow:hidden;text-overflow:ellipsis;${extraStyle}">${escapeHtml(textValue)}</td>`;
+            }).join('')}</tr>`;
+        }).join('');
+
+        return `
+            <table style="width:100%;table-layout:fixed;border-collapse:collapse;border:${border};font-size:${cfg.rowFontSize}px;color:${cfg.tableTextColor};">
+                <colgroup>${colgroupHtml}</colgroup>
+                <thead style="background:${cfg.headerBg};color:${cfg.headerTextColor};"><tr>${headerHtml}</tr></thead>
+                <tbody style="text-align:center;">${rowHtml}</tbody>
+            </table>
+        `;
+    };
+
     const buildMonthPdfWrapper = (year, month, options = {}) => {
         const wrapper = document.createElement('div');
         const headingConfig = getPdfHeadingConfig({
@@ -7029,52 +7270,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         wrapper.style.fontSize = '12px';
         wrapper.style.lineHeight = '1.25';
 
-        const useExternalRows = Array.isArray(options.rows) && options.rows.length > 0;
-        const daysInMonth = getDaysInMonth(year, month);
-        const rowSource = useExternalRows
-            ? options.rows
-            : Array.from({ length: daysInMonth }, (_, i) => {
-                const day = i + 1;
-                const dateKey = `${year}-${month}-${day}`;
-                const d = workData[dateKey] || {};
-                return {
-                    date: `${String(day).padStart(2, '0')}.${String(month + 1).padStart(2, '0')}.${year}`,
-                    inTime: d.inTime || '-',
-                    outTime: d.outTime || '-',
-                    movementOut: d.movementOut || '-',
-                    movementIn: d.movementIn || '-',
-                    teamMembers: d.teamMembers || '-',
-                    workLocation: d.workLocation || '-',
-                    vehicleNumber: d.vehicleNumber || '-',
-                    km: d.km || '-',
-                    specialDays: d.specialDays || '-',
-                    leaveStatus: d.leaveStatus || 'No',
-                    leaveReason: d.leaveReason || '-'
-                };
-            });
-
-        const rows = rowSource.map((row) => {
-            const formattedDate = row.date || '-';
-            const weekendClass = isWeekendFromDdMmYyyy(formattedDate) ? 'color:#ef4444;font-weight:700;' : '';
-            const leaveYes = String(row.leaveStatus || '').toLowerCase() === 'yes';
-            const reasonText = row.leaveReason || '-';
-            return `
-                <tr>
-                    <td style="border:1px solid #9ca3af;padding:6px 4px;font-weight:700;white-space:nowrap;font-size:10px;${weekendClass}">${formattedDate}</td>
-                    <td style="border:1px solid #9ca3af;padding:6px 3px;white-space:nowrap;font-size:10px;">${row.inTime || '-'}</td>
-                    <td style="border:1px solid #9ca3af;padding:6px 3px;white-space:nowrap;font-size:10px;">${row.outTime || '-'}</td>
-                    <td style="border:1px solid #9ca3af;padding:6px 3px;white-space:nowrap;font-size:10px;">${row.movementOut || '-'}</td>
-                    <td style="border:1px solid #9ca3af;padding:6px 3px;white-space:nowrap;font-size:10px;">${row.movementIn || '-'}</td>
-                    <td style="border:1px solid #9ca3af;padding:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${row.teamMembers || '-'}</td>
-                    <td style="border:1px solid #9ca3af;padding:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${row.workLocation || '-'}</td>
-                    <td style="border:1px solid #9ca3af;padding:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${row.vehicleNumber || '-'}</td>
-                    <td style="border:1px solid #9ca3af;padding:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${row.km || '-'}</td>
-                    <td style="border:1px solid #9ca3af;padding:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${row.specialDays || '-'}</td>
-                    <td style="border:1px solid #9ca3af;padding:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;${leaveYes ? 'color:#1E90FF;font-weight:700;' : ''}">${row.leaveStatus || 'No'}</td>
-                    <td style="border:1px solid #9ca3af;padding:6px 4px;white-space:nowrap;line-height:1.12;font-size:10px;overflow:hidden;text-overflow:ellipsis;">${reasonText}</td>
-                </tr>
-            `;
-        }).join('');
+        const tableSettings = getPdfTableSettings();
+        let rowSource = getPdfMonthRowSource(year, month, options);
+        if (!tableSettings.includeEmptyRows) rowSource = rowSource.filter(hasRowDataForPdf);
+        const tableMarkup = renderPdfTableMarkup(rowSource, tableSettings);
 
         wrapper.innerHTML = `
             <div style="text-align:center;font-size:12px;line-height:1.1;margin-bottom:0.5cm;">
@@ -7082,28 +7281,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <p style="font-size:14px;font-weight:600;margin:0 0 4px;">${headingConfig.subtitle}</p>
                 <h3 style="font-size:14px;font-weight:600;margin:0;">${months[month]} ${year}</h3>
             </div>
-            <table style="width:100%;table-layout:fixed;border-collapse:collapse;border:1px solid #9ca3af;font-size:11px;color:#1f2937;">
-                <colgroup>
-                    <col style="width:10%">
-                    <col style="width:7%">
-                    <col style="width:7%">
-                    <col style="width:9%">
-                    <col style="width:9%">
-                    <col style="width:9%">
-                    <col style="width:8%">
-                    <col style="width:8%">
-                    <col style="width:6%">
-                    <col style="width:7%">
-                    <col style="width:6%">
-                    <col style="width:14%">
-                </colgroup>
-                <thead style="background:#f3f4f6;color:#1f2937;">
-                    <tr>
-                        ${['Day', 'In Time', 'Out Time', 'Movement<br>Out Time', 'Movement<br>In Time', 'Team Members', 'Work Location', 'Vehicle Number', 'KM<br>Reading', 'Present Special Day', 'Leave Status', 'Leave Reason'].map(h => `<th style="border:1px solid #9ca3af;padding:6px 4px;font-weight:700;white-space:normal;word-break:keep-all;line-height:1.1;font-size:9.6px;">${h}</th>`).join('')}
-                    </tr>
-                </thead>
-                <tbody style="text-align:center;">${rows}</tbody>
-            </table>
+            ${tableMarkup}
         `;
         return wrapper;
     };
@@ -7161,36 +7339,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const showExportPreview = (year, month) => {
         const headingConfig = getPdfHeadingConfig();
-        const daysInMonth = getDaysInMonth(year, month);
-
-        const tableRows = Array.from({ length: daysInMonth }, (_, i) => {
-            const day = i + 1;
-            const dateKey = `${year}-${month}-${day}`;
-            const dayData = workData[dateKey] || {};
-            const formattedDate = `${String(day).padStart(2, '0')}.${String(month + 1).padStart(2, '0')}.${year}`;
-            const leaveStatusText = dayData.leaveStatus || 'No';
-            const isDayWeekend = isWeekend(year, month, day);
-
-            const rowClass = '';
-            const dateClass = isDayWeekend ? 'text-red-500 font-bold' : '';
-            const leaveStatusHTML = leaveStatusText === 'Yes' ? `<span class="font-bold text-blue-700">${leaveStatusText}</span>` : leaveStatusText;
-
-            return `
-                <tr class="${rowClass}">
-                    <td class="px-1.5 py-2 whitespace-nowrap font-bold ${dateClass}" style="border:1px solid #9ca3af;">${formattedDate}</td>
-                    <td class="px-1.5 py-2 whitespace-nowrap" style="border:1px solid #9ca3af;">${dayData.inTime || '-'}</td>
-                    <td class="px-1.5 py-2 whitespace-nowrap" style="border:1px solid #9ca3af;">${dayData.outTime || '-'}</td>
-                    <td class="px-1.5 py-2 whitespace-nowrap" style="border:1px solid #9ca3af;">${dayData.movementOut || '-'}</td>
-                    <td class="px-1.5 py-2 whitespace-nowrap" style="border:1px solid #9ca3af;">${dayData.movementIn || '-'}</td>
-                    <td class="px-1.5 py-2 whitespace-nowrap" style="border:1px solid #9ca3af;">${dayData.teamMembers || '-'}</td>
-                    <td class="px-1.5 py-2 whitespace-nowrap" style="border:1px solid #9ca3af;">${dayData.workLocation || '-'}</td>
-                    <td class="px-1.5 py-2 whitespace-nowrap" style="border:1px solid #9ca3af;">${dayData.vehicleNumber || '-'}</td>
-                    <td class="px-1.5 py-2 whitespace-nowrap" style="border:1px solid #9ca3af;">${dayData.km || '-'}</td>
-                    <td class="px-1.5 py-2 whitespace-nowrap" style="border:1px solid #9ca3af;">${dayData.specialDays || '-'}</td>
-                    <td class="px-1.5 py-2 whitespace-nowrap" style="border:1px solid #9ca3af;">${leaveStatusHTML}</td>
-                    <td class="px-1 py-1" style="border:1px solid #9ca3af;white-space:nowrap;line-height:1.12;font-size:10px;overflow:hidden;text-overflow:ellipsis;">${dayData.leaveReason || '-'}</td>
-                </tr>`;
-        }).join('');
+        const tableSettings = getPdfTableSettings();
+        let rowSource = getPdfMonthRowSource(year, month);
+        if (!tableSettings.includeEmptyRows) rowSource = rowSource.filter(hasRowDataForPdf);
+        const previewTable = renderPdfTableMarkup(rowSource, tableSettings);
 
         const previewHTML = `
             <div class="fixed inset-0 bg-gray-900 bg-opacity-70 flex justify-center items-center z-50 p-4 overflow-auto modal-bg-animate" data-dismiss="modal">
@@ -7209,30 +7361,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                             <h3 class="text-sm font-semibold">${months[month]} ${year}</h3>
                         </div>
                         <div class="overflow-x-auto">
-                            <table class="w-full border-collapse text-[11px]" style="color:#1f2937; border:1px solid #9ca3af;">
-                                <colgroup>
-                                    <col style="width:10%">
-                                    <col style="width:7%">
-                                    <col style="width:7%">
-                                    <col style="width:9%">
-                                    <col style="width:9%">
-                                    <col style="width:9%">
-                                    <col style="width:8%">
-                                    <col style="width:8%">
-                                    <col style="width:6%">
-                                    <col style="width:7%">
-                                    <col style="width:6%">
-                                    <col style="width:14%">
-                                </colgroup>
-                                <thead class="bg-gray-100 text-gray-800">
-                                    <tr>
-                                        ${['Day', 'In Time', 'Out Time', 'Movement<br>Out Time', 'Movement<br>In Time', 'Team Members', 'Work Location', 'Vehicle Number', 'KM<br>Reading', 'Present Special Day', 'Leave Status', 'Leave Reason'].map(h => 
-                                            `<th class="px-1 py-1.5 font-bold" style="border:1px solid #9ca3af;white-space:normal;word-break:keep-all;line-height:1.1;font-size:9.6px;">${h}</th>`
-                                        ).join('')}
-                                    </tr>
-                                </thead>
-                                <tbody class="text-gray-800 text-center" style="border:1px solid #9ca3af;">${tableRows}</tbody>
-                            </table>
+                            ${previewTable}
                         </div>
                     </div>
                 </div>
@@ -7828,6 +7957,91 @@ document.addEventListener('DOMContentLoaded', async () => {
         page.dataset.navReady = '1';
     };
 
+    const renderPdfColumnsBuilder = (settings) => {
+        const container = document.getElementById('settings-pdf-columns-builder');
+        if (!container) return;
+        const optionsMarkup = (selected) => PDF_TABLE_FIELD_OPTIONS.map(opt => `
+            <option value="${opt.key}" ${opt.key === selected ? 'selected' : ''}>${opt.label.replace('\n', ' ')}</option>
+        `).join('');
+        container.innerHTML = settings.columns.map((col, index) => `
+            <div class="rounded-xl border border-slate-200/70 dark:border-slate-700/60 p-3 bg-white/40 dark:bg-gray-900/35" data-col-index="${index}">
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-2 items-end">
+                    <div class="md:col-span-3">
+                        <label class="text-xs font-semibold text-slate-600 dark:text-slate-300">Source</label>
+                        <select class="pdf-col-source w-full mt-1 p-2 border border-gray-300 rounded-lg bg-gray-50/70 premium-select dark:bg-gray-800/50 dark:border-gray-700">
+                            ${optionsMarkup(col.source)}
+                        </select>
+                    </div>
+                    <div class="md:col-span-3">
+                        <label class="text-xs font-semibold text-slate-600 dark:text-slate-300">Header Label</label>
+                        <input type="text" class="pdf-col-label w-full mt-1 p-2 border border-gray-300 rounded-lg bg-gray-50/70 premium-input dark:bg-gray-800/50 dark:border-gray-700" value="${escapeHtml(col.label).replace(/"/g, '&quot;')}" />
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="text-xs font-semibold text-slate-600 dark:text-slate-300">Width</label>
+                        <input type="number" min="2" max="35" step="0.5" class="pdf-col-width w-full mt-1 p-2 border border-gray-300 rounded-lg bg-gray-50/70 premium-input dark:bg-gray-800/50 dark:border-gray-700" value="${col.width}" />
+                    </div>
+                    <div class="md:col-span-2 flex items-center gap-2 mt-1 md:mt-6">
+                        <input type="checkbox" class="pdf-col-visible ios-switch" ${col.visible ? 'checked' : ''} />
+                        <span class="text-xs font-semibold text-slate-600 dark:text-slate-300">Visible</span>
+                    </div>
+                    <div class="md:col-span-2">
+                        <button class="pdf-col-remove w-full ios-secondary-btn px-3 py-2 rounded-lg text-xs font-semibold dark:text-gray-100">Remove</button>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    };
+
+    const renderPdfTableSettingsEditor = () => {
+        const settings = getPdfTableSettings();
+        const bindValue = (id, value) => {
+            const el = document.getElementById(id);
+            if (el) el.value = value;
+        };
+        bindValue('settings-pdf-header-bg', settings.headerBg);
+        bindValue('settings-pdf-header-text', settings.headerTextColor);
+        bindValue('settings-pdf-text-color', settings.tableTextColor);
+        bindValue('settings-pdf-border-color', settings.borderColor);
+        bindValue('settings-pdf-border-width', settings.borderWidth);
+        bindValue('settings-pdf-header-font-size', settings.headerFontSize);
+        bindValue('settings-pdf-row-font-size', settings.rowFontSize);
+        const includeToggle = document.getElementById('settings-pdf-include-empty-rows');
+        if (includeToggle) includeToggle.checked = settings.includeEmptyRows;
+        renderPdfColumnsBuilder(settings);
+    };
+
+    const collectPdfTableSettingsFromEditor = () => {
+        const current = getPdfTableSettings();
+        const columns = [];
+        document.querySelectorAll('#settings-pdf-columns-builder [data-col-index]').forEach((row, idx) => {
+            const sourceEl = row.querySelector('.pdf-col-source');
+            const labelEl = row.querySelector('.pdf-col-label');
+            const widthEl = row.querySelector('.pdf-col-width');
+            const visibleEl = row.querySelector('.pdf-col-visible');
+            const source = getFieldMeta(sourceEl?.value || '').key;
+            const fallbackLabel = getFieldMeta(source).label;
+            columns.push({
+                id: current.columns[idx]?.id || `col_${source}_${Date.now()}_${idx}`,
+                source,
+                label: (labelEl?.value || '').trim() || fallbackLabel,
+                width: clampNumber(widthEl?.value, 2, 35, getFieldMeta(source).width),
+                visible: Boolean(visibleEl?.checked)
+            });
+        });
+        return sanitizePdfTableSettings({
+            ...current,
+            headerBg: document.getElementById('settings-pdf-header-bg')?.value,
+            headerTextColor: document.getElementById('settings-pdf-header-text')?.value,
+            tableTextColor: document.getElementById('settings-pdf-text-color')?.value,
+            borderColor: document.getElementById('settings-pdf-border-color')?.value,
+            borderWidth: document.getElementById('settings-pdf-border-width')?.value,
+            headerFontSize: document.getElementById('settings-pdf-header-font-size')?.value,
+            rowFontSize: document.getElementById('settings-pdf-row-font-size')?.value,
+            includeEmptyRows: document.getElementById('settings-pdf-include-empty-rows')?.checked !== false,
+            columns
+        });
+    };
+
     const renderSettingsPage = () => {
         if (!user) return;
         initSettingsNavigation();
@@ -7863,6 +8077,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('settings-pdf-title').value = pdfHeading.title;
         document.getElementById('settings-pdf-name').value = pdfHeading.name;
         document.getElementById('settings-pdf-service-no').value = pdfHeading.serviceNo;
+        renderPdfTableSettingsEditor();
         document.getElementById('notify-reminder-toggle').checked = localStorage.getItem('notifyReminderEnabled') !== 'false';
         document.getElementById('notify-backup-toggle').checked = localStorage.getItem('notifyBackupEnabled') !== 'false';
         document.getElementById('reduce-motion-toggle').checked = localStorage.getItem('reduceMotion') === 'true';
@@ -7882,6 +8097,28 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('settings-accent-reset').onclick = () => applyAccentColor('#007aff');
         document.getElementById('save-pdf-heading-btn').onclick = handleSavePdfHeading;
         document.getElementById('reset-pdf-heading-btn').onclick = resetPdfHeadingDefaults;
+        document.getElementById('save-pdf-table-settings-btn').onclick = handleSavePdfTableSettings;
+        document.getElementById('reset-pdf-table-settings-btn').onclick = resetPdfTableSettingsDefaults;
+        document.getElementById('settings-pdf-add-column-btn').onclick = handleAddPdfTableColumn;
+        const columnsBuilder = document.getElementById('settings-pdf-columns-builder');
+        if (columnsBuilder && columnsBuilder.dataset.bound !== '1') {
+            columnsBuilder.addEventListener('click', (e) => {
+                const removeBtn = e.target.closest('.pdf-col-remove');
+                if (!removeBtn) return;
+                const row = removeBtn.closest('[data-col-index]');
+                if (!row) return;
+                const settings = collectPdfTableSettingsFromEditor();
+                if (settings.columns.length <= 1) {
+                    showToast('At least one column is required.', 'error');
+                    return;
+                }
+                const index = Number(row.dataset.colIndex);
+                settings.columns.splice(index, 1);
+                savePdfTableSettings(settings);
+                renderPdfTableSettingsEditor();
+            });
+            columnsBuilder.dataset.bound = '1';
+        }
         document.getElementById('notify-reminder-toggle').onchange = (e) => {
             localStorage.setItem('notifyReminderEnabled', String(e.target.checked));
             refreshReminderBell();
@@ -7995,6 +8232,42 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (nameInput) nameInput.value = defaults.name;
         if (serviceInput) serviceInput.value = defaults.serviceNo;
         showToast('PDF heading reset to default.', 'info');
+    };
+
+    const handleAddPdfTableColumn = () => {
+        const settings = collectPdfTableSettingsFromEditor();
+        const fallback = PDF_TABLE_FIELD_OPTIONS[0];
+        settings.columns.push({
+            id: `col_custom_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+            source: fallback.key,
+            label: `New Column ${settings.columns.length + 1}`,
+            width: 8,
+            visible: true
+        });
+        savePdfTableSettings(settings);
+        renderPdfTableSettingsEditor();
+    };
+
+    const handleSavePdfTableSettings = () => {
+        const statusEl = document.getElementById('pdf-table-save-status');
+        const settings = collectPdfTableSettingsFromEditor();
+        const visibleCount = settings.columns.filter(c => c.visible).length;
+        if (visibleCount === 0) {
+            showToast('Enable at least one visible column.', 'error');
+            return;
+        }
+        savePdfTableSettings(settings);
+        if (statusEl) {
+            statusEl.textContent = 'Saved';
+            setTimeout(() => { statusEl.textContent = ''; }, 2200);
+        }
+        showToast('PDF table settings saved.', 'success');
+    };
+
+    const resetPdfTableSettingsDefaults = () => {
+        localStorage.removeItem(PDF_TABLE_SETTINGS_KEY);
+        renderPdfTableSettingsEditor();
+        showToast('PDF table settings reset.', 'info');
     };
 
     const handleForceSync = async () => {
