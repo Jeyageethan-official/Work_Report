@@ -1606,9 +1606,16 @@
             border-radius: 0 !important;
             padding: 0 !important;
             min-height: 0 !important;
+            margin: 0 !important;
+            max-width: none !important;
         }
         .settings-detail-panel .section-heading {
             display: none !important;
+        }
+        #settings-detail-view {
+            max-width: none !important;
+            width: 100% !important;
+            margin: 0 !important;
         }
         #settings-page .widget-card {
             overflow: hidden;
@@ -4303,7 +4310,7 @@ document.addEventListener('DOMContentLoaded', async () => {
              floatingDatePickerBtn.classList.add('hidden');
              setupAiPage();
         } else if (pageId === 'settings-page') {
-             pageTitle.textContent = settingsDetailActive ? settingsDetailTitle : "Settings";
+             pageTitle.textContent = "Settings";
              floatingBtnListener = null;
              shouldShowFloatingDatePicker = false;
              floatingDatePickerBtn.classList.add('hidden'); // Hide on settings page
@@ -7742,7 +7749,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
         settingsDetailActive = true;
         settingsDetailTitle = title || 'Settings';
-        if (settingsPage?.style.display === 'block' && pageTitle) pageTitle.textContent = settingsDetailTitle;
+        if (settingsPage?.style.display === 'block' && pageTitle) pageTitle.textContent = 'Settings';
         if (headerBackBtn) headerBackBtn.classList.remove('hidden');
     };
 
