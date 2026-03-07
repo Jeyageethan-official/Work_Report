@@ -3526,7 +3526,7 @@
                         <button id="settings-nav-account" class="settings-nav-row"><span>Account</span><span>›</span></button>
                         <button id="settings-nav-theme" class="settings-nav-row"><span>Theme</span><span>›</span></button>
                         <button id="settings-nav-work-policy" class="settings-nav-row"><span>Work Policy</span><span>›</span></button>
-                        <button id="settings-nav-pdf" class="settings-nav-row"><span>PDF Export Heading</span><span>›</span></button>
+                        <button id="settings-nav-pdf" class="settings-nav-row"><span>Data Table</span><span>›</span></button>
                     </div>
                 </div>
 
@@ -3609,7 +3609,7 @@
                 </div>
 
                 <div id="settings-panel-pdf" class="settings-detail-panel" style="display:none;">
-                    <h3 class="section-heading">PDF Export Heading</h3>
+                    <h3 class="section-heading">Data Table</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                        <div class="md:col-span-2">
                             <label for="settings-pdf-title" class="font-medium text-sm text-gray-700 dark:text-gray-300">Heading Title</label>
@@ -3628,63 +3628,6 @@
                        <button id="save-pdf-heading-btn" class="px-5 py-2 rounded-lg font-semibold text-sm shadow-sm transition-all bg-blue-600 text-white hover:bg-blue-700">Save PDF Heading</button>
                        <button id="reset-pdf-heading-btn" class="ios-secondary-btn px-4 py-2 rounded-lg text-sm font-semibold dark:text-gray-100">Reset Default</button>
                        <p id="pdf-heading-save-status" class="text-sm text-green-600 dark:text-green-400 flex items-center"></p>
-                    </div>
-
-                    <div class="my-5 border-t border-slate-200/70 dark:border-slate-700/70"></div>
-
-                    <h3 class="section-heading">PDF Table Designer</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label for="settings-pdf-header-bg" class="font-medium text-sm text-gray-700 dark:text-gray-300">Header Background</label>
-                            <input type="color" id="settings-pdf-header-bg" class="w-full mt-1 h-11 p-1 border border-gray-300 rounded-lg bg-gray-50/50 premium-input dark:bg-gray-800/50 dark:border-gray-700" />
-                        </div>
-                        <div>
-                            <label for="settings-pdf-header-text" class="font-medium text-sm text-gray-700 dark:text-gray-300">Header Text Color</label>
-                            <input type="color" id="settings-pdf-header-text" class="w-full mt-1 h-11 p-1 border border-gray-300 rounded-lg bg-gray-50/50 premium-input dark:bg-gray-800/50 dark:border-gray-700" />
-                        </div>
-                        <div>
-                            <label for="settings-pdf-text-color" class="font-medium text-sm text-gray-700 dark:text-gray-300">Row Text Color</label>
-                            <input type="color" id="settings-pdf-text-color" class="w-full mt-1 h-11 p-1 border border-gray-300 rounded-lg bg-gray-50/50 premium-input dark:bg-gray-800/50 dark:border-gray-700" />
-                        </div>
-                        <div>
-                            <label for="settings-pdf-border-color" class="font-medium text-sm text-gray-700 dark:text-gray-300">Border Color</label>
-                            <input type="color" id="settings-pdf-border-color" class="w-full mt-1 h-11 p-1 border border-gray-300 rounded-lg bg-gray-50/50 premium-input dark:bg-gray-800/50 dark:border-gray-700" />
-                        </div>
-                        <div>
-                            <label for="settings-pdf-border-width" class="font-medium text-sm text-gray-700 dark:text-gray-300">Border Width (px)</label>
-                            <input type="number" id="settings-pdf-border-width" min="0.5" max="3" step="0.1" class="w-full mt-1 p-2 border border-gray-300 rounded-lg bg-gray-50/50 premium-input dark:bg-gray-800/50 dark:border-gray-700" />
-                        </div>
-                        <div>
-                            <label for="settings-pdf-header-font-size" class="font-medium text-sm text-gray-700 dark:text-gray-300">Header Font Size (px)</label>
-                            <input type="number" id="settings-pdf-header-font-size" min="8" max="14" step="0.1" class="w-full mt-1 p-2 border border-gray-300 rounded-lg bg-gray-50/50 premium-input dark:bg-gray-800/50 dark:border-gray-700" />
-                        </div>
-                        <div>
-                            <label for="settings-pdf-row-font-size" class="font-medium text-sm text-gray-700 dark:text-gray-300">Row Font Size (px)</label>
-                            <input type="number" id="settings-pdf-row-font-size" min="8" max="14" step="0.1" class="w-full mt-1 p-2 border border-gray-300 rounded-lg bg-gray-50/50 premium-input dark:bg-gray-800/50 dark:border-gray-700" />
-                        </div>
-                        <div>
-                            <label for="settings-pdf-cell-padding-y" class="font-medium text-sm text-gray-700 dark:text-gray-300">Row Vertical Space (px)</label>
-                            <input type="number" id="settings-pdf-cell-padding-y" min="2" max="18" step="0.5" class="w-full mt-1 p-2 border border-gray-300 rounded-lg bg-gray-50/50 premium-input dark:bg-gray-800/50 dark:border-gray-700" />
-                        </div>
-                        <div>
-                            <label for="settings-pdf-cell-padding-x" class="font-medium text-sm text-gray-700 dark:text-gray-300">Cell Horizontal Space (px)</label>
-                            <input type="number" id="settings-pdf-cell-padding-x" min="2" max="18" step="0.5" class="w-full mt-1 p-2 border border-gray-300 rounded-lg bg-gray-50/50 premium-input dark:bg-gray-800/50 dark:border-gray-700" />
-                        </div>
-                        <div>
-                            <label for="settings-pdf-header-padding-y" class="font-medium text-sm text-gray-700 dark:text-gray-300">Header Vertical Space (px)</label>
-                            <input type="number" id="settings-pdf-header-padding-y" min="2" max="18" step="0.5" class="w-full mt-1 p-2 border border-gray-300 rounded-lg bg-gray-50/50 premium-input dark:bg-gray-800/50 dark:border-gray-700" />
-                        </div>
-                        <div>
-                            <label for="settings-pdf-header-padding-x" class="font-medium text-sm text-gray-700 dark:text-gray-300">Header Horizontal Space (px)</label>
-                            <input type="number" id="settings-pdf-header-padding-x" min="2" max="18" step="0.5" class="w-full mt-1 p-2 border border-gray-300 rounded-lg bg-gray-50/50 premium-input dark:bg-gray-800/50 dark:border-gray-700" />
-                        </div>
-                        <div class="flex items-center justify-between rounded-xl border border-slate-200/70 dark:border-slate-700/60 px-3 py-2 mt-1">
-                            <div>
-                                <p class="font-medium text-sm text-gray-700 dark:text-gray-300">Show All Month Rows</p>
-                                <p class="text-xs text-gray-500 dark:text-gray-400">Off means only filled rows will appear in PDF.</p>
-                            </div>
-                            <input id="settings-pdf-include-empty-rows" type="checkbox" class="ios-switch" checked />
-                        </div>
                     </div>
 
                     <div class="mt-5">
@@ -3714,8 +3657,6 @@
                                 <tbody id="settings-pdf-columns-builder"></tbody>
                             </table>
                         </div>
-                        <div id="settings-pdf-resize-editor" class="pdf-resize-wrap"></div>
-                        <p class="pdf-resize-note">Column border line-ai drag pannina width direct-aa change aagum (mouse/touch both support).</p>
                     </div>
                     <div class="mt-4 flex gap-3 flex-wrap">
                         <button id="save-pdf-table-settings-btn" class="px-5 py-2 rounded-lg font-semibold text-sm shadow-sm transition-all bg-blue-600 text-white hover:bg-blue-700">Save Table Settings</button>
@@ -7490,10 +7431,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         wrapper.style.fontSize = '12px';
         wrapper.style.lineHeight = '1.25';
 
-        const tableSettings = getPdfTableSettings();
+        const baseTableSettings = getPdfTableSettings();
+        const tableSettings = sanitizePdfTableSettings({
+            ...baseTableSettings,
+            // Reduce bottom white gap in A4 by keeping row height slightly larger
+            cellPaddingY: Math.max(Number(baseTableSettings.cellPaddingY) || 0, 8.8),
+            headerPaddingY: Math.max(Number(baseTableSettings.headerPaddingY) || 0, 7.8),
+            rowLineHeight: Math.max(Number(baseTableSettings.rowLineHeight) || 0, 1.26),
+            rowFontSize: Math.max(Number(baseTableSettings.rowFontSize) || 0, 11.6),
+            headerFontSize: Math.max(Number(baseTableSettings.headerFontSize) || 0, 11.1),
+            tableTextColor: '#000000',
+            headerTextColor: '#000000'
+        });
         let rowSource = getPdfMonthRowSource(year, month, options);
         if (!tableSettings.includeEmptyRows) rowSource = rowSource.filter(hasRowDataForPdf);
-        const tableMarkup = renderPdfTableMarkup(rowSource, tableSettings);
+        const tableMarkup = renderPdfTableMarkup(rowSource, tableSettings, { disableAutoHighlights: true });
 
         wrapper.innerHTML = `
             <div style="text-align:center;font-size:12px;line-height:1.1;margin-bottom:0.5cm;">
@@ -8162,7 +8114,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             ['settings-nav-account', 'settings-panel-account', 'Account'],
             ['settings-nav-theme', 'settings-panel-theme', 'Theme'],
             ['settings-nav-work-policy', 'settings-panel-work-policy', 'Work Policy'],
-            ['settings-nav-pdf', 'settings-panel-pdf', 'PDF Export Heading'],
+            ['settings-nav-pdf', 'settings-panel-pdf', 'Data Table'],
             ['settings-nav-backup', 'settings-panel-backup', 'Backup & Restore'],
             ['settings-nav-notifications', 'settings-panel-notifications', 'Notifications'],
             ['settings-nav-experience', 'settings-panel-experience', 'App Experience']
