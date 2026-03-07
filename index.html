@@ -1582,160 +1582,6 @@
             font-weight: 620;
             transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
         }
-        #settings-page.table-editor-mode #settings-home-view,
-        #settings-page.table-editor-mode #settings-detail-view,
-        #settings-page.table-editor-mode #settings-breadcrumb,
-        #settings-page.table-editor-mode #settings-breadcrumb-divider {
-            display: none !important;
-        }
-        #table-editor-root { display: none; }
-        #settings-page.table-editor-mode #table-editor-root { display: block; }
-        .table-editor-toolbar {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            padding: 0.65rem;
-            border: 1px solid rgba(148,163,184,0.3);
-            border-radius: 14px;
-            background: rgba(255,255,255,0.75);
-            box-shadow: 0 10px 26px rgba(15,23,42,0.08);
-        }
-        .table-editor-toolbar-group { display:flex; gap:0.35rem; align-items:center; flex-wrap:wrap; }
-        .table-editor-tool-btn, .table-editor-tool-select {
-            height: 34px;
-            border: 1px solid rgba(148,163,184,0.45);
-            border-radius: 10px;
-            background: #fff;
-            font-size: 12px;
-            font-weight: 600;
-            color: #1f2937;
-            padding: 0 0.55rem;
-        }
-        .table-editor-color-wrap {
-            display:flex; align-items:center; gap:0.3rem;
-            font-size:11px; font-weight:600; color:#475569;
-            border:1px solid rgba(148,163,184,0.45); border-radius:10px; padding:0 0.4rem; height:34px; background:#fff;
-        }
-        .table-editor-color-wrap input { width:20px; height:20px; border:none; background:none; padding:0; }
-        .table-editor-formula-bar {
-            margin-top: 0.7rem;
-            display: flex;
-            gap: 0.5rem;
-            align-items: center;
-            background: rgba(255,255,255,0.75);
-            border: 1px solid rgba(148,163,184,0.28);
-            border-radius: 12px;
-            padding: 0.5rem;
-        }
-        .table-editor-active-ref {
-            min-width: 52px;
-            text-align: center;
-            font-size: 12px;
-            font-weight: 700;
-            color: #1d4ed8;
-            border: 1px solid rgba(147,197,253,0.85);
-            border-radius: 8px;
-            padding: 0.25rem 0.35rem;
-            background: rgba(219,234,254,0.85);
-        }
-        .table-editor-formula-input {
-            flex: 1;
-            min-width: 180px;
-            height: 36px;
-            border: 1px solid rgba(148,163,184,0.45);
-            border-radius: 10px;
-            padding: 0 0.65rem;
-            background: #fff;
-            color: #0f172a;
-            font-size: 13px;
-        }
-        .table-editor-grid-wrap {
-            margin-top: 0.75rem;
-            border: 1px solid rgba(148,163,184,0.32);
-            border-radius: 14px;
-            overflow: auto;
-            background: rgba(255,255,255,0.82);
-            max-height: calc(100vh - 280px);
-            --te-header-bg: #dbeafe;
-            --te-header-text: #1e3a8a;
-            --te-cell-bg: #ffffff;
-            --te-cell-text: #0f172a;
-            --te-border: #cbd5e1;
-        }
-        .table-editor-grid {
-            width: max-content;
-            min-width: 100%;
-            border-collapse: collapse;
-            table-layout: fixed;
-        }
-        .table-editor-grid th, .table-editor-grid td {
-            border: 1px solid var(--te-border);
-            min-width: 110px;
-            height: 34px;
-            padding: 0.25rem 0.4rem;
-            font-size: 12px;
-            color: var(--te-cell-text);
-            background: var(--te-cell-bg);
-            overflow: hidden;
-            white-space: nowrap;
-            text-overflow: ellipsis;
-        }
-        .table-editor-grid .te-corner {
-            min-width: 46px;
-            width: 46px;
-            position: sticky;
-            left: 0;
-            z-index: 4;
-            background: #e2e8f0;
-        }
-        .table-editor-grid .te-col-head {
-            position: sticky;
-            top: 0;
-            z-index: 3;
-            background: var(--te-header-bg);
-            color: var(--te-header-text);
-            font-weight: 700;
-        }
-        .table-editor-grid .te-row-head {
-            min-width: 46px;
-            width: 46px;
-            position: sticky;
-            left: 0;
-            z-index: 2;
-            background: #e2e8f0;
-            text-align: center;
-            font-weight: 700;
-        }
-        .table-editor-grid td.te-active {
-            outline: 2px solid #2563eb;
-            outline-offset: -2px;
-        }
-        .table-editor-grid td.te-range {
-            background: rgba(191,219,254,0.35);
-        }
-        .table-editor-grid td[contenteditable="true"]:focus {
-            outline: 2px solid #1d4ed8;
-            outline-offset: -2px;
-            background: #eff6ff;
-        }
-        .te-resizer {
-            position: absolute;
-            top: 0;
-            right: -4px;
-            width: 8px;
-            height: 100%;
-            cursor: col-resize;
-            touch-action: none;
-        }
-        html.dark .table-editor-toolbar,
-        html.dark .table-editor-formula-bar,
-        html.dark .table-editor-grid-wrap { background: rgba(15,23,42,0.78); border-color: rgba(71,85,105,0.7); }
-        html.dark .table-editor-tool-btn, html.dark .table-editor-tool-select, html.dark .table-editor-formula-input, html.dark .table-editor-color-wrap {
-            background: rgba(30,41,59,0.9); color: #e2e8f0; border-color: rgba(71,85,105,0.8);
-        }
-        html.dark .table-editor-grid th, html.dark .table-editor-grid td { color: #e2e8f0; border-color: rgba(71,85,105,0.65); background: #0f172a; }
-        html.dark .table-editor-grid .te-col-head { background: #1e3a8a; }
-        html.dark .table-editor-grid .te-row-head, html.dark .table-editor-grid .te-corner { background: #1f2937; }
         .settings-nav-row:hover {
             transform: translateY(-1px);
             border-color: color-mix(in srgb, var(--ios-primary) 48%, #94a3b8);
@@ -3467,7 +3313,7 @@
                     </button>
                     <button id="nav-settings-btn" class="nav-button">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82"></path></svg>
-                        <span>Table Editor</span>
+                        <span>Settings</span>
                     </button>
                 </nav>
                 <div class="desktop-sidebar-spacer"></div>
@@ -3663,63 +3509,8 @@
             </div>
         </div>
 
-        <!-- Table Editor Page -->
+        <!-- Settings Page -->
         <div id="settings-page" class="p-4 sm:p-6 lg:p-8">
-            <div id="table-editor-root" class="fade-in">
-                <div class="table-editor-toolbar">
-                    <div class="table-editor-toolbar-group">
-                        <button id="te-undo-btn" class="table-editor-tool-btn">Undo</button>
-                        <button id="te-redo-btn" class="table-editor-tool-btn">Redo</button>
-                    </div>
-                    <div class="table-editor-toolbar-group">
-                        <button id="te-add-row-btn" class="table-editor-tool-btn">+ Row</button>
-                        <button id="te-add-col-btn" class="table-editor-tool-btn">+ Column</button>
-                        <button id="te-del-row-btn" class="table-editor-tool-btn">- Row</button>
-                        <button id="te-del-col-btn" class="table-editor-tool-btn">- Column</button>
-                    </div>
-                    <div class="table-editor-toolbar-group">
-                        <button id="te-bold-btn" class="table-editor-tool-btn">B</button>
-                        <button id="te-italic-btn" class="table-editor-tool-btn">I</button>
-                        <button id="te-underline-btn" class="table-editor-tool-btn">U</button>
-                        <select id="te-align-select" class="table-editor-tool-select">
-                            <option value="left">Left</option>
-                            <option value="center">Center</option>
-                            <option value="right">Right</option>
-                        </select>
-                        <select id="te-font-size" class="table-editor-tool-select">
-                            <option value="11">11</option>
-                            <option value="12" selected>12</option>
-                            <option value="13">13</option>
-                            <option value="14">14</option>
-                            <option value="16">16</option>
-                        </select>
-                    </div>
-                    <div class="table-editor-toolbar-group">
-                        <label class="table-editor-color-wrap">Text <input id="te-text-color" type="color" value="#0f172a"></label>
-                        <label class="table-editor-color-wrap">Fill <input id="te-fill-color" type="color" value="#ffffff"></label>
-                        <select id="te-theme-select" class="table-editor-tool-select">
-                            <option value="office-blue">Office Blue</option>
-                            <option value="minimal-white">Minimal White</option>
-                            <option value="dark-sheet">Dark Spreadsheet</option>
-                            <option value="premium-gray">Premium Gray</option>
-                            <option value="soft-green">Soft Green</option>
-                            <option value="glass-modern">Modern Glass</option>
-                        </select>
-                    </div>
-                    <div class="table-editor-toolbar-group">
-                        <button id="te-copy-btn" class="table-editor-tool-btn">Copy</button>
-                        <button id="te-paste-btn" class="table-editor-tool-btn">Paste</button>
-                        <button id="te-export-csv-btn" class="table-editor-tool-btn">Export CSV</button>
-                    </div>
-                </div>
-                <div class="table-editor-formula-bar">
-                    <span id="te-active-cell-label" class="table-editor-active-ref">A1</span>
-                    <input id="te-formula-input" class="table-editor-formula-input" placeholder="Edit selected cell..." />
-                </div>
-                <div id="table-editor-grid-wrap" class="table-editor-grid-wrap">
-                    <table id="table-editor-grid" class="table-editor-grid"></table>
-                </div>
-            </div>
             <div id="settings-home-view" class="max-w-xl mx-auto fade-in space-y-4">
                 <div class="widget-card text-center">
                     <div id="settings-user-avatar-wrap" class="w-24 h-24 rounded-full shrink-0 mx-auto">
@@ -4085,7 +3876,7 @@
             <button id="m-nav-reminder-btn" class="bottom-nav-btn"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M15 17h5l-1.4-1.4A2 2 0 0 1 18 14.2V11a6 6 0 1 0-12 0v3.2a2 2 0 0 1-.6 1.4L4 17h5"></path><path d="M10 17a2 2 0 0 0 4 0"></path></svg><span>Reminder</span></button>
             <button id="m-nav-reports-btn" class="bottom-nav-btn"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M4 19h16M7 16V8M12 16V5M17 16v-4"></path></svg><span>Reports</span></button>
             <button id="m-nav-ai-btn" class="bottom-nav-btn"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="m12 3-2 5-5 2 5 2 2 5 2-5 5-2-5-2-2-5z"></path></svg><span>AI</span></button>
-            <button id="m-nav-settings-btn" class="bottom-nav-btn"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82"></path></svg><span>Editor</span></button>
+            <button id="m-nav-settings-btn" class="bottom-nav-btn"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82"></path></svg><span>Settings</span></button>
         </nav>
 
         <!-- Scroll Buttons -->
@@ -4397,7 +4188,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const PDF_HEADING_NAME_KEY = 'pdfHeadingName';
     const PDF_HEADING_SERVICE_KEY = 'pdfHeadingServiceNo';
     const PDF_TABLE_SETTINGS_KEY = 'pdfTableSettingsV1';
-    const TABLE_EDITOR_STATE_KEY = 'tableEditorStateV1';
     let syncInProgress = false;
     let syncBannerTimer = null;
 
@@ -4408,11 +4198,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     let signupEventsBound = false;
     let settingsDetailActive = false;
     let settingsDetailTitle = 'Settings';
-    let tableEditorState = null;
-    let tableEditorHistory = [];
-    let tableEditorFuture = [];
-    let tableEditorDragging = false;
-    let tableEditorDragAnchor = null;
     const navIds = [
         'nav-dashboard-btn', 'nav-reminder-btn', 'nav-reports-btn', 'nav-ai-btn', 'nav-settings-btn', 'nav-logout-btn',
         'm-nav-dashboard-btn', 'm-nav-reminder-btn', 'm-nav-reports-btn', 'm-nav-ai-btn', 'm-nav-settings-btn'
@@ -4937,12 +4722,12 @@ document.addEventListener('DOMContentLoaded', async () => {
              floatingDatePickerBtn.classList.add('hidden');
              setupAiPage();
         } else if (pageId === 'settings-page') {
-             pageTitle.textContent = "Table Editor";
+             pageTitle.textContent = "Settings";
              floatingBtnListener = null;
              shouldShowFloatingDatePicker = false;
              floatingDatePickerBtn.classList.add('hidden'); // Hide on settings page
              renderSettingsPage();
-             if (headerBackBtn) headerBackBtn.classList.add('hidden');
+             if (headerBackBtn && settingsDetailActive) headerBackBtn.classList.remove('hidden');
         } else if (pageId === 'download-page') {
              pageTitle.textContent = "Download & Share";
              floatingBtnListener = null;
@@ -5195,7 +4980,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         <a id="sidebar-reminder-btn" class="sidebar-item"><div class="sidebar-item-content"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><span>Reminders</span></div>${chevronIcon}</a>
                         <a id="sidebar-share-btn" class="sidebar-item"><div class="sidebar-item-content"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg><span>Share & Export</span></div>${chevronIcon}</a>
                         <div class="my-2 border-t border-gray-200 dark:border-gray-700"></div>
-                        <a id="sidebar-settings-btn" class="sidebar-item"><div class="sidebar-item-content"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg><span>Table Editor</span></div>${chevronIcon}</a>
+                        <a id="sidebar-settings-btn" class="sidebar-item"><div class="sidebar-item-content"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg><span>Settings</span></div>${chevronIcon}</a>
                         <a id="sidebar-theme-toggle-btn" class="sidebar-item"><div class="sidebar-item-content">${themeIcon}<span>${themeText}</span></div></a>
                     </nav>
                 </div>
@@ -8353,407 +8138,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     //
     // ===================================================================================
     
-    const toColumnLabel = (index) => {
-        let n = index + 1;
-        let s = '';
-        while (n > 0) {
-            const rem = (n - 1) % 26;
-            s = String.fromCharCode(65 + rem) + s;
-            n = Math.floor((n - 1) / 26);
-        }
-        return s;
-    };
-
-    const createDefaultTableEditorState = () => {
-        const rows = 18;
-        const cols = 8;
-        return {
-            rows,
-            cols,
-            headers: Array.from({ length: cols }, (_, i) => toColumnLabel(i)),
-            colWidths: Array.from({ length: cols }, () => 130),
-            data: {},
-            theme: 'office-blue',
-            active: { r: 0, c: 0 },
-            range: null
-        };
-    };
-
-    const cloneTableEditorState = (state) => JSON.parse(JSON.stringify(state));
-
-    const getCellKey = (r, c) => `${r}:${c}`;
-
-    const getTableEditorCell = (r, c) => {
-        const key = getCellKey(r, c);
-        if (!tableEditorState.data[key]) tableEditorState.data[key] = { v: '', s: {} };
-        return tableEditorState.data[key];
-    };
-
-    const saveTableEditorState = () => {
-        localStorage.setItem(TABLE_EDITOR_STATE_KEY, JSON.stringify(tableEditorState));
-    };
-
-    const pushTableEditorHistory = () => {
-        tableEditorHistory.push(cloneTableEditorState(tableEditorState));
-        if (tableEditorHistory.length > 80) tableEditorHistory.shift();
-        tableEditorFuture = [];
-    };
-
-    const loadTableEditorState = () => {
-        const parsed = safeJsonParse(localStorage.getItem(TABLE_EDITOR_STATE_KEY), null);
-        if (!parsed || typeof parsed !== 'object') {
-            tableEditorState = createDefaultTableEditorState();
-            saveTableEditorState();
-            return;
-        }
-        const fallback = createDefaultTableEditorState();
-        tableEditorState = {
-            ...fallback,
-            ...parsed,
-            headers: Array.isArray(parsed.headers) ? parsed.headers : fallback.headers,
-            colWidths: Array.isArray(parsed.colWidths) ? parsed.colWidths : fallback.colWidths,
-            data: parsed.data && typeof parsed.data === 'object' ? parsed.data : {},
-            active: parsed.active || fallback.active
-        };
-    };
-
-    const normalizeTableEditorRange = () => {
-        const a = tableEditorState.active || { r: 0, c: 0 };
-        const r = tableEditorState.range || { r1: a.r, c1: a.c, r2: a.r, c2: a.c };
-        return {
-            r1: Math.min(r.r1, r.r2),
-            c1: Math.min(r.c1, r.c2),
-            r2: Math.max(r.r1, r.r2),
-            c2: Math.max(r.c1, r.c2)
-        };
-    };
-
-    const getSelectedCellCoords = () => {
-        const r = normalizeTableEditorRange();
-        const list = [];
-        for (let row = r.r1; row <= r.r2; row++) {
-            for (let col = r.c1; col <= r.c2; col++) list.push({ r: row, c: col });
-        }
-        return list;
-    };
-
-    const applyTableThemeClass = () => {
-        const wrap = document.getElementById('table-editor-grid-wrap');
-        if (!wrap) return;
-        wrap.dataset.theme = tableEditorState.theme || 'office-blue';
-        const themeMap = {
-            'office-blue': { hbg: '#dbeafe', htc: '#1e3a8a', bg: '#ffffff', tc: '#0f172a', border: '#cbd5e1' },
-            'minimal-white': { hbg: '#f8fafc', htc: '#0f172a', bg: '#ffffff', tc: '#0f172a', border: '#e2e8f0' },
-            'dark-sheet': { hbg: '#1e293b', htc: '#e2e8f0', bg: '#0f172a', tc: '#e2e8f0', border: '#334155' },
-            'premium-gray': { hbg: '#e2e8f0', htc: '#1f2937', bg: '#f8fafc', tc: '#111827', border: '#cbd5e1' },
-            'soft-green': { hbg: '#dcfce7', htc: '#166534', bg: '#f7fee7', tc: '#14532d', border: '#bbf7d0' },
-            'glass-modern': { hbg: '#dbeafe', htc: '#1d4ed8', bg: '#eff6ff', tc: '#0f172a', border: '#bfdbfe' }
-        };
-        const palette = themeMap[tableEditorState.theme] || themeMap['office-blue'];
-        wrap.style.setProperty('--te-header-bg', palette.hbg);
-        wrap.style.setProperty('--te-header-text', palette.htc);
-        wrap.style.setProperty('--te-cell-bg', palette.bg);
-        wrap.style.setProperty('--te-cell-text', palette.tc);
-        wrap.style.setProperty('--te-border', palette.border);
-    };
-
-    const renderTableEditorGrid = () => {
-        const table = document.getElementById('table-editor-grid');
-        if (!table) return;
-        const { rows, cols, headers, colWidths } = tableEditorState;
-        const range = normalizeTableEditorRange();
-
-        const colgroup = ['<col style="width:46px">']
-            .concat(Array.from({ length: cols }, (_, c) => `<col style="width:${Number(colWidths[c] || 130)}px">`))
-            .join('');
-
-        const headerCells = Array.from({ length: cols }, (_, c) => {
-            const label = escapeHtml(headers[c] || toColumnLabel(c));
-            return `<th class="te-col-head" data-col="${c}"><span class="te-head-label" contenteditable="true" spellcheck="false" data-col-label="${c}">${label}</span><span class="te-resizer" data-resize-col="${c}"></span></th>`;
-        }).join('');
-
-        const bodyRows = Array.from({ length: rows }, (_, r) => {
-            const rowHead = `<th class="te-row-head" data-row-head="${r}">${r + 1}</th>`;
-            const cells = Array.from({ length: cols }, (_, c) => {
-                const cell = getTableEditorCell(r, c);
-                const active = tableEditorState.active && tableEditorState.active.r === r && tableEditorState.active.c === c;
-                const inRange = r >= range.r1 && r <= range.r2 && c >= range.c1 && c <= range.c2;
-                const cls = `${active ? 'te-active ' : ''}${inRange ? 'te-range' : ''}`.trim();
-                const st = cell.s || {};
-                const style = [
-                    st.bg ? `background:${st.bg}` : '',
-                    st.tc ? `color:${st.tc}` : '',
-                    st.bold ? 'font-weight:700' : '',
-                    st.italic ? 'font-style:italic' : '',
-                    st.underline ? 'text-decoration:underline' : '',
-                    st.align ? `text-align:${st.align}` : '',
-                    st.fs ? `font-size:${st.fs}px` : ''
-                ].filter(Boolean).join(';');
-                return `<td class="${cls}" data-r="${r}" data-c="${c}" style="${style}">${escapeHtml(cell.v || '')}</td>`;
-            }).join('');
-            return `<tr>${rowHead}${cells}</tr>`;
-        }).join('');
-
-        table.innerHTML = `<colgroup>${colgroup}</colgroup><thead><tr><th class="te-corner"></th>${headerCells}</tr></thead><tbody>${bodyRows}</tbody>`;
-        applyTableThemeClass();
-        bindTableEditorGridEvents();
-        updateTableEditorFormulaBar();
-    };
-
-    const updateTableEditorFormulaBar = () => {
-        const refEl = document.getElementById('te-active-cell-label');
-        const inputEl = document.getElementById('te-formula-input');
-        if (!refEl || !inputEl) return;
-        const { r, c } = tableEditorState.active || { r: 0, c: 0 };
-        refEl.textContent = `${toColumnLabel(c)}${r + 1}`;
-        inputEl.value = getTableEditorCell(r, c).v || '';
-    };
-
-    const setActiveTableCell = (r, c, extend = false) => {
-        tableEditorState.active = { r, c };
-        if (extend && tableEditorDragAnchor) {
-            tableEditorState.range = { r1: tableEditorDragAnchor.r, c1: tableEditorDragAnchor.c, r2: r, c2: c };
-        } else {
-            tableEditorState.range = { r1: r, c1: c, r2: r, c2: c };
-            tableEditorDragAnchor = { r, c };
-        }
-        renderTableEditorGrid();
-    };
-
-    const startCellEdit = (td) => {
-        if (!td) return;
-        td.setAttribute('contenteditable', 'true');
-        td.focus();
-        document.execCommand && document.execCommand('selectAll', false, null);
-    };
-
-    const finishCellEdit = (td) => {
-        if (!td) return;
-        const r = Number(td.dataset.r);
-        const c = Number(td.dataset.c);
-        const val = td.textContent || '';
-        td.removeAttribute('contenteditable');
-        pushTableEditorHistory();
-        getTableEditorCell(r, c).v = val;
-        saveTableEditorState();
-        updateTableEditorFormulaBar();
-    };
-
-    const bindTableEditorGridEvents = () => {
-        const table = document.getElementById('table-editor-grid');
-        if (!table) return;
-        table.querySelectorAll('td[data-r][data-c]').forEach((td) => {
-            td.onmousedown = (e) => {
-                const r = Number(td.dataset.r);
-                const c = Number(td.dataset.c);
-                tableEditorDragging = true;
-                if (!e.shiftKey) tableEditorDragAnchor = { r, c };
-                setActiveTableCell(r, c, e.shiftKey);
-            };
-            td.onmouseenter = () => {
-                if (!tableEditorDragging) return;
-                const r = Number(td.dataset.r);
-                const c = Number(td.dataset.c);
-                setActiveTableCell(r, c, true);
-            };
-            td.ondblclick = () => startCellEdit(td);
-            td.onblur = () => finishCellEdit(td);
-            td.onkeydown = (e) => {
-                if (e.key === 'Enter') { e.preventDefault(); finishCellEdit(td); }
-            };
-        });
-        window.onmouseup = () => { tableEditorDragging = false; };
-
-        table.querySelectorAll('.te-head-label').forEach((el) => {
-            el.onblur = () => {
-                const c = Number(el.dataset.colLabel);
-                pushTableEditorHistory();
-                tableEditorState.headers[c] = (el.textContent || '').trim() || toColumnLabel(c);
-                saveTableEditorState();
-                renderTableEditorGrid();
-            };
-        });
-
-        table.querySelectorAll('.te-resizer').forEach((h) => {
-            h.onpointerdown = (ev) => {
-                ev.preventDefault();
-                const col = Number(h.dataset.resizeCol);
-                const startX = ev.clientX;
-                const base = Number(tableEditorState.colWidths[col] || 130);
-                const move = (mv) => {
-                    const next = Math.max(72, base + (mv.clientX - startX));
-                    tableEditorState.colWidths[col] = next;
-                    renderTableEditorGrid();
-                };
-                const up = () => {
-                    window.removeEventListener('pointermove', move);
-                    window.removeEventListener('pointerup', up);
-                    saveTableEditorState();
-                };
-                window.addEventListener('pointermove', move);
-                window.addEventListener('pointerup', up);
-            };
-        });
-    };
-
-    const applyStyleToSelection = (mutator) => {
-        pushTableEditorHistory();
-        getSelectedCellCoords().forEach(({ r, c }) => {
-            const cell = getTableEditorCell(r, c);
-            cell.s = cell.s || {};
-            mutator(cell.s);
-        });
-        saveTableEditorState();
-        renderTableEditorGrid();
-    };
-
-    const tableEditorAddRow = () => { pushTableEditorHistory(); tableEditorState.rows += 1; saveTableEditorState(); renderTableEditorGrid(); };
-    const tableEditorAddCol = () => {
-        pushTableEditorHistory();
-        tableEditorState.cols += 1;
-        tableEditorState.headers.push(toColumnLabel(tableEditorState.cols - 1));
-        tableEditorState.colWidths.push(130);
-        saveTableEditorState();
-        renderTableEditorGrid();
-    };
-    const tableEditorDeleteRow = () => {
-        if (tableEditorState.rows <= 1) return;
-        pushTableEditorHistory();
-        const r = (tableEditorState.active || { r: tableEditorState.rows - 1 }).r;
-        const nextData = {};
-        Object.entries(tableEditorState.data).forEach(([k, v]) => {
-            const [rr, cc] = k.split(':').map(Number);
-            if (rr === r) return;
-            const nr = rr > r ? rr - 1 : rr;
-            nextData[`${nr}:${cc}`] = v;
-        });
-        tableEditorState.data = nextData;
-        tableEditorState.rows -= 1;
-        tableEditorState.active.r = Math.max(0, Math.min(tableEditorState.rows - 1, tableEditorState.active.r));
-        saveTableEditorState();
-        renderTableEditorGrid();
-    };
-    const tableEditorDeleteCol = () => {
-        if (tableEditorState.cols <= 1) return;
-        pushTableEditorHistory();
-        const c = (tableEditorState.active || { c: tableEditorState.cols - 1 }).c;
-        const nextData = {};
-        Object.entries(tableEditorState.data).forEach(([k, v]) => {
-            const [rr, cc] = k.split(':').map(Number);
-            if (cc === c) return;
-            const nc = cc > c ? cc - 1 : cc;
-            nextData[`${rr}:${nc}`] = v;
-        });
-        tableEditorState.data = nextData;
-        tableEditorState.headers.splice(c, 1);
-        tableEditorState.colWidths.splice(c, 1);
-        tableEditorState.cols -= 1;
-        tableEditorState.active.c = Math.max(0, Math.min(tableEditorState.cols - 1, tableEditorState.active.c));
-        saveTableEditorState();
-        renderTableEditorGrid();
-    };
-
-    const tableEditorCopy = async () => {
-        const range = normalizeTableEditorRange();
-        const lines = [];
-        for (let r = range.r1; r <= range.r2; r++) {
-            const row = [];
-            for (let c = range.c1; c <= range.c2; c++) row.push((getTableEditorCell(r, c).v || '').replace(/\t/g, ' '));
-            lines.push(row.join('\t'));
-        }
-        try { await navigator.clipboard.writeText(lines.join('\n')); showToast('Copied', 'success'); } catch { showToast('Copy failed', 'error'); }
-    };
-
-    const tableEditorPaste = async () => {
-        try {
-            const txt = await navigator.clipboard.readText();
-            if (!txt) return;
-            pushTableEditorHistory();
-            const { r, c } = tableEditorState.active || { r: 0, c: 0 };
-            txt.split(/\r?\n/).forEach((line, ri) => {
-                if (!line.length) return;
-                line.split('\t').forEach((val, ci) => {
-                    const rr = r + ri; const cc = c + ci;
-                    if (rr >= tableEditorState.rows || cc >= tableEditorState.cols) return;
-                    getTableEditorCell(rr, cc).v = val;
-                });
-            });
-            saveTableEditorState();
-            renderTableEditorGrid();
-        } catch {
-            showToast('Paste blocked by browser', 'error');
-        }
-    };
-
-    const tableEditorExportCsv = () => {
-        const rows = [];
-        rows.push(tableEditorState.headers.map(h => `"${String(h).replace(/"/g, '""')}"`).join(','));
-        for (let r = 0; r < tableEditorState.rows; r++) {
-            const line = [];
-            for (let c = 0; c < tableEditorState.cols; c++) {
-                line.push(`"${String(getTableEditorCell(r, c).v || '').replace(/"/g, '""')}"`);
-            }
-            rows.push(line.join(','));
-        }
-        const blob = new Blob([rows.join('\n')], { type: 'text/csv;charset=utf-8' });
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = `table-editor-${new Date().toISOString().slice(0,10)}.csv`;
-        a.click();
-        URL.revokeObjectURL(a.href);
-    };
-
-    const bindTableEditorToolbar = () => {
-        const byId = (id) => document.getElementById(id);
-        byId('te-undo-btn').onclick = () => {
-            if (!tableEditorHistory.length) return;
-            tableEditorFuture.push(cloneTableEditorState(tableEditorState));
-            tableEditorState = tableEditorHistory.pop();
-            saveTableEditorState();
-            renderTableEditorGrid();
-        };
-        byId('te-redo-btn').onclick = () => {
-            if (!tableEditorFuture.length) return;
-            tableEditorHistory.push(cloneTableEditorState(tableEditorState));
-            tableEditorState = tableEditorFuture.pop();
-            saveTableEditorState();
-            renderTableEditorGrid();
-        };
-        byId('te-add-row-btn').onclick = tableEditorAddRow;
-        byId('te-add-col-btn').onclick = tableEditorAddCol;
-        byId('te-del-row-btn').onclick = tableEditorDeleteRow;
-        byId('te-del-col-btn').onclick = tableEditorDeleteCol;
-        byId('te-copy-btn').onclick = tableEditorCopy;
-        byId('te-paste-btn').onclick = tableEditorPaste;
-        byId('te-export-csv-btn').onclick = tableEditorExportCsv;
-        byId('te-bold-btn').onclick = () => applyStyleToSelection((s) => { s.bold = !s.bold; });
-        byId('te-italic-btn').onclick = () => applyStyleToSelection((s) => { s.italic = !s.italic; });
-        byId('te-underline-btn').onclick = () => applyStyleToSelection((s) => { s.underline = !s.underline; });
-        byId('te-align-select').onchange = (e) => applyStyleToSelection((s) => { s.align = e.target.value; });
-        byId('te-font-size').onchange = (e) => applyStyleToSelection((s) => { s.fs = Number(e.target.value || 12); });
-        byId('te-text-color').oninput = (e) => applyStyleToSelection((s) => { s.tc = e.target.value; });
-        byId('te-fill-color').oninput = (e) => applyStyleToSelection((s) => { s.bg = e.target.value; });
-        byId('te-theme-select').onchange = (e) => { tableEditorState.theme = e.target.value; saveTableEditorState(); renderTableEditorGrid(); };
-        const formulaInput = byId('te-formula-input');
-        if (formulaInput) {
-            formulaInput.onchange = () => {
-                pushTableEditorHistory();
-                const { r, c } = tableEditorState.active || { r: 0, c: 0 };
-                getTableEditorCell(r, c).v = formulaInput.value || '';
-                saveTableEditorState();
-                renderTableEditorGrid();
-            };
-        }
-    };
-
-    const initTableEditorModule = () => {
-        loadTableEditorState();
-        renderTableEditorGrid();
-        bindTableEditorToolbar();
-        const themeSel = document.getElementById('te-theme-select');
-        if (themeSel) themeSel.value = tableEditorState.theme || 'office-blue';
-    };
-
     const showSettingsHome = () => {
         const home = document.getElementById('settings-home-view');
         const detail = document.getElementById('settings-detail-view');
@@ -9015,9 +8399,49 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     const renderSettingsPage = () => {
-        if (!settingsPage) return;
-        settingsPage.classList.add('table-editor-mode');
-        initTableEditorModule();
+        if (!user) return;
+        initSettingsNavigation();
+        showSettingsHome();
+
+        // Profile
+        const initialEl = document.getElementById('settings-user-initial');
+        const photoEl = document.getElementById('settings-user-photo');
+        const homeNameEl = document.getElementById('settings-home-name');
+        const homeEmailEl = document.getElementById('settings-home-email');
+        const initial = (user.displayName || user.email || 'U').charAt(0).toUpperCase();
+        initialEl.textContent = initial;
+        if (user.photoURL) {
+            photoEl.src = user.photoURL;
+            photoEl.style.display = 'block';
+            initialEl.style.display = 'none';
+        } else {
+            photoEl.removeAttribute('src');
+            photoEl.style.display = 'none';
+            initialEl.style.display = 'inline-flex';
+        }
+        document.getElementById('settings-display-name').value = user.displayName || '';
+        document.getElementById('settings-email').textContent = user.email;
+        if (homeNameEl) homeNameEl.textContent = user.displayName || 'User';
+        if (homeEmailEl) homeEmailEl.textContent = user.email || '';
+
+        // Preferences
+        document.getElementById('settings-leave-allowance').value = userSettings.baseAnnualLeave || 35;
+        document.getElementById('settings-work-hours').value = (userSettings.normalWorkMinutes || 540) / 60;
+        document.getElementById('theme-toggle-ios').checked = document.documentElement.classList.contains('dark');
+        document.getElementById('settings-accent-color').value = localStorage.getItem('accentColor') || '#007aff';
+        const pdfHeading = getPdfHeadingConfig();
+        document.getElementById('settings-pdf-title').value = pdfHeading.title;
+        document.getElementById('settings-pdf-name').value = pdfHeading.name;
+        document.getElementById('settings-pdf-service-no').value = pdfHeading.serviceNo;
+        renderPdfTableSettingsEditor();
+        document.getElementById('notify-reminder-toggle').checked = localStorage.getItem('notifyReminderEnabled') !== 'false';
+        document.getElementById('notify-backup-toggle').checked = localStorage.getItem('notifyBackupEnabled') !== 'false';
+        document.getElementById('reduce-motion-toggle').checked = localStorage.getItem('reduceMotion') === 'true';
+        document.getElementById('auto-scroll-toggle').checked = localStorage.getItem('autoScrollToToday') !== 'false';
+        document.documentElement.classList.toggle('reduce-motion', localStorage.getItem('reduceMotion') === 'true');
+        updateBackupUi(0);
+        
+        addSettingsEventListeners();
     };
 
     const addSettingsEventListeners = () => {
