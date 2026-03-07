@@ -1912,6 +1912,15 @@
             padding: 1.1rem !important;
             min-height: 0 !important;
         }
+        #settings-page .settings-detail-panel {
+            border: none !important;
+            background: transparent !important;
+            box-shadow: none !important;
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+            border-radius: 0 !important;
+            padding: 0 !important;
+        }
         html.dark #settings-page .widget-card {
             border-color: rgba(100, 116, 139, 0.35) !important;
             background: rgba(15, 23, 42, 0.5) !important;
@@ -3361,7 +3370,7 @@
                 </div>
             </div>
 
-            <div id="settings-detail-view" class="max-w-4xl mx-auto fade-in" style="display:none;">
+            <div id="settings-detail-view" class="w-full fade-in" style="display:none;">
                 <div class="widget-card mb-4">
                     <div class="flex items-center justify-between">
                         <button id="settings-detail-back-btn" class="ios-secondary-btn px-3 py-2 rounded-lg text-sm font-semibold dark:text-gray-100">← Back</button>
@@ -3369,6 +3378,7 @@
                         <div class="w-[72px]"></div>
                     </div>
                 </div>
+                <p id="settings-breadcrumb" class="text-sm font-medium text-slate-600 dark:text-slate-300 mb-3 ml-1">Settings</p>
 
                 <div id="settings-panel-account" class="settings-detail-panel widget-card" style="display:none;">
                     <h3 class="section-heading">Account</h3>
@@ -7728,8 +7738,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     const showSettingsHome = () => {
         const home = document.getElementById('settings-home-view');
         const detail = document.getElementById('settings-detail-view');
+        const breadcrumb = document.getElementById('settings-breadcrumb');
         if (home) home.style.display = 'block';
         if (detail) detail.style.display = 'none';
+        if (breadcrumb) breadcrumb.textContent = 'Settings';
         document.querySelectorAll('.settings-detail-panel').forEach(panel => panel.style.display = 'none');
         settingsDetailActive = false;
         settingsDetailTitle = 'Settings';
@@ -7741,9 +7753,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         const home = document.getElementById('settings-home-view');
         const detail = document.getElementById('settings-detail-view');
         const titleEl = document.getElementById('settings-detail-title');
+        const breadcrumb = document.getElementById('settings-breadcrumb');
         if (home) home.style.display = 'none';
         if (detail) detail.style.display = 'block';
         if (titleEl) titleEl.textContent = title || 'Settings';
+        if (breadcrumb) breadcrumb.textContent = `Settings / ${title || 'Settings'}`;
         document.querySelectorAll('.settings-detail-panel').forEach(panel => {
             panel.style.display = panel.id === panelId ? 'block' : 'none';
         });
