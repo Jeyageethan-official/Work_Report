@@ -14,6 +14,7 @@ const appBaseUrlParam = defineString("APP_BASE_URL", {
 const mailFromParam = defineString("MAIL_FROM", {
   default: "Work Report <no-reply@workreport.app>",
 });
+const mailTemplateVersion = "2026-03-07-b";
 
 const json = (res, status, payload) => {
   res.status(status).set("Content-Type", "application/json").send(JSON.stringify(payload));
@@ -166,8 +167,8 @@ exports.sendAuthEmail = onRequest(
         apiKey: key,
         from: mailFromParam.value(),
         to: cleanEmail,
-        subject,
-        html,
+        subject: `${subject}`,
+        html: `${html}\n<!-- template:${mailTemplateVersion} -->`,
       });
 
       return json(res, 200, { ok: true });
