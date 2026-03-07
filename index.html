@@ -5781,6 +5781,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             'auth/operation-not-allowed': 'This sign-in method is not enabled.',
             'auth/operation-not-supported-in-this-environment': 'Google Sign-In requires secure web app URL.',
             'auth/unauthorized-domain': 'This domain is not allowed for Google sign-in. Use the official app URL.',
+            'google-popup-unsupported-host': 'Google sign-in is available only on workreport.online or work-report-fe3da.web.app.',
             'auth/unauthorized-continue-uri': 'Password reset link config is invalid. Please try again.',
             'auth/web-storage-unsupported': 'Browser storage is blocked. Enable cookies/storage and retry.',
             'auth/invalid-action-code': 'This link is invalid or already used.',
@@ -5816,7 +5817,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             handleCodeInApp: false
         };
     };
-    const ALLOW_FIREBASE_DEFAULT_AUTH_EMAIL_FALLBACK = true;
     const VERIFY_RESEND_COOLDOWN_MS = 10 * 60 * 1000;
     const verifyResendKeyFor = (email = '') => `verifyResendAt:${String(email || '').trim().toLowerCase()}`;
     const canResendVerifyFor = (email = '') => {
@@ -6104,31 +6104,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                 displayName: fullName || userCredential.user.displayName || ''
             });
         } catch (err) {
-            if (ALLOW_FIREBASE_DEFAULT_AUTH_EMAIL_FALLBACK) {
-                console.warn('Custom verify mail failed, falling back to Firebase mail:', err);
-                await userCredential.user.sendEmailVerification(getActionCodeSettings());
-            } else {
-                throw new Error('Verification email service is temporarily unavailable. Please try again.');
-            }
+            throw new Error(mapAuthError(err));
         }
         await auth.signOut();
     };
 
     const performPasswordReset = async (email) => {
-        let customError = null;
-        try {
-            await sendCustomAuthEmail({ type: 'resetPassword', email });
-            return;
-        } catch (err) {
-            customError = err;
-            console.warn('Custom reset mail failed, attempting Firebase fallback:', err);
-        }
-        try {
-            await auth.sendPasswordResetEmail(email, getActionCodeSettings());
-        } catch (fallbackErr) {
-            console.warn('Firebase reset fallback also failed:', fallbackErr);
-            throw (customError || fallbackErr);
-        }
+        await sendCustomAuthEmail({ type: 'resetPassword', email });
     };
 
     const sendCustomAuthEmail = async ({ type, email, displayName = '' }) => {
@@ -6190,23 +6172,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     };
 
+    const isOfficialGoogleAuthHost = () => {
+        const host = (window.location.hostname || '').toLowerCase();
+        return host === 'workreport.online' || host === 'work-report-fe3da.web.app';
+    };
+
     const startGoogleSignIn = async (errorTargetId) => {
         setAuthError(errorTargetId, '');
         setGoogleAuthButtonsDisabled(true);
         setAuthLoading(true, 'Signing you in...');
 
         const protocol = window.location.protocol;
-        const protocolOk = protocol === 'http:' || protocol === 'https:' || protocol === 'chrome-extension:';
-        const isGithubPagesHost = /\.github\.io$/i.test(window.location.hostname || '');
-        if (!protocolOk || isGithubPagesHost) {
-            const hostedAuthUrl = new URL(HOSTED_WEB_APP_URL);
-            hostedAuthUrl.searchParams.set('auth', 'google');
-            hostedAuthUrl.searchParams.set('src', isGithubPagesHost ? 'github-pages' : 'file');
-            hostedAuthUrl.searchParams.set('appv', '20260306_4');
-            localStorage.setItem(GOOGLE_AUTH_FLAG, '1');
-            localStorage.setItem(GOOGLE_AUTH_TS, String(Date.now()));
-            window.location.href = hostedAuthUrl.toString();
-            return;
+        const protocolOk = protocol === 'http:' || protocol === 'https:';
+        if (!protocolOk || !isOfficialGoogleAuthHost()) {
+            throw new Error('google-popup-unsupported-host');
         }
 
         await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
@@ -6214,9 +6193,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         provider.addScope('email');
         provider.addScope('profile');
         provider.setCustomParameters({ prompt: 'select_account' });
-        localStorage.setItem(GOOGLE_AUTH_FLAG, '1');
-        localStorage.setItem(GOOGLE_AUTH_TS, String(Date.now()));
-        await auth.signInWithRedirect(provider);
+        await auth.signInWithPopup(provider);
     };
 
     const addSigninEventListeners = () => {
@@ -9539,21 +9516,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     db = firebase.firestore();
     let userRefUnsubscribe = null;
     const initialShareId = new URLSearchParams(window.location.search).get('shareId');
-    const clearAuthIntentParams = () => {
-        const cleanUrl = new URL(window.location.href);
-        cleanUrl.searchParams.delete('auth');
-        cleanUrl.searchParams.delete('src');
-        cleanUrl.searchParams.delete('appv');
-        window.history.replaceState({}, '', cleanUrl.toString());
-    };
-    const waitForAuthUser = async (timeoutMs = 4500, stepMs = 120) => {
-        const started = Date.now();
-        while (Date.now() - started < timeoutMs) {
-            if (auth?.currentUser) return auth.currentUser;
-            await new Promise(resolve => setTimeout(resolve, stepMs));
-        }
-        return null;
-    };
     const renderSignedOutAuthState = () => {
         user = null;
         hideAuthActionPage();
@@ -9749,19 +9711,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         await startSignedInDataSync(firebaseUser);
     };
 
-    let redirectResultResolved = false;
-    const resolveRedirectUserOnce = async () => {
-        if (redirectResultResolved) return null;
-        redirectResultResolved = true;
-        try {
-            const redirectResult = await auth.getRedirectResult();
-            return redirectResult?.user || null;
-        } catch (redirectErr) {
-            setAuthError('signin-error', mapAuthError(redirectErr));
-            return null;
-        }
-    };
-
     auth.onAuthStateChanged(async (currentUser) => {
         if (userRefUnsubscribe) {
             userRefUnsubscribe();
@@ -9769,7 +9718,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         const authActionParams = parseAuthActionParams();
-        if (authActionParams?.mode && authActionParams?.oobCode) {
+        if (authActionParams?.mode) {
             await handleAuthActionPage(authActionParams);
             hideBootSplash();
             return;
@@ -9783,23 +9732,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         setAuthLoading(true, 'Loading...');
-        const params = new URLSearchParams(window.location.search);
-        const authIntent = params.get('auth');
-        const redirectInFlight = localStorage.getItem(GOOGLE_AUTH_FLAG) === '1';
-
-        if (!currentUser) {
-            const redirectUser = await resolveRedirectUserOnce();
-            if (redirectUser) currentUser = redirectUser;
-        }
         if (!currentUser && auth.currentUser) {
             currentUser = auth.currentUser;
-        }
-        if (!currentUser && (authIntent === 'google' || redirectInFlight)) {
-            currentUser = await waitForAuthUser(6500, 120);
-        }
-
-        if (authIntent === 'google') {
-            clearAuthIntentParams();
         }
 
         if (currentUser) {
@@ -9821,18 +9755,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         verificationSent = true;
                         markVerifyResendFor(unverifiedEmail);
                     } catch (verifyErr) {
-                        if (ALLOW_FIREBASE_DEFAULT_AUTH_EMAIL_FALLBACK) {
-                            console.warn('Custom verification resend failed, falling back to Firebase mail:', verifyErr);
-                            try {
-                                await currentUser.sendEmailVerification(getActionCodeSettings());
-                                verificationSent = true;
-                                markVerifyResendFor(unverifiedEmail);
-                            } catch (fallbackErr) {
-                                console.warn('Fallback verification send failed:', fallbackErr);
-                            }
-                        } else {
-                            console.warn('Custom verification resend failed:', verifyErr);
-                        }
+                        console.warn('Custom verification resend failed:', verifyErr);
                     }
                 }
                 await auth.signOut();
@@ -9864,9 +9787,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
-        if (redirectInFlight || authIntent === 'google') {
-            setAuthError('signin-error', 'Google sign-in did not complete. Please try again.');
-        }
         localStorage.removeItem(GOOGLE_AUTH_FLAG);
         localStorage.removeItem(GOOGLE_AUTH_TS);
         if (!navigator.onLine && enterOfflineLocalState()) {

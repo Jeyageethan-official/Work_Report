@@ -13,7 +13,7 @@ const appBaseUrlParam = defineString("APP_BASE_URL", {
   default: `https://${PROJECT_ID}.web.app`,
 });
 const mailFromParam = defineString("MAIL_FROM", {
-  default: "Work Report <no-reply@workreport.app>",
+  default: "Work Report <noreply@workreport.online>",
 });
 const mailTemplateVersion = "2026-03-07-b";
 const RESET_TTL_MS = 60 * 60 * 1000;
