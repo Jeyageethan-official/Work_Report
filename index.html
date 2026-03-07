@@ -6035,6 +6035,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
             await sendCustomAuthEmail({ type: 'resetPassword', email });
         } catch (err) {
+            const code = String(err?.code || '');
+            const msg = String(err?.message || '');
+            const isRateLimited = code === 'too-many-attempts' || msg === 'too-many-attempts' || msg.includes('TOO_MANY_ATTEMPTS_TRY_LATER');
+            if (isRateLimited) {
+                // Temporary fallback path to improve reliability when custom generation is throttled.
+                await auth.sendPasswordResetEmail(email, getActionCodeSettings());
+                return;
+            }
             if (ALLOW_FIREBASE_DEFAULT_AUTH_EMAIL_FALLBACK) {
                 console.warn('Custom reset mail failed, falling back to Firebase mail:', err);
                 await auth.sendPasswordResetEmail(email, getActionCodeSettings());
