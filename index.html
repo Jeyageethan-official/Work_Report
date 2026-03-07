@@ -1542,9 +1542,34 @@
             background: rgba(255, 255, 255, 0.42);
             border: 1px solid rgba(148, 163, 184, 0.25);
         }
+        .settings-nav-row {
+            width: 100%;
+            border: 1px solid rgba(148, 163, 184, 0.28);
+            background: rgba(255, 255, 255, 0.88);
+            color: #1e293b;
+            border-radius: 12px;
+            min-height: 2.75rem;
+            padding: 0.55rem 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.94rem;
+            font-weight: 620;
+            transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        .settings-nav-row:hover {
+            transform: translateY(-1px);
+            border-color: color-mix(in srgb, var(--ios-primary) 48%, #94a3b8);
+            box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+        }
         html.dark .settings-row {
             background: rgba(17, 24, 39, 0.45);
             border-color: rgba(100, 116, 139, 0.35);
+        }
+        html.dark .settings-nav-row {
+            background: rgba(15, 23, 42, 0.82);
+            border-color: rgba(96, 165, 250, 0.22);
+            color: #e2e8f0;
         }
         #settings-page .widget-card {
             overflow: hidden;
@@ -3251,35 +3276,68 @@
 
         <!-- Settings Page -->
         <div id="settings-page" class="p-4 sm:p-6 lg:p-8">
-             <div class="space-y-8 max-w-4xl mx-auto fade-in">
-                <!-- Profile Settings Card -->
-                <div class="widget-card">
-                     <h3 class="section-heading">Account</h3>
-                     <div class="flex flex-col sm:flex-row items-center gap-6">
-                         <div id="settings-user-avatar-wrap" class="w-24 h-24 rounded-full shrink-0">
-                             <img id="settings-user-photo" alt="User profile" />
-                             <span id="settings-user-initial" class="w-full h-full inline-flex items-center justify-center text-gray-400 dark:text-gray-500 text-4xl font-bold">U</span>
-                         </div>
-                         <div class="flex-grow w-full text-left">
-                             <div class="space-y-3">
-                                 <div>
-                                     <label for="settings-display-name" class="font-medium text-sm text-gray-700 dark:text-gray-300">Display Name</label>
-                                     <input type="text" id="settings-display-name" class="w-full mt-1 p-2 border border-gray-300 rounded-lg bg-gray-50/50 premium-input dark:bg-gray-800/50 dark:border-gray-700" />
-                                 </div>
-                                 <div>
-                                     <label class="font-medium text-sm text-gray-700 dark:text-gray-300">Email</label>
-                                     <p id="settings-email" class="mt-1 text-gray-500 dark:text-gray-400"></p>
-                                 </div>
-                             </div>
-                             <div class="mt-4 flex gap-3">
-                                 <button id="save-profile-btn" class="px-5 py-2 rounded-lg font-semibold text-sm shadow-sm transition-all bg-blue-600 text-white hover:bg-blue-700">Save Profile</button>
-                                 <p id="profile-save-status" class="text-sm text-green-600 dark:text-green-400 flex items-center"></p>
-                             </div>
-                         </div>
-                     </div>
+            <div id="settings-home-view" class="max-w-xl mx-auto fade-in space-y-4">
+                <div class="widget-card text-center">
+                    <div id="settings-user-avatar-wrap" class="w-24 h-24 rounded-full shrink-0 mx-auto">
+                        <img id="settings-user-photo" alt="User profile" />
+                        <span id="settings-user-initial" class="w-full h-full inline-flex items-center justify-center text-gray-400 dark:text-gray-500 text-4xl font-bold">U</span>
+                    </div>
+                    <h3 id="settings-home-name" class="mt-3 text-xl font-bold text-gray-900 dark:text-gray-100">User</h3>
+                    <p id="settings-home-email" class="text-sm text-gray-500 dark:text-gray-400 mt-1">user@email.com</p>
+                    <div class="mt-4 rounded-2xl px-4 py-3 text-left bg-gradient-to-r from-blue-600 to-sky-500 text-white">
+                        <p class="font-semibold text-sm">Professional Settings</p>
+                        <p class="text-xs text-blue-100 mt-0.5">Manage your account, theme, export, backup and app preferences</p>
+                    </div>
                 </div>
-                <!-- App Preferences Card -->
+
                 <div class="widget-card">
+                    <p class="text-xs uppercase tracking-[0.12em] text-gray-500 dark:text-gray-400 mb-3">Account Settings</p>
+                    <div class="space-y-2">
+                        <button id="settings-nav-account" class="settings-nav-row"><span>Account</span><span>›</span></button>
+                        <button id="settings-nav-theme" class="settings-nav-row"><span>Theme</span><span>›</span></button>
+                        <button id="settings-nav-work-policy" class="settings-nav-row"><span>Work Policy</span><span>›</span></button>
+                        <button id="settings-nav-pdf" class="settings-nav-row"><span>PDF Export Heading</span><span>›</span></button>
+                    </div>
+                </div>
+
+                <div class="widget-card">
+                    <p class="text-xs uppercase tracking-[0.12em] text-gray-500 dark:text-gray-400 mb-3">System</p>
+                    <div class="space-y-2">
+                        <button id="settings-nav-backup" class="settings-nav-row"><span>Backup & Restore</span><span>›</span></button>
+                        <button id="settings-nav-notifications" class="settings-nav-row"><span>Notifications</span><span>›</span></button>
+                        <button id="settings-nav-experience" class="settings-nav-row"><span>App Experience</span><span>›</span></button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="settings-detail-view" class="max-w-4xl mx-auto fade-in" style="display:none;">
+                <div class="widget-card mb-4">
+                    <div class="flex items-center justify-between">
+                        <button id="settings-detail-back-btn" class="ios-secondary-btn px-3 py-2 rounded-lg text-sm font-semibold dark:text-gray-100">← Back</button>
+                        <h3 id="settings-detail-title" class="section-heading !mb-0">Settings</h3>
+                        <div class="w-[72px]"></div>
+                    </div>
+                </div>
+
+                <div id="settings-panel-account" class="settings-detail-panel widget-card" style="display:none;">
+                    <h3 class="section-heading">Account</h3>
+                    <div class="space-y-3">
+                        <div>
+                            <label for="settings-display-name" class="font-medium text-sm text-gray-700 dark:text-gray-300">Display Name</label>
+                            <input type="text" id="settings-display-name" class="w-full mt-1 p-2 border border-gray-300 rounded-lg bg-gray-50/50 premium-input dark:bg-gray-800/50 dark:border-gray-700" />
+                        </div>
+                        <div>
+                            <label class="font-medium text-sm text-gray-700 dark:text-gray-300">Email</label>
+                            <p id="settings-email" class="mt-1 text-gray-500 dark:text-gray-400"></p>
+                        </div>
+                        <div class="mt-4 flex gap-3">
+                            <button id="save-profile-btn" class="px-5 py-2 rounded-lg font-semibold text-sm shadow-sm transition-all bg-blue-600 text-white hover:bg-blue-700">Save Profile</button>
+                            <p id="profile-save-status" class="text-sm text-green-600 dark:text-green-400 flex items-center"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="settings-panel-theme" class="settings-detail-panel widget-card" style="display:none;">
                     <h3 class="section-heading">Theme</h3>
                     <div class="mb-4 settings-row">
                         <div>
@@ -3300,7 +3358,7 @@
                     </div>
                 </div>
 
-                <div class="widget-card">
+                <div id="settings-panel-work-policy" class="settings-detail-panel widget-card" style="display:none;">
                     <h3 class="section-heading">Work Policy</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                        <div>
@@ -3317,7 +3375,8 @@
                        <p id="preferences-save-status" class="text-sm text-green-600 dark:text-green-400 flex items-center"></p>
                     </div>
                 </div>
-                <div class="widget-card">
+
+                <div id="settings-panel-pdf" class="settings-detail-panel widget-card" style="display:none;">
                     <h3 class="section-heading">PDF Export Heading</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                        <div class="md:col-span-2">
@@ -3339,8 +3398,8 @@
                        <p id="pdf-heading-save-status" class="text-sm text-green-600 dark:text-green-400 flex items-center"></p>
                     </div>
                 </div>
-                <!-- Data Management Card -->
-                <div class="widget-card">
+
+                <div id="settings-panel-backup" class="settings-detail-panel widget-card" style="display:none;">
                     <h3 class="section-heading">Backup & Restore</h3>
                     <div class="mb-4 p-3 rounded-xl bg-white/50 dark:bg-gray-900/40 border border-white/40 dark:border-white/10">
                         <div class="flex items-center justify-between text-sm">
@@ -3359,7 +3418,7 @@
                     <p id="data-op-status" class="text-sm text-green-600 dark:text-green-400 mt-4 h-5"></p>
                 </div>
 
-                <div class="widget-card">
+                <div id="settings-panel-notifications" class="settings-detail-panel widget-card" style="display:none;">
                     <h3 class="section-heading">Notifications</h3>
                     <div class="space-y-3 text-sm">
                         <div class="flex items-center justify-between p-3 rounded-xl bg-white/40 dark:bg-gray-900/35">
@@ -3379,7 +3438,7 @@
                     </div>
                 </div>
 
-                <div class="widget-card">
+                <div id="settings-panel-experience" class="settings-detail-panel widget-card" style="display:none;">
                     <h3 class="section-heading">App Experience</h3>
                     <div class="space-y-3 text-sm">
                         <div class="flex items-center justify-between p-3 rounded-xl bg-white/40 dark:bg-gray-900/35">
@@ -7618,73 +7677,58 @@ document.addEventListener('DOMContentLoaded', async () => {
     //
     // ===================================================================================
     
-    const refreshSettingsAccordionHeights = () => {
-        document.querySelectorAll('#settings-page .widget-card.is-open .settings-accordion-content').forEach((contentEl) => {
-            contentEl.style.maxHeight = `${contentEl.scrollHeight + 12}px`;
+    const showSettingsHome = () => {
+        const home = document.getElementById('settings-home-view');
+        const detail = document.getElementById('settings-detail-view');
+        if (home) home.style.display = 'block';
+        if (detail) detail.style.display = 'none';
+        document.querySelectorAll('.settings-detail-panel').forEach(panel => panel.style.display = 'none');
+    };
+
+    const showSettingsPanel = (panelId, title) => {
+        const home = document.getElementById('settings-home-view');
+        const detail = document.getElementById('settings-detail-view');
+        const titleEl = document.getElementById('settings-detail-title');
+        if (home) home.style.display = 'none';
+        if (detail) detail.style.display = 'block';
+        if (titleEl) titleEl.textContent = title || 'Settings';
+        document.querySelectorAll('.settings-detail-panel').forEach(panel => {
+            panel.style.display = panel.id === panelId ? 'block' : 'none';
         });
     };
 
-    const initSettingsAccordions = () => {
+    const initSettingsNavigation = () => {
         const page = document.getElementById('settings-page');
-        if (!page || page.dataset.accordionReady === '1') return;
-        const cards = Array.from(page.querySelectorAll('.widget-card'));
-        cards.forEach((card, idx) => {
-            const heading = card.querySelector(':scope > h3.section-heading');
-            if (!heading) return;
-
-            const title = (heading.textContent || '').trim() || `Section ${idx + 1}`;
-            if (title.toLowerCase() === 'account') {
-                heading.style.marginBottom = '0.9rem';
-                return;
-            }
-            heading.remove();
-
-            const toggle = document.createElement('button');
-            toggle.type = 'button';
-            toggle.className = 'settings-accordion-toggle';
-            toggle.innerHTML = `
-                <span class="settings-accordion-title">${title}</span>
-                <svg class="settings-accordion-chevron" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"></path>
-                </svg>
-            `;
-
-            const content = document.createElement('div');
-            content.className = 'settings-accordion-content';
-            while (card.firstChild) {
-                content.appendChild(card.firstChild);
-            }
-
-            card.appendChild(toggle);
-            card.appendChild(content);
-
-            const storageKey = `settingsAccordion:${title}`;
-            const storedState = localStorage.getItem(storageKey);
-            const shouldOpen = storedState !== null ? storedState === '1' : idx === 0;
-
-            const applyState = (open) => {
-                card.classList.toggle('is-open', open);
-                toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
-                content.style.maxHeight = open ? `${content.scrollHeight + 12}px` : '0px';
-            };
-
-            applyState(shouldOpen);
-            toggle.addEventListener('click', () => {
-                const next = !card.classList.contains('is-open');
-                applyState(next);
-                localStorage.setItem(storageKey, next ? '1' : '0');
-            });
+        if (!page || page.dataset.navReady === '1') return;
+        const map = [
+            ['settings-nav-account', 'settings-panel-account', 'Account'],
+            ['settings-nav-theme', 'settings-panel-theme', 'Theme'],
+            ['settings-nav-work-policy', 'settings-panel-work-policy', 'Work Policy'],
+            ['settings-nav-pdf', 'settings-panel-pdf', 'PDF Export Heading'],
+            ['settings-nav-backup', 'settings-panel-backup', 'Backup & Restore'],
+            ['settings-nav-notifications', 'settings-panel-notifications', 'Notifications'],
+            ['settings-nav-experience', 'settings-panel-experience', 'App Experience']
+        ];
+        map.forEach(([btnId, panelId, title]) => {
+            const btn = document.getElementById(btnId);
+            if (!btn) return;
+            btn.addEventListener('click', () => showSettingsPanel(panelId, title));
         });
-        page.dataset.accordionReady = '1';
+        const backBtn = document.getElementById('settings-detail-back-btn');
+        if (backBtn) backBtn.addEventListener('click', showSettingsHome);
+        page.dataset.navReady = '1';
     };
 
     const renderSettingsPage = () => {
         if (!user) return;
-        initSettingsAccordions();
+        initSettingsNavigation();
+        showSettingsHome();
 
         // Profile
         const initialEl = document.getElementById('settings-user-initial');
         const photoEl = document.getElementById('settings-user-photo');
+        const homeNameEl = document.getElementById('settings-home-name');
+        const homeEmailEl = document.getElementById('settings-home-email');
         const initial = (user.displayName || user.email || 'U').charAt(0).toUpperCase();
         initialEl.textContent = initial;
         if (user.photoURL) {
@@ -7698,6 +7742,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         document.getElementById('settings-display-name').value = user.displayName || '';
         document.getElementById('settings-email').textContent = user.email;
+        if (homeNameEl) homeNameEl.textContent = user.displayName || 'User';
+        if (homeEmailEl) homeEmailEl.textContent = user.email || '';
 
         // Preferences
         document.getElementById('settings-leave-allowance').value = userSettings.baseAnnualLeave || 35;
@@ -7714,7 +7760,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('auto-scroll-toggle').checked = localStorage.getItem('autoScrollToToday') !== 'false';
         document.documentElement.classList.toggle('reduce-motion', localStorage.getItem('reduceMotion') === 'true');
         updateBackupUi(0);
-        refreshSettingsAccordionHeights();
         
         addSettingsEventListeners();
     };
@@ -7768,6 +7813,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             showToast(navigator.onLine ? 'Profile Saved!' : 'Saved offline. Will sync when online.', 'success');
             renderMainNav(user); // Update header
             document.getElementById('settings-user-initial').textContent = newName.charAt(0).toUpperCase();
+            const homeNameEl = document.getElementById('settings-home-name');
+            if (homeNameEl) homeNameEl.textContent = newName;
         } catch (error) {
             showToast('Profile saved locally. Cloud sync pending.', 'info');
             console.error('Profile update error:', error);
