@@ -1676,6 +1676,31 @@
             overflow: hidden;
             transition: max-height 0.28s ease;
         }
+        .pdf-columns-editor-head,
+        .pdf-column-editor-row {
+            display: grid;
+            grid-template-columns: 1.35fr 1.35fr 0.8fr 0.7fr 0.8fr;
+            gap: 0.55rem;
+            align-items: end;
+        }
+        .pdf-columns-editor-head {
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            color: #475569;
+        }
+        html.dark .pdf-columns-editor-head { color: #94a3b8; }
+        @media (max-width: 767px) {
+            .pdf-columns-editor-head { display: none; }
+            .pdf-column-editor-row {
+                grid-template-columns: 1fr 1fr;
+                gap: 0.5rem;
+                align-items: center;
+            }
+            .pdf-column-editor-row .pdf-col-field.wide {
+                grid-column: 1 / -1;
+            }
+        }
         #settings-page .widget-card:not(.is-open) .settings-accordion-toggle {
             margin-bottom: 0;
         }
@@ -3514,6 +3539,22 @@
                             <label for="settings-pdf-row-font-size" class="font-medium text-sm text-gray-700 dark:text-gray-300">Row Font Size (px)</label>
                             <input type="number" id="settings-pdf-row-font-size" min="8" max="14" step="0.1" class="w-full mt-1 p-2 border border-gray-300 rounded-lg bg-gray-50/50 premium-input dark:bg-gray-800/50 dark:border-gray-700" />
                         </div>
+                        <div>
+                            <label for="settings-pdf-cell-padding-y" class="font-medium text-sm text-gray-700 dark:text-gray-300">Row Vertical Space (px)</label>
+                            <input type="number" id="settings-pdf-cell-padding-y" min="2" max="18" step="0.5" class="w-full mt-1 p-2 border border-gray-300 rounded-lg bg-gray-50/50 premium-input dark:bg-gray-800/50 dark:border-gray-700" />
+                        </div>
+                        <div>
+                            <label for="settings-pdf-cell-padding-x" class="font-medium text-sm text-gray-700 dark:text-gray-300">Cell Horizontal Space (px)</label>
+                            <input type="number" id="settings-pdf-cell-padding-x" min="2" max="18" step="0.5" class="w-full mt-1 p-2 border border-gray-300 rounded-lg bg-gray-50/50 premium-input dark:bg-gray-800/50 dark:border-gray-700" />
+                        </div>
+                        <div>
+                            <label for="settings-pdf-header-padding-y" class="font-medium text-sm text-gray-700 dark:text-gray-300">Header Vertical Space (px)</label>
+                            <input type="number" id="settings-pdf-header-padding-y" min="2" max="18" step="0.5" class="w-full mt-1 p-2 border border-gray-300 rounded-lg bg-gray-50/50 premium-input dark:bg-gray-800/50 dark:border-gray-700" />
+                        </div>
+                        <div>
+                            <label for="settings-pdf-header-padding-x" class="font-medium text-sm text-gray-700 dark:text-gray-300">Header Horizontal Space (px)</label>
+                            <input type="number" id="settings-pdf-header-padding-x" min="2" max="18" step="0.5" class="w-full mt-1 p-2 border border-gray-300 rounded-lg bg-gray-50/50 premium-input dark:bg-gray-800/50 dark:border-gray-700" />
+                        </div>
                         <div class="flex items-center justify-between rounded-xl border border-slate-200/70 dark:border-slate-700/60 px-3 py-2 mt-1">
                             <div>
                                 <p class="font-medium text-sm text-gray-700 dark:text-gray-300">Show All Month Rows</p>
@@ -3529,19 +3570,15 @@
                             <button id="settings-pdf-add-column-btn" class="ios-secondary-btn px-3 py-1.5 rounded-lg text-xs font-semibold dark:text-gray-100">+ Add Column</button>
                         </div>
                         <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">Edit directly in this table. Source change pannina header and width auto update aagum.</p>
-                        <div class="overflow-x-auto rounded-xl border border-slate-200/70 dark:border-slate-700/60 bg-white/50 dark:bg-gray-900/35">
-                            <table class="w-full min-w-[760px] text-sm">
-                                <thead class="bg-slate-100/80 dark:bg-slate-800/70">
-                                    <tr>
-                                        <th class="text-left px-3 py-2 font-semibold text-slate-700 dark:text-slate-200">Source</th>
-                                        <th class="text-left px-3 py-2 font-semibold text-slate-700 dark:text-slate-200">Header</th>
-                                        <th class="text-left px-3 py-2 font-semibold text-slate-700 dark:text-slate-200">Width</th>
-                                        <th class="text-left px-3 py-2 font-semibold text-slate-700 dark:text-slate-200">Visible</th>
-                                        <th class="text-left px-3 py-2 font-semibold text-slate-700 dark:text-slate-200">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="settings-pdf-columns-builder"></tbody>
-                            </table>
+                        <div class="rounded-xl border border-slate-200/70 dark:border-slate-700/60 bg-white/50 dark:bg-gray-900/35 p-3">
+                            <div class="pdf-columns-editor-head mb-2 px-1">
+                                <div>Source</div>
+                                <div>Header</div>
+                                <div>Width</div>
+                                <div>Visible</div>
+                                <div>Action</div>
+                            </div>
+                            <div id="settings-pdf-columns-builder" class="space-y-2"></div>
                         </div>
                     </div>
                     <div class="mt-4 flex gap-3 flex-wrap">
@@ -4136,6 +4173,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         borderWidth: 1,
         headerFontSize: 9.6,
         rowFontSize: 10,
+        cellPaddingX: 4,
+        cellPaddingY: 6,
+        headerPaddingX: 4,
+        headerPaddingY: 6,
+        rowLineHeight: 1.15,
+        headerLineHeight: 1.1,
         includeEmptyRows: true,
         columns: PDF_TABLE_FIELD_OPTIONS.map((f, i) => ({
             id: `col_${f.key}_${i}`,
@@ -4177,6 +4220,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             borderWidth: clampNumber(raw.borderWidth, 0.5, 3, fallback.borderWidth),
             headerFontSize: clampNumber(raw.headerFontSize, 8, 14, fallback.headerFontSize),
             rowFontSize: clampNumber(raw.rowFontSize, 8, 14, fallback.rowFontSize),
+            cellPaddingX: clampNumber(raw.cellPaddingX, 2, 18, fallback.cellPaddingX),
+            cellPaddingY: clampNumber(raw.cellPaddingY, 2, 18, fallback.cellPaddingY),
+            headerPaddingX: clampNumber(raw.headerPaddingX, 2, 18, fallback.headerPaddingX),
+            headerPaddingY: clampNumber(raw.headerPaddingY, 2, 18, fallback.headerPaddingY),
+            rowLineHeight: clampNumber(raw.rowLineHeight, 1, 1.8, fallback.rowLineHeight),
+            headerLineHeight: clampNumber(raw.headerLineHeight, 1, 1.8, fallback.headerLineHeight),
             includeEmptyRows: raw.includeEmptyRows !== false,
             columns: columns.length ? columns : fallback.columns
         };
@@ -7258,7 +7307,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const headerHtml = columns.map((col) => {
             const safeLabel = formatPdfHeaderLabel(col.label || getFieldMeta(col.source).label, col.source);
-            return `<th style="border:${border};padding:6px 4px;font-weight:700;white-space:normal;word-break:keep-all;line-height:1.1;font-size:${cfg.headerFontSize}px;">${safeLabel}</th>`;
+            return `<th style="border:${border};padding:${cfg.headerPaddingY}px ${cfg.headerPaddingX}px;font-weight:700;white-space:normal;word-break:keep-all;line-height:${cfg.headerLineHeight};font-size:${cfg.headerFontSize}px;">${safeLabel}</th>`;
         }).join('');
 
         const rowHtml = rowSource.map((row) => {
@@ -7270,9 +7319,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 if (source === 'date' && isWeekendFromDdMmYyyy(textValue)) extraStyle += 'color:#ef4444;font-weight:700;';
                 if (source === 'leaveStatus' && String(textValue).toLowerCase() === 'yes') extraStyle += 'color:#1E90FF;font-weight:700;';
                 if (source === 'leaveReason') {
-                    return `<td style="border:${border};padding:6px 4px;white-space:normal;line-height:1.15;font-size:${cfg.rowFontSize}px;overflow:hidden;word-break:break-word;${extraStyle}">${escapeHtml(textValue)}</td>`;
+                    return `<td style="border:${border};padding:${cfg.cellPaddingY}px ${cfg.cellPaddingX}px;white-space:normal;line-height:${cfg.rowLineHeight};font-size:${cfg.rowFontSize}px;overflow:hidden;word-break:break-word;${extraStyle}">${escapeHtml(textValue)}</td>`;
                 }
-                return `<td style="border:${border};padding:6px 4px;white-space:nowrap;font-size:${cfg.rowFontSize}px;overflow:hidden;text-overflow:ellipsis;${extraStyle}">${escapeHtml(textValue)}</td>`;
+                return `<td style="border:${border};padding:${cfg.cellPaddingY}px ${cfg.cellPaddingX}px;white-space:nowrap;line-height:${cfg.rowLineHeight};font-size:${cfg.rowFontSize}px;overflow:hidden;text-overflow:ellipsis;${extraStyle}">${escapeHtml(textValue)}</td>`;
             }).join('')}</tr>`;
         }).join('');
 
@@ -7999,25 +8048,30 @@ document.addEventListener('DOMContentLoaded', async () => {
             <option value="${opt.key}" ${opt.key === selected ? 'selected' : ''}>${opt.label}</option>
         `).join('');
         container.innerHTML = settings.columns.map((col, index) => `
-            <tr data-col-index="${index}" class="border-t border-slate-200/70 dark:border-slate-700/60">
-                <td class="px-3 py-2">
+            <div data-col-index="${index}" class="pdf-column-editor-row rounded-lg border border-slate-200/70 dark:border-slate-700/60 p-2 bg-white/40 dark:bg-gray-900/30">
+                <div class="pdf-col-field">
+                    <label class="text-[11px] font-semibold text-slate-600 dark:text-slate-300 md:hidden mb-1 block">Source</label>
                     <select class="pdf-col-source w-full p-2 border border-gray-300 rounded-lg bg-gray-50/70 premium-select dark:bg-gray-800/50 dark:border-gray-700">
                         ${optionsMarkup(col.source)}
                     </select>
-                </td>
-                <td class="px-3 py-2">
+                </div>
+                <div class="pdf-col-field">
+                    <label class="text-[11px] font-semibold text-slate-600 dark:text-slate-300 md:hidden mb-1 block">Header</label>
                     <input type="text" class="pdf-col-label w-full p-2 border border-gray-300 rounded-lg bg-gray-50/70 premium-input dark:bg-gray-800/50 dark:border-gray-700" value="${escapeHtml(col.label).replace(/"/g, '&quot;')}" />
-                </td>
-                <td class="px-3 py-2">
+                </div>
+                <div class="pdf-col-field">
+                    <label class="text-[11px] font-semibold text-slate-600 dark:text-slate-300 md:hidden mb-1 block">Width</label>
                     <input type="number" min="2" max="35" step="0.5" class="pdf-col-width w-full p-2 border border-gray-300 rounded-lg bg-gray-50/70 premium-input dark:bg-gray-800/50 dark:border-gray-700" value="${col.width}" />
-                </td>
-                <td class="px-3 py-2">
+                </div>
+                <div class="pdf-col-field">
+                    <label class="text-[11px] font-semibold text-slate-600 dark:text-slate-300 md:hidden mb-1 block">Visible</label>
                     <input type="checkbox" class="pdf-col-visible ios-switch" ${col.visible ? 'checked' : ''} />
-                </td>
-                <td class="px-3 py-2">
+                </div>
+                <div class="pdf-col-field wide">
+                    <label class="text-[11px] font-semibold text-slate-600 dark:text-slate-300 md:hidden mb-1 block">Action</label>
                     <button class="pdf-col-remove ios-secondary-btn px-3 py-1.5 rounded-lg text-xs font-semibold dark:text-gray-100">Remove</button>
-                </td>
-            </tr>
+                </div>
+            </div>
         `).join('');
     };
 
@@ -8034,6 +8088,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         bindValue('settings-pdf-border-width', settings.borderWidth);
         bindValue('settings-pdf-header-font-size', settings.headerFontSize);
         bindValue('settings-pdf-row-font-size', settings.rowFontSize);
+        bindValue('settings-pdf-cell-padding-x', settings.cellPaddingX);
+        bindValue('settings-pdf-cell-padding-y', settings.cellPaddingY);
+        bindValue('settings-pdf-header-padding-x', settings.headerPaddingX);
+        bindValue('settings-pdf-header-padding-y', settings.headerPaddingY);
         const includeToggle = document.getElementById('settings-pdf-include-empty-rows');
         if (includeToggle) includeToggle.checked = settings.includeEmptyRows;
         renderPdfColumnsBuilder(settings);
@@ -8066,6 +8124,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             borderWidth: document.getElementById('settings-pdf-border-width')?.value,
             headerFontSize: document.getElementById('settings-pdf-header-font-size')?.value,
             rowFontSize: document.getElementById('settings-pdf-row-font-size')?.value,
+            cellPaddingX: document.getElementById('settings-pdf-cell-padding-x')?.value,
+            cellPaddingY: document.getElementById('settings-pdf-cell-padding-y')?.value,
+            headerPaddingX: document.getElementById('settings-pdf-header-padding-x')?.value,
+            headerPaddingY: document.getElementById('settings-pdf-header-padding-y')?.value,
             includeEmptyRows: document.getElementById('settings-pdf-include-empty-rows')?.checked !== false,
             columns
         });
