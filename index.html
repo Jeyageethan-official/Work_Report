@@ -1617,6 +1617,15 @@
             width: 100% !important;
             margin: 0 !important;
         }
+        #settings-breadcrumb-divider {
+            height: 1px;
+            width: 100%;
+            background: rgba(148, 163, 184, 0.35);
+            margin: 0 0 1cm 0;
+        }
+        html.dark #settings-breadcrumb-divider {
+            background: rgba(96, 165, 250, 0.32);
+        }
         #settings-page .widget-card {
             overflow: hidden;
         }
@@ -3378,9 +3387,10 @@
                         <div class="w-[72px]"></div>
                     </div>
                 </div>
-                <p id="settings-breadcrumb" class="text-sm font-medium text-slate-600 dark:text-slate-300 mb-3 ml-1">Settings</p>
+                <p id="settings-breadcrumb" class="text-sm font-bold text-slate-700 dark:text-slate-200 mb-2 ml-1">Settings</p>
+                <div id="settings-breadcrumb-divider"></div>
 
-                <div id="settings-panel-account" class="settings-detail-panel widget-card" style="display:none;">
+                <div id="settings-panel-account" class="settings-detail-panel" style="display:none;">
                     <h3 class="section-heading">Account</h3>
                     <div class="space-y-3">
                         <div>
@@ -3398,7 +3408,7 @@
                     </div>
                 </div>
 
-                <div id="settings-panel-theme" class="settings-detail-panel widget-card" style="display:none;">
+                <div id="settings-panel-theme" class="settings-detail-panel" style="display:none;">
                     <h3 class="section-heading">Theme</h3>
                     <div class="mb-4 settings-row">
                         <div>
@@ -3419,7 +3429,7 @@
                     </div>
                 </div>
 
-                <div id="settings-panel-work-policy" class="settings-detail-panel widget-card" style="display:none;">
+                <div id="settings-panel-work-policy" class="settings-detail-panel" style="display:none;">
                     <h3 class="section-heading">Work Policy</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                        <div>
@@ -3437,7 +3447,7 @@
                     </div>
                 </div>
 
-                <div id="settings-panel-pdf" class="settings-detail-panel widget-card" style="display:none;">
+                <div id="settings-panel-pdf" class="settings-detail-panel" style="display:none;">
                     <h3 class="section-heading">PDF Export Heading</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                        <div class="md:col-span-2">
@@ -3460,7 +3470,7 @@
                     </div>
                 </div>
 
-                <div id="settings-panel-backup" class="settings-detail-panel widget-card" style="display:none;">
+                <div id="settings-panel-backup" class="settings-detail-panel" style="display:none;">
                     <h3 class="section-heading">Backup & Restore</h3>
                     <div class="mb-4 p-3 rounded-xl bg-white/50 dark:bg-gray-900/40 border border-white/40 dark:border-white/10">
                         <div class="flex items-center justify-between text-sm">
@@ -3479,7 +3489,7 @@
                     <p id="data-op-status" class="text-sm text-green-600 dark:text-green-400 mt-4 h-5"></p>
                 </div>
 
-                <div id="settings-panel-notifications" class="settings-detail-panel widget-card" style="display:none;">
+                <div id="settings-panel-notifications" class="settings-detail-panel" style="display:none;">
                     <h3 class="section-heading">Notifications</h3>
                     <div class="space-y-3 text-sm">
                         <div class="flex items-center justify-between p-3 rounded-xl bg-white/40 dark:bg-gray-900/35">
@@ -3499,7 +3509,7 @@
                     </div>
                 </div>
 
-                <div id="settings-panel-experience" class="settings-detail-panel widget-card" style="display:none;">
+                <div id="settings-panel-experience" class="settings-detail-panel" style="display:none;">
                     <h3 class="section-heading">App Experience</h3>
                     <div class="space-y-3 text-sm">
                         <div class="flex items-center justify-between p-3 rounded-xl bg-white/40 dark:bg-gray-900/35">
@@ -4312,6 +4322,8 @@ document.addEventListener('DOMContentLoaded', async () => {
              floatingBtnListener = null;
              shouldShowFloatingDatePicker = false;
              floatingDatePickerBtn.classList.add('hidden');
+             scrollUpButton.classList.add('hidden');
+             scrollDownButton.classList.add('hidden');
              renderDashboard();
         } else if (pageId === 'ai-page') {
              pageTitle.textContent = "AI Assistant";
@@ -8456,10 +8468,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         const onAiPage = aiPage.style.display === 'block';
         const onReminderPage = reminderPage.style.display === 'block';
         const onDownloadPage = downloadPage.style.display === 'block';
+        const onDashboardPage = dashboardPage.style.display === 'block';
 
-        scrollUpButton.classList.toggle('hidden', isAtTop || onReminderPage || onSettings);
+        scrollUpButton.classList.toggle('hidden', isAtTop || onReminderPage || onSettings || onDashboardPage);
         floatingDatePickerBtn.classList.toggle('hidden', isAtTop || onSettings || onAiPage || !shouldShowFloatingDatePicker);
-        scrollDownButton.classList.toggle('hidden', onReminderPage || onDownloadPage || onSettings);
+        scrollDownButton.classList.toggle('hidden', onReminderPage || onDownloadPage || onSettings || onDashboardPage);
         mainNavEl?.classList.toggle('nav-scrolled', !isAtTop);
         mobileBottomNavEl?.classList.toggle('nav-scrolled', !isAtTop);
         document.getElementById('safe-top-overlay')?.classList.toggle('is-scrolled', !isAtTop);
