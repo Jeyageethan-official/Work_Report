@@ -1555,20 +1555,22 @@
             background: transparent;
             display: flex;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start;
             gap: 0.75rem;
             padding: 0;
             margin: 0 0 0.8rem 0;
             text-align: left;
             cursor: pointer;
             position: relative;
+            min-height: 2.7rem;
+            padding-right: 1.5rem;
         }
         .settings-accordion-title {
             font-size: 1.03rem;
             font-weight: 760;
             color: #1e293b;
             letter-spacing: -0.01em;
-            text-align: center;
+            text-align: left;
         }
         .settings-accordion-chevron {
             width: 1.15rem;
@@ -1585,6 +1587,12 @@
             max-height: 0;
             overflow: hidden;
             transition: max-height 0.28s ease;
+        }
+        #settings-page .widget-card:not(.is-open) .settings-accordion-toggle {
+            margin-bottom: 0;
+        }
+        #settings-page .widget-card.is-open .settings-accordion-toggle {
+            margin-bottom: 0.8rem;
         }
         #settings-page .widget-card.is-open .settings-accordion-chevron {
             transform: translateY(-50%) rotate(180deg);
