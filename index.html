@@ -1623,8 +1623,32 @@
             background: rgba(148, 163, 184, 0.35);
             margin: 0 0 1cm 0;
         }
+        #settings-breadcrumb {
+            color: var(--ios-primary) !important;
+            font-size: 1.02rem !important;
+            font-weight: 800 !important;
+            letter-spacing: 0.01em;
+        }
         html.dark #settings-breadcrumb-divider {
             background: rgba(96, 165, 250, 0.32);
+        }
+        @media (min-width: 1024px) {
+            #settings-home-view {
+                max-width: none !important;
+                width: 100% !important;
+                margin: 0 !important;
+                display: grid !important;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 1rem;
+            }
+            #settings-home-view > .widget-card:first-child {
+                grid-column: 1 / -1;
+            }
+            #settings-detail-view {
+                max-width: none !important;
+                width: 100% !important;
+                margin: 0 !important;
+            }
         }
         #settings-page .widget-card {
             overflow: hidden;
