@@ -5779,6 +5779,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             'auth/too-many-requests': 'Too many attempts. Please try again later.',
             'auth/operation-not-allowed': 'This sign-in method is not enabled.',
             'auth/operation-not-supported-in-this-environment': 'Google Sign-In requires secure web app URL.',
+            'auth/unauthorized-domain': 'This domain is not allowed for Google sign-in. Use the official app URL.',
+            'auth/unauthorized-continue-uri': 'Password reset link config is invalid. Please try again.',
+            'auth/web-storage-unsupported': 'Browser storage is blocked. Enable cookies/storage and retry.',
             'auth/invalid-action-code': 'This link is invalid or already used.',
             'auth/expired-action-code': 'This link has expired. Please request a new one.'
         };
@@ -5794,7 +5797,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         const protocol = window.location.protocol;
         if (protocol !== 'http:' && protocol !== 'https:') return undefined;
         return {
-            url: `${getAppBaseUrl()}?authAction=1`,
+            // Always use official hosted URL to avoid unauthorized continue-uri on mirrored domains.
+            url: `${HOSTED_WEB_APP_URL}?authAction=1`,
             handleCodeInApp: false
         };
     };
@@ -6045,10 +6049,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const protocol = window.location.protocol;
         const protocolOk = protocol === 'http:' || protocol === 'https:' || protocol === 'chrome-extension:';
-        if (!protocolOk) {
+        const isGithubPagesHost = /\.github\.io$/i.test(window.location.hostname || '');
+        if (!protocolOk || isGithubPagesHost) {
             const hostedAuthUrl = new URL(HOSTED_WEB_APP_URL);
             hostedAuthUrl.searchParams.set('auth', 'google');
-            hostedAuthUrl.searchParams.set('src', 'file');
+            hostedAuthUrl.searchParams.set('src', isGithubPagesHost ? 'github-pages' : 'file');
             hostedAuthUrl.searchParams.set('appv', '20260306_4');
             localStorage.setItem(GOOGLE_AUTH_FLAG, '1');
             localStorage.setItem(GOOGLE_AUTH_TS, String(Date.now()));
@@ -6061,9 +6066,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         provider.addScope('email');
         provider.addScope('profile');
         provider.setCustomParameters({ prompt: 'select_account' });
-        localStorage.setItem(GOOGLE_AUTH_FLAG, '1');
-        localStorage.setItem(GOOGLE_AUTH_TS, String(Date.now()));
-        await auth.signInWithRedirect(provider);
+        try {
+            await auth.signInWithPopup(provider);
+            localStorage.removeItem(GOOGLE_AUTH_FLAG);
+            localStorage.removeItem(GOOGLE_AUTH_TS);
+        } catch (popupErr) {
+            const code = String(popupErr?.code || '');
+            if (code === 'auth/popup-blocked' || code === 'auth/cancelled-popup-request' || code === 'auth/operation-not-supported-in-this-environment' || code === 'auth/web-storage-unsupported') {
+                localStorage.setItem(GOOGLE_AUTH_FLAG, '1');
+                localStorage.setItem(GOOGLE_AUTH_TS, String(Date.now()));
+                await auth.signInWithRedirect(provider);
+                return;
+            }
+            throw popupErr;
+        }
     };
 
     const addSigninEventListeners = () => {
