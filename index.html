@@ -1555,18 +1555,20 @@
             background: transparent;
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            justify-content: center;
             gap: 0.75rem;
             padding: 0;
             margin: 0 0 0.8rem 0;
             text-align: left;
             cursor: pointer;
+            position: relative;
         }
         .settings-accordion-title {
             font-size: 1.03rem;
             font-weight: 760;
             color: #1e293b;
             letter-spacing: -0.01em;
+            text-align: center;
         }
         .settings-accordion-chevron {
             width: 1.15rem;
@@ -1574,6 +1576,10 @@
             color: #64748b;
             transition: transform 0.22s ease, color 0.22s ease;
             flex-shrink: 0;
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
         }
         .settings-accordion-content {
             max-height: 0;
@@ -1581,7 +1587,7 @@
             transition: max-height 0.28s ease;
         }
         #settings-page .widget-card.is-open .settings-accordion-chevron {
-            transform: rotate(180deg);
+            transform: translateY(-50%) rotate(180deg);
             color: var(--ios-primary);
         }
         html.dark .settings-accordion-title { color: #e2e8f0; }
@@ -7619,6 +7625,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (!heading) return;
 
             const title = (heading.textContent || '').trim() || `Section ${idx + 1}`;
+            if (title.toLowerCase() === 'account') {
+                heading.style.marginBottom = '0.9rem';
+                return;
+            }
             heading.remove();
 
             const toggle = document.createElement('button');
