@@ -7069,7 +7069,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     <td style="border:1px solid #9ca3af;padding:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${row.km || '-'}</td>
                     <td style="border:1px solid #9ca3af;padding:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${row.specialDays || '-'}</td>
                     <td style="border:1px solid #9ca3af;padding:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;${leaveYes ? 'color:#1E90FF;font-weight:700;' : ''}">${row.leaveStatus || 'No'}</td>
-                    <td style="border:1px solid #9ca3af;padding:6px 5px;white-space:normal;word-break:break-word;line-height:1.12;font-size:10px;max-height:2.25em;overflow:hidden;">${reasonText}</td>
+                    <td style="border:1px solid #9ca3af;padding:6px 4px;white-space:nowrap;line-height:1.12;font-size:10px;overflow:hidden;text-overflow:ellipsis;">${reasonText}</td>
                 </tr>
             `;
         }).join('');
@@ -7082,22 +7082,22 @@ document.addEventListener('DOMContentLoaded', async () => {
             </div>
             <table style="width:100%;table-layout:fixed;border-collapse:collapse;border:1px solid #9ca3af;font-size:11px;color:#1f2937;">
                 <colgroup>
-                    <col style="width:11%">
+                    <col style="width:9%">
                     <col style="width:8%">
-                    <col style="width:8%">
-                    <col style="width:8%">
-                    <col style="width:8%">
-                    <col style="width:10%">
                     <col style="width:8%">
                     <col style="width:9%">
+                    <col style="width:9%">
+                    <col style="width:9%">
+                    <col style="width:8%">
+                    <col style="width:8%">
                     <col style="width:5%">
                     <col style="width:7%">
                     <col style="width:6%">
-                    <col style="width:12%">
+                    <col style="width:14%">
                 </colgroup>
                 <thead style="background:#f3f4f6;color:#1f2937;">
                     <tr>
-                        ${['Day', 'In Time', 'Out Time', 'Movement Out Time', 'Movement In Time', 'Team Members', 'Work Location', 'Vehicle Number', 'KM Reading', 'Present Special Day', 'Leave Status', 'Leave Reason'].map(h => `<th style="border:1px solid #9ca3af;padding:6px 4px;font-weight:700;white-space:normal;word-break:break-word;line-height:1.12;font-size:10px;">${h}</th>`).join('')}
+                        ${['Day', 'In Time', 'Out Time', 'Movement Out<br>Time', 'Movement In<br>Time', 'Team Members', 'Work Location', 'Vehicle Number', 'KM Reading', 'Present Special Day', 'Leave Status', 'Leave Reason'].map(h => `<th style="border:1px solid #9ca3af;padding:6px 4px;font-weight:700;white-space:normal;word-break:normal;line-height:1.08;font-size:10px;">${h}</th>`).join('')}
                     </tr>
                 </thead>
                 <tbody style="text-align:center;">${rows}</tbody>
@@ -7186,7 +7186,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     <td class="px-1.5 py-2 whitespace-nowrap" style="border:1px solid #9ca3af;">${dayData.km || '-'}</td>
                     <td class="px-1.5 py-2 whitespace-nowrap" style="border:1px solid #9ca3af;">${dayData.specialDays || '-'}</td>
                     <td class="px-1.5 py-2 whitespace-nowrap" style="border:1px solid #9ca3af;">${leaveStatusHTML}</td>
-                    <td class="px-1.5 py-1" style="border:1px solid #9ca3af;white-space:normal;word-break:break-word;line-height:1.12;font-size:10px;max-height:2.25em;overflow:hidden;">${dayData.leaveReason || '-'}</td>
+                    <td class="px-1 py-1" style="border:1px solid #9ca3af;white-space:nowrap;line-height:1.12;font-size:10px;overflow:hidden;text-overflow:ellipsis;">${dayData.leaveReason || '-'}</td>
                 </tr>`;
         }).join('');
 
@@ -7210,8 +7210,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                             <table class="w-full border-collapse text-[11px]" style="color:#1f2937; border:1px solid #9ca3af;">
                                 <thead class="bg-gray-100 text-gray-800">
                                     <tr>
-                                        ${['Day', 'In Time', 'Out Time', 'Movement Out Time', 'Movement In Time', 'Team Members', 'Work Location', 'Vehicle Number', 'KM Reading', 'Present Special Day', 'Leave Status', 'Leave Reason'].map(h => 
-                                            `<th class="px-1 py-1.5 font-bold" style="border:1px solid #9ca3af;white-space:normal;word-break:break-word;line-height:1.12;font-size:10px;">${h}</th>`
+                                        ${['Day', 'In Time', 'Out Time', 'Movement Out<br>Time', 'Movement In<br>Time', 'Team Members', 'Work Location', 'Vehicle Number', 'KM Reading', 'Present Special Day', 'Leave Status', 'Leave Reason'].map(h => 
+                                            `<th class="px-1 py-1.5 font-bold" style="border:1px solid #9ca3af;white-space:normal;word-break:normal;line-height:1.08;font-size:10px;">${h}</th>`
                                         ).join('')}
                                     </tr>
                                 </thead>
