@@ -3525,10 +3525,24 @@
 
                     <div class="mt-5">
                         <div class="flex items-center justify-between mb-2">
-                            <h4 class="font-semibold text-gray-800 dark:text-gray-100">Columns (Add / Edit / Remove)</h4>
+                            <h4 class="font-semibold text-gray-800 dark:text-gray-100">Columns (Easy Table Editor)</h4>
                             <button id="settings-pdf-add-column-btn" class="ios-secondary-btn px-3 py-1.5 rounded-lg text-xs font-semibold dark:text-gray-100">+ Add Column</button>
                         </div>
-                        <div id="settings-pdf-columns-builder" class="space-y-2"></div>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">Edit directly in this table. Source change pannina header and width auto update aagum.</p>
+                        <div class="overflow-x-auto rounded-xl border border-slate-200/70 dark:border-slate-700/60 bg-white/50 dark:bg-gray-900/35">
+                            <table class="w-full min-w-[760px] text-sm">
+                                <thead class="bg-slate-100/80 dark:bg-slate-800/70">
+                                    <tr>
+                                        <th class="text-left px-3 py-2 font-semibold text-slate-700 dark:text-slate-200">Source</th>
+                                        <th class="text-left px-3 py-2 font-semibold text-slate-700 dark:text-slate-200">Header</th>
+                                        <th class="text-left px-3 py-2 font-semibold text-slate-700 dark:text-slate-200">Width</th>
+                                        <th class="text-left px-3 py-2 font-semibold text-slate-700 dark:text-slate-200">Visible</th>
+                                        <th class="text-left px-3 py-2 font-semibold text-slate-700 dark:text-slate-200">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="settings-pdf-columns-builder"></tbody>
+                            </table>
+                        </div>
                     </div>
                     <div class="mt-4 flex gap-3 flex-wrap">
                         <button id="save-pdf-table-settings-btn" class="px-5 py-2 rounded-lg font-semibold text-sm shadow-sm transition-all bg-blue-600 text-white hover:bg-blue-700">Save Table Settings</button>
@@ -4090,12 +4104,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         { key: 'date', label: 'Day', width: 10 },
         { key: 'inTime', label: 'In Time', width: 7 },
         { key: 'outTime', label: 'Out Time', width: 7 },
-        { key: 'movementOut', label: 'Movement\nOut Time', width: 9 },
-        { key: 'movementIn', label: 'Movement\nIn Time', width: 9 },
+        { key: 'movementOut', label: 'Movement Out Time', width: 9 },
+        { key: 'movementIn', label: 'Movement In Time', width: 9 },
         { key: 'teamMembers', label: 'Team Members', width: 9 },
         { key: 'workLocation', label: 'Work Location', width: 8 },
         { key: 'vehicleNumber', label: 'Vehicle Number', width: 8 },
-        { key: 'km', label: 'KM\nReading', width: 6 },
+        { key: 'km', label: 'KM Reading', width: 6 },
         { key: 'specialDays', label: 'Present Special Day', width: 7 },
         { key: 'leaveStatus', label: 'Leave Status', width: 6 },
         { key: 'leaveReason', label: 'Leave Reason', width: 14 }
@@ -4138,13 +4152,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         const fallback = createDefaultPdfTableSettings();
         if (!raw || typeof raw !== 'object') return fallback;
         const safeColor = (v, fb) => (/^#[0-9a-fA-F]{6}$/.test(String(v || '').trim()) ? String(v).trim() : fb);
+        const prettifyLabel = (text) => {
+            const s = String(text || '').trim();
+            if (!s) return s;
+            if (/\s/.test(s)) return s;
+            return s.replace(/([a-z])([A-Z])/g, '$1 $2');
+        };
         const colsRaw = Array.isArray(raw.columns) && raw.columns.length > 0 ? raw.columns : fallback.columns;
         const columns = colsRaw.map((col, idx) => {
             const source = getFieldMeta(String(col?.source || '')).key;
             return {
                 id: String(col?.id || `col_${source}_${idx}`),
                 source,
-                label: String(col?.label || getFieldMeta(source).label).slice(0, 48),
+                label: prettifyLabel(String(col?.label || getFieldMeta(source).label)).slice(0, 48),
                 width: clampNumber(col?.width, 2, 35, getFieldMeta(source).width),
                 visible: col?.visible !== false
             };
@@ -4160,6 +4180,21 @@ document.addEventListener('DOMContentLoaded', async () => {
             includeEmptyRows: raw.includeEmptyRows !== false,
             columns: columns.length ? columns : fallback.columns
         };
+    };
+
+    const formatPdfHeaderLabel = (label, source) => {
+        const raw = String(label || '').trim();
+        const normalized = raw.replace(/\s+/g, ' ').toLowerCase();
+        if (source === 'movementOut' && (normalized === 'movement out time' || normalized === 'movementouttime')) {
+            return 'Movement<br>Out Time';
+        }
+        if (source === 'movementIn' && (normalized === 'movement in time' || normalized === 'movementintime')) {
+            return 'Movement<br>In Time';
+        }
+        if (source === 'km' && (normalized === 'km reading' || normalized === 'kmreading')) {
+            return 'KM<br>Reading';
+        }
+        return escapeHtml(raw).replace(/\n/g, '<br>');
     };
 
     const getPdfTableSettings = () => {
@@ -7222,7 +7257,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const border = `${cfg.borderWidth}px solid ${cfg.borderColor}`;
 
         const headerHtml = columns.map((col) => {
-            const safeLabel = escapeHtml(col.label || getFieldMeta(col.source).label).replace(/\n/g, '<br>');
+            const safeLabel = formatPdfHeaderLabel(col.label || getFieldMeta(col.source).label, col.source);
             return `<th style="border:${border};padding:6px 4px;font-weight:700;white-space:normal;word-break:keep-all;line-height:1.1;font-size:${cfg.headerFontSize}px;">${safeLabel}</th>`;
         }).join('');
 
@@ -7961,34 +7996,28 @@ document.addEventListener('DOMContentLoaded', async () => {
         const container = document.getElementById('settings-pdf-columns-builder');
         if (!container) return;
         const optionsMarkup = (selected) => PDF_TABLE_FIELD_OPTIONS.map(opt => `
-            <option value="${opt.key}" ${opt.key === selected ? 'selected' : ''}>${opt.label.replace('\n', ' ')}</option>
+            <option value="${opt.key}" ${opt.key === selected ? 'selected' : ''}>${opt.label}</option>
         `).join('');
         container.innerHTML = settings.columns.map((col, index) => `
-            <div class="rounded-xl border border-slate-200/70 dark:border-slate-700/60 p-3 bg-white/40 dark:bg-gray-900/35" data-col-index="${index}">
-                <div class="grid grid-cols-1 md:grid-cols-12 gap-2 items-end">
-                    <div class="md:col-span-3">
-                        <label class="text-xs font-semibold text-slate-600 dark:text-slate-300">Source</label>
-                        <select class="pdf-col-source w-full mt-1 p-2 border border-gray-300 rounded-lg bg-gray-50/70 premium-select dark:bg-gray-800/50 dark:border-gray-700">
-                            ${optionsMarkup(col.source)}
-                        </select>
-                    </div>
-                    <div class="md:col-span-3">
-                        <label class="text-xs font-semibold text-slate-600 dark:text-slate-300">Header Label</label>
-                        <input type="text" class="pdf-col-label w-full mt-1 p-2 border border-gray-300 rounded-lg bg-gray-50/70 premium-input dark:bg-gray-800/50 dark:border-gray-700" value="${escapeHtml(col.label).replace(/"/g, '&quot;')}" />
-                    </div>
-                    <div class="md:col-span-2">
-                        <label class="text-xs font-semibold text-slate-600 dark:text-slate-300">Width</label>
-                        <input type="number" min="2" max="35" step="0.5" class="pdf-col-width w-full mt-1 p-2 border border-gray-300 rounded-lg bg-gray-50/70 premium-input dark:bg-gray-800/50 dark:border-gray-700" value="${col.width}" />
-                    </div>
-                    <div class="md:col-span-2 flex items-center gap-2 mt-1 md:mt-6">
-                        <input type="checkbox" class="pdf-col-visible ios-switch" ${col.visible ? 'checked' : ''} />
-                        <span class="text-xs font-semibold text-slate-600 dark:text-slate-300">Visible</span>
-                    </div>
-                    <div class="md:col-span-2">
-                        <button class="pdf-col-remove w-full ios-secondary-btn px-3 py-2 rounded-lg text-xs font-semibold dark:text-gray-100">Remove</button>
-                    </div>
-                </div>
-            </div>
+            <tr data-col-index="${index}" class="border-t border-slate-200/70 dark:border-slate-700/60">
+                <td class="px-3 py-2">
+                    <select class="pdf-col-source w-full p-2 border border-gray-300 rounded-lg bg-gray-50/70 premium-select dark:bg-gray-800/50 dark:border-gray-700">
+                        ${optionsMarkup(col.source)}
+                    </select>
+                </td>
+                <td class="px-3 py-2">
+                    <input type="text" class="pdf-col-label w-full p-2 border border-gray-300 rounded-lg bg-gray-50/70 premium-input dark:bg-gray-800/50 dark:border-gray-700" value="${escapeHtml(col.label).replace(/"/g, '&quot;')}" />
+                </td>
+                <td class="px-3 py-2">
+                    <input type="number" min="2" max="35" step="0.5" class="pdf-col-width w-full p-2 border border-gray-300 rounded-lg bg-gray-50/70 premium-input dark:bg-gray-800/50 dark:border-gray-700" value="${col.width}" />
+                </td>
+                <td class="px-3 py-2">
+                    <input type="checkbox" class="pdf-col-visible ios-switch" ${col.visible ? 'checked' : ''} />
+                </td>
+                <td class="px-3 py-2">
+                    <button class="pdf-col-remove ios-secondary-btn px-3 py-1.5 rounded-lg text-xs font-semibold dark:text-gray-100">Remove</button>
+                </td>
+            </tr>
         `).join('');
     };
 
@@ -8116,6 +8145,18 @@ document.addEventListener('DOMContentLoaded', async () => {
                 settings.columns.splice(index, 1);
                 savePdfTableSettings(settings);
                 renderPdfTableSettingsEditor();
+            });
+            columnsBuilder.addEventListener('change', (e) => {
+                const sourceEl = e.target.closest('.pdf-col-source');
+                if (!sourceEl) return;
+                const row = sourceEl.closest('[data-col-index]');
+                if (!row) return;
+                const source = getFieldMeta(sourceEl.value).key;
+                const meta = getFieldMeta(source);
+                const labelInput = row.querySelector('.pdf-col-label');
+                const widthInput = row.querySelector('.pdf-col-width');
+                if (labelInput) labelInput.value = meta.label;
+                if (widthInput) widthInput.value = String(meta.width);
             });
             columnsBuilder.dataset.bound = '1';
         }
