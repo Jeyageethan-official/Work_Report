@@ -1463,7 +1463,7 @@
                 margin-top: 0;
             }
             #main-nav {
-                margin-bottom: 1.5cm;
+                margin-bottom: 0.5cm;
             }
             #main-nav::before { content: none; }
             #main-nav::after {
@@ -1598,13 +1598,13 @@
             display: none !important;
         }
         .settings-detail-panel {
-            border: none !important;
-            background: transparent !important;
-            box-shadow: none !important;
-            backdrop-filter: none !important;
-            -webkit-backdrop-filter: none !important;
-            border-radius: 0 !important;
-            padding: 0 !important;
+            border: 1px solid rgba(255, 255, 255, 0.5) !important;
+            background: rgba(255, 255, 255, 0.48) !important;
+            box-shadow: 0 14px 30px rgba(15, 23, 42, 0.08) !important;
+            backdrop-filter: blur(20px) saturate(130%) !important;
+            -webkit-backdrop-filter: blur(20px) saturate(130%) !important;
+            border-radius: 20px !important;
+            padding: 1.1rem !important;
             min-height: 0 !important;
             margin: 0 !important;
             max-width: none !important;
@@ -1928,13 +1928,18 @@
             min-height: 0 !important;
         }
         #settings-page .settings-detail-panel {
-            border: none !important;
-            background: transparent !important;
-            box-shadow: none !important;
-            backdrop-filter: none !important;
-            -webkit-backdrop-filter: none !important;
-            border-radius: 0 !important;
-            padding: 0 !important;
+            border: 1px solid rgba(255, 255, 255, 0.5) !important;
+            background: rgba(255, 255, 255, 0.48) !important;
+            box-shadow: 0 14px 30px rgba(15, 23, 42, 0.08) !important;
+            backdrop-filter: blur(20px) saturate(130%) !important;
+            -webkit-backdrop-filter: blur(20px) saturate(130%) !important;
+            border-radius: 20px !important;
+            padding: 1.1rem !important;
+        }
+        html.dark #settings-page .settings-detail-panel {
+            border-color: rgba(100, 116, 139, 0.35) !important;
+            background: rgba(15, 23, 42, 0.5) !important;
+            box-shadow: 0 14px 30px rgba(0, 0, 0, 0.28) !important;
         }
         html.dark #settings-page .widget-card {
             border-color: rgba(100, 116, 139, 0.35) !important;
@@ -2845,7 +2850,7 @@
             #ai-page,
             #reminder-page,
             #download-page {
-                margin-top: 1.5cm !important;
+                margin-top: 0.5cm !important;
             }
             #app-wrapper {
                 padding-top: 0 !important;
