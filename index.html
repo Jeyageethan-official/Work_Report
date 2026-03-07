@@ -5812,6 +5812,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         };
     };
     const ALLOW_FIREBASE_DEFAULT_AUTH_EMAIL_FALLBACK = false;
+    const VERIFY_RESEND_COOLDOWN_MS = 10 * 60 * 1000;
+    const verifyResendKeyFor = (email = '') => `verifyResendAt:${String(email || '').trim().toLowerCase()}`;
+    const canResendVerifyFor = (email = '') => {
+        const key = verifyResendKeyFor(email);
+        const last = Number(localStorage.getItem(key) || 0);
+        return !last || (Date.now() - last) >= VERIFY_RESEND_COOLDOWN_MS;
+    };
+    const markVerifyResendFor = (email = '') => {
+        const key = verifyResendKeyFor(email);
+        localStorage.setItem(key, String(Date.now()));
+    };
 
     const showAuthActionPage = (title, subtitle, bodyHtml) => {
         const titleEl = document.getElementById('auth-action-title');
@@ -6035,14 +6046,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
             await sendCustomAuthEmail({ type: 'resetPassword', email });
         } catch (err) {
-            const code = String(err?.code || '');
-            const msg = String(err?.message || '');
-            const isRateLimited = code === 'too-many-attempts' || msg === 'too-many-attempts' || msg.includes('TOO_MANY_ATTEMPTS_TRY_LATER');
-            if (isRateLimited) {
-                // Temporary fallback path to improve reliability when custom generation is throttled.
-                await auth.sendPasswordResetEmail(email, getActionCodeSettings());
-                return;
-            }
             if (ALLOW_FIREBASE_DEFAULT_AUTH_EMAIL_FALLBACK) {
                 console.warn('Custom reset mail failed, falling back to Firebase mail:', err);
                 await auth.sendPasswordResetEmail(email, getActionCodeSettings());
@@ -9741,24 +9744,29 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
             if (isPasswordUserUnverified(currentUser)) {
                 let verificationSent = false;
-                try {
-                    await sendCustomAuthEmail({
-                        type: 'verifyEmail',
-                        email: currentUser.email || '',
-                        displayName: currentUser.displayName || ''
-                    });
-                    verificationSent = true;
-                } catch (verifyErr) {
-                    if (ALLOW_FIREBASE_DEFAULT_AUTH_EMAIL_FALLBACK) {
-                        console.warn('Custom verification resend failed, falling back to Firebase mail:', verifyErr);
-                        try {
-                            await currentUser.sendEmailVerification(getActionCodeSettings());
-                            verificationSent = true;
-                        } catch (fallbackErr) {
-                            console.warn('Fallback verification send failed:', fallbackErr);
+                const unverifiedEmail = currentUser.email || '';
+                if (canResendVerifyFor(unverifiedEmail)) {
+                    try {
+                        await sendCustomAuthEmail({
+                            type: 'verifyEmail',
+                            email: unverifiedEmail,
+                            displayName: currentUser.displayName || ''
+                        });
+                        verificationSent = true;
+                        markVerifyResendFor(unverifiedEmail);
+                    } catch (verifyErr) {
+                        if (ALLOW_FIREBASE_DEFAULT_AUTH_EMAIL_FALLBACK) {
+                            console.warn('Custom verification resend failed, falling back to Firebase mail:', verifyErr);
+                            try {
+                                await currentUser.sendEmailVerification(getActionCodeSettings());
+                                verificationSent = true;
+                                markVerifyResendFor(unverifiedEmail);
+                            } catch (fallbackErr) {
+                                console.warn('Fallback verification send failed:', fallbackErr);
+                            }
+                        } else {
+                            console.warn('Custom verification resend failed:', verifyErr);
                         }
-                    } else {
-                        console.warn('Custom verification resend failed:', verifyErr);
                     }
                 }
                 await auth.signOut();
@@ -9767,7 +9775,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 renderSignedOutAuthState();
                 setAuthError('signin-error', verificationSent
                     ? 'Please verify your email. Verification link sent.'
-                    : 'Please verify your email. Verification email could not be sent now.');
+                    : 'Please verify your email. Check your inbox for the latest verification email.');
                 setGoogleAuthButtonsDisabled(false);
                 setAuthLoading(false);
                 hideBootSplash();
