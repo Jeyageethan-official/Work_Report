@@ -5802,6 +5802,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             handleCodeInApp: false
         };
     };
+    const ALLOW_FIREBASE_DEFAULT_AUTH_EMAIL_FALLBACK = false;
 
     const showAuthActionPage = (title, subtitle, bodyHtml) => {
         const titleEl = document.getElementById('auth-action-title');
@@ -6011,8 +6012,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                 displayName: fullName || userCredential.user.displayName || ''
             });
         } catch (err) {
-            console.warn('Custom verify mail failed, falling back to Firebase mail:', err);
-            await userCredential.user.sendEmailVerification(getActionCodeSettings());
+            if (ALLOW_FIREBASE_DEFAULT_AUTH_EMAIL_FALLBACK) {
+                console.warn('Custom verify mail failed, falling back to Firebase mail:', err);
+                await userCredential.user.sendEmailVerification(getActionCodeSettings());
+            } else {
+                throw new Error('Verification email service is temporarily unavailable. Please try again.');
+            }
         }
         await auth.signOut();
     };
@@ -6021,8 +6026,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
             await sendCustomAuthEmail({ type: 'resetPassword', email });
         } catch (err) {
-            console.warn('Custom reset mail failed, falling back to Firebase mail:', err);
-            await auth.sendPasswordResetEmail(email, getActionCodeSettings());
+            if (ALLOW_FIREBASE_DEFAULT_AUTH_EMAIL_FALLBACK) {
+                console.warn('Custom reset mail failed, falling back to Firebase mail:', err);
+                await auth.sendPasswordResetEmail(email, getActionCodeSettings());
+            } else {
+                throw new Error('Reset email service is temporarily unavailable. Please try again.');
+            }
         }
     };
 
@@ -9703,25 +9712,34 @@ document.addEventListener('DOMContentLoaded', async () => {
                 console.warn('User reload skipped:', reloadErr);
             }
             if (isPasswordUserUnverified(currentUser)) {
+                let verificationSent = false;
                 try {
                     await sendCustomAuthEmail({
                         type: 'verifyEmail',
                         email: currentUser.email || '',
                         displayName: currentUser.displayName || ''
                     });
+                    verificationSent = true;
                 } catch (verifyErr) {
-                    console.warn('Custom verification resend failed, falling back to Firebase mail:', verifyErr);
-                    try {
-                        await currentUser.sendEmailVerification(getActionCodeSettings());
-                    } catch (fallbackErr) {
-                        console.warn('Fallback verification send failed:', fallbackErr);
+                    if (ALLOW_FIREBASE_DEFAULT_AUTH_EMAIL_FALLBACK) {
+                        console.warn('Custom verification resend failed, falling back to Firebase mail:', verifyErr);
+                        try {
+                            await currentUser.sendEmailVerification(getActionCodeSettings());
+                            verificationSent = true;
+                        } catch (fallbackErr) {
+                            console.warn('Fallback verification send failed:', fallbackErr);
+                        }
+                    } else {
+                        console.warn('Custom verification resend failed:', verifyErr);
                     }
                 }
                 await auth.signOut();
                 localStorage.removeItem(GOOGLE_AUTH_FLAG);
                 localStorage.removeItem(GOOGLE_AUTH_TS);
                 renderSignedOutAuthState();
-                setAuthError('signin-error', 'Please verify your email. New verification link sent.');
+                setAuthError('signin-error', verificationSent
+                    ? 'Please verify your email. Verification link sent.'
+                    : 'Please verify your email. Verification email could not be sent now.');
                 setGoogleAuthButtonsDisabled(false);
                 setAuthLoading(false);
                 hideBootSplash();
