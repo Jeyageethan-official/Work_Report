@@ -5789,7 +5789,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             'unauthorized-continue-uri': 'Domain setup is pending. Please try again in a few minutes.',
             'resend-key-missing': 'Email service key is missing. Contact admin.',
             'resend-send-failed': 'Email delivery failed. Please retry after a moment.',
-            'send-failed': 'Unable to send email now. Please try again.'
+            'send-failed': 'Unable to send email now. Please try again.',
+            'invalid-token': 'This reset link is invalid.',
+            'token-expired': 'This reset link has expired. Please request a new link.',
+            'token-used': 'This reset link was already used. Please request a new one.',
+            'weak-password': 'Password must be at least 6 characters.',
+            'reset-failed': 'Could not reset password now. Please try again.'
         };
         if (table[code]) return table[code];
         if (table[msg]) return table[msg];
@@ -5811,7 +5816,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             handleCodeInApp: false
         };
     };
-    const ALLOW_FIREBASE_DEFAULT_AUTH_EMAIL_FALLBACK = false;
+    const ALLOW_FIREBASE_DEFAULT_AUTH_EMAIL_FALLBACK = true;
     const VERIFY_RESEND_COOLDOWN_MS = 10 * 60 * 1000;
     const verifyResendKeyFor = (email = '') => `verifyResendAt:${String(email || '').trim().toLowerCase()}`;
     const canResendVerifyFor = (email = '') => {
@@ -5848,19 +5853,22 @@ document.addEventListener('DOMContentLoaded', async () => {
         const params = new URLSearchParams(window.location.search);
         const mode = params.get('mode');
         const oobCode = params.get('oobCode');
-        if (!mode || !oobCode) return null;
+        const token = params.get('token');
+        if (!mode) return null;
+        if (mode === 'customReset' && token) return { mode, token, continueUrl: params.get('continueUrl') || '' };
+        if (!oobCode) return null;
         return { mode, oobCode, continueUrl: params.get('continueUrl') || '' };
     };
 
     const clearAuthActionParams = () => {
         const cleanUrl = new URL(window.location.href);
-        ['mode', 'oobCode', 'apiKey', 'lang', 'continueUrl', 'authAction'].forEach((k) => cleanUrl.searchParams.delete(k));
+        ['mode', 'oobCode', 'apiKey', 'lang', 'continueUrl', 'authAction', 'token'].forEach((k) => cleanUrl.searchParams.delete(k));
         window.history.replaceState({}, '', cleanUrl.toString());
     };
 
     const handleAuthActionPage = async (action) => {
         if (!action || !auth) return false;
-        const { mode, oobCode } = action;
+        const { mode, oobCode, token } = action;
         if (mode === 'verifyEmail') {
             showAuthActionPage(
                 'Verify Your Email',
@@ -5967,7 +5975,71 @@ document.addEventListener('DOMContentLoaded', async () => {
             return true;
         }
 
+        if (mode === 'customReset') {
+            showAuthActionPage(
+                'Reset Password',
+                'Work Report Account',
+                `<form id="auth-custom-reset-form" class="space-y-3">
+                    <div>
+                        <label class="auth-field-label">New password</label>
+                        <input id="auth-custom-reset-password" type="password" class="signin-input" placeholder="New password" required />
+                    </div>
+                    <div>
+                        <label class="auth-field-label">Confirm password</label>
+                        <input id="auth-custom-reset-confirm" type="password" class="signin-input" placeholder="Confirm password" required />
+                    </div>
+                    <p id="auth-custom-reset-error" class="text-red-500 text-sm min-h-[18px]"></p>
+                    <button type="submit" class="auth-primary-btn">Update Password</button>
+                </form>`
+            );
+            document.getElementById('auth-custom-reset-form')?.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const p1 = document.getElementById('auth-custom-reset-password')?.value || '';
+                const p2 = document.getElementById('auth-custom-reset-confirm')?.value || '';
+                const errEl = document.getElementById('auth-custom-reset-error');
+                if (errEl) errEl.textContent = '';
+                if (p1.length < 6) {
+                    if (errEl) errEl.textContent = 'Password must be at least 6 characters.';
+                    return;
+                }
+                if (p1 !== p2) {
+                    if (errEl) errEl.textContent = 'Passwords do not match.';
+                    return;
+                }
+                try {
+                    await completeCustomPasswordReset(token, p1);
+                    showAuthActionPage(
+                        'Password Updated',
+                        'Work Report Account',
+                        `<p class="text-sm text-slate-600 dark:text-slate-300 mb-4">Password updated successfully. Please sign in.</p>
+                         <button id="auth-action-go-signin" class="auth-primary-btn">Go to Sign In</button>`
+                    );
+                    document.getElementById('auth-action-go-signin')?.addEventListener('click', () => {
+                        hideAuthActionPage();
+                        clearAuthActionParams();
+                        showSigninPage();
+                    });
+                } catch (err) {
+                    if (errEl) errEl.textContent = mapAuthError(err);
+                }
+            });
+            return true;
+        }
+
         return false;
+    };
+
+    const completeCustomPasswordReset = async (token, password) => {
+        const endpoint = `https://us-central1-work-report-fe3da.cloudfunctions.net/completePasswordReset`;
+        const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ token, password })
+        });
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok || result?.ok !== true) {
+            throw new Error(result?.error || 'reset-failed');
+        }
     };
 
     const createUserProfileOnSignup = async (firebaseUser, explicitName = null) => {
@@ -6043,15 +6115,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     const performPasswordReset = async (email) => {
+        let customError = null;
         try {
             await sendCustomAuthEmail({ type: 'resetPassword', email });
+            return;
         } catch (err) {
-            if (ALLOW_FIREBASE_DEFAULT_AUTH_EMAIL_FALLBACK) {
-                console.warn('Custom reset mail failed, falling back to Firebase mail:', err);
-                await auth.sendPasswordResetEmail(email, getActionCodeSettings());
-            } else {
-                throw new Error('Reset email service is temporarily unavailable. Please try again.');
-            }
+            customError = err;
+            console.warn('Custom reset mail failed, attempting Firebase fallback:', err);
+        }
+        try {
+            await auth.sendPasswordResetEmail(email, getActionCodeSettings());
+        } catch (fallbackErr) {
+            console.warn('Firebase reset fallback also failed:', fallbackErr);
+            throw (customError || fallbackErr);
         }
     };
 
@@ -6075,15 +6151,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     const openForgotPasswordModal = () => {
         const prefillEmail = (document.getElementById('auth-email')?.value || '').trim();
         const content = `
-            <div class="space-y-3">
+            <form id="forgot-email-form" class="space-y-3">
                 <p class="text-sm text-slate-600 dark:text-slate-300">Enter your account email. We will send a password reset link.</p>
                 <input id="forgot-email-input" type="email" class="signin-input" placeholder="Email address" value="${escapeHtml(prefillEmail).replace(/"/g, '&quot;')}" />
                 <p id="forgot-email-error" class="text-sm text-red-500 min-h-[18px]"></p>
-                <button id="forgot-email-send-btn" class="auth-primary-btn">Send Reset Link</button>
-            </div>
+                <button id="forgot-email-send-btn" type="submit" class="auth-primary-btn">Send Reset Link</button>
+            </form>
         `;
         openModal(createModal('Forgot Password', content, 'forgot-password-modal', 'max-w-md'));
-        document.getElementById('forgot-email-send-btn')?.addEventListener('click', async () => {
+        document.getElementById('forgot-email-form')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
             const email = (document.getElementById('forgot-email-input')?.value || '').trim();
             const errEl = document.getElementById('forgot-email-error');
             const sendBtn = document.getElementById('forgot-email-send-btn');
@@ -6137,20 +6214,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         provider.addScope('email');
         provider.addScope('profile');
         provider.setCustomParameters({ prompt: 'select_account' });
-        try {
-            await auth.signInWithPopup(provider);
-            localStorage.removeItem(GOOGLE_AUTH_FLAG);
-            localStorage.removeItem(GOOGLE_AUTH_TS);
-        } catch (popupErr) {
-            const code = String(popupErr?.code || '');
-            if (code === 'auth/popup-blocked' || code === 'auth/cancelled-popup-request' || code === 'auth/operation-not-supported-in-this-environment' || code === 'auth/web-storage-unsupported') {
-                localStorage.setItem(GOOGLE_AUTH_FLAG, '1');
-                localStorage.setItem(GOOGLE_AUTH_TS, String(Date.now()));
-                await auth.signInWithRedirect(provider);
-                return;
-            }
-            throw popupErr;
-        }
+        localStorage.setItem(GOOGLE_AUTH_FLAG, '1');
+        localStorage.setItem(GOOGLE_AUTH_TS, String(Date.now()));
+        await auth.signInWithRedirect(provider);
     };
 
     const addSigninEventListeners = () => {

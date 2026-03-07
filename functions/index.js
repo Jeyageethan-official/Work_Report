@@ -2,6 +2,7 @@ const { onRequest } = require("firebase-functions/v2/https");
 const { defineSecret, defineString } = require("firebase-functions/params");
 const logger = require("firebase-functions/logger");
 const admin = require("firebase-admin");
+const crypto = require("crypto");
 
 admin.initializeApp();
 
@@ -15,6 +16,7 @@ const mailFromParam = defineString("MAIL_FROM", {
   default: "Work Report <no-reply@workreport.app>",
 });
 const mailTemplateVersion = "2026-03-07-b";
+const RESET_TTL_MS = 60 * 60 * 1000;
 
 const json = (res, status, payload) => {
   res.status(status).set("Content-Type", "application/json").send(JSON.stringify(payload));
@@ -156,7 +158,19 @@ exports.sendAuthEmail = onRequest(
           tip: "If you did not request this, you can ignore this message.",
         });
       } else {
-        link = await admin.auth().generatePasswordResetLink(cleanEmail, actionCodeSettings);
+        // Custom password reset flow to avoid Firebase OOB throttling and keep branded email UX.
+        const userRecord = await admin.auth().getUserByEmail(cleanEmail).catch(() => null);
+        if (!userRecord) return json(res, 200, { ok: true });
+        const token = crypto.randomBytes(32).toString("hex");
+        const expiresAt = Date.now() + RESET_TTL_MS;
+        await admin.firestore().collection("passwordResetTokens").doc(token).set({
+          email: cleanEmail,
+          uid: userRecord.uid,
+          used: false,
+          createdAt: admin.firestore.FieldValue.serverTimestamp(),
+          expiresAt,
+        });
+        link = `${appBaseUrlParam.value()}?authAction=1&mode=customReset&token=${encodeURIComponent(token)}`;
         subject = "Reset your Work Report password";
         html = buildPremiumTemplate({
           title: "Reset your password",
@@ -196,6 +210,45 @@ exports.sendAuthEmail = onRequest(
         return json(res, 502, { ok: false, error: "resend-send-failed" });
       }
       return json(res, 500, { ok: false, error: "send-failed" });
+    }
+  }
+);
+
+exports.completePasswordReset = onRequest(
+  {
+    region: "us-central1",
+    cors: false,
+  },
+  async (req, res) => {
+    applyCors(req, res);
+    if (req.method === "OPTIONS") return res.status(204).send("");
+    if (req.method !== "POST") return json(res, 405, { ok: false, error: "method-not-allowed" });
+
+    try {
+      const token = String(req.body?.token || "").trim();
+      const password = String(req.body?.password || "");
+      if (!token) return json(res, 400, { ok: false, error: "invalid-token" });
+      if (password.length < 6) return json(res, 400, { ok: false, error: "weak-password" });
+
+      const tokenRef = admin.firestore().collection("passwordResetTokens").doc(token);
+      const snap = await tokenRef.get();
+      if (!snap.exists) return json(res, 400, { ok: false, error: "invalid-token" });
+
+      const data = snap.data() || {};
+      if (data.used) return json(res, 400, { ok: false, error: "token-used" });
+      if (!data.uid || !data.email) return json(res, 400, { ok: false, error: "invalid-token" });
+      if (!data.expiresAt || Number(data.expiresAt) < Date.now()) return json(res, 400, { ok: false, error: "token-expired" });
+
+      await admin.auth().updateUser(data.uid, { password });
+      await tokenRef.set({
+        used: true,
+        usedAt: admin.firestore.FieldValue.serverTimestamp(),
+      }, { merge: true });
+
+      return json(res, 200, { ok: true });
+    } catch (err) {
+      logger.error("completePasswordReset failed", err);
+      return json(res, 500, { ok: false, error: "reset-failed" });
     }
   }
 );
