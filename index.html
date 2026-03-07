@@ -59,6 +59,8 @@
             --bg-dark-start: #111827;
             --bg-dark-end: #000000;
             --slt-blue: #3b82f6; /* A corporate blue */
+            --page-gap-mobile: clamp(0.55rem, 1.6vh, 0.9rem);
+            --page-gap-desktop: 0.5cm;
             --safe-top: env(safe-area-inset-top, 0px);
             --safe-bottom: env(safe-area-inset-bottom, 0px);
             --safe-left: env(safe-area-inset-left, 0px);
@@ -1463,7 +1465,7 @@
                 margin-top: 0;
             }
             #main-nav {
-                margin-bottom: 1.5cm;
+                margin-bottom: var(--page-gap-desktop);
             }
             #main-nav::before { content: none; }
             #main-nav::after {
@@ -2850,7 +2852,7 @@
             #ai-page,
             #reminder-page,
             #download-page {
-                margin-top: 1.5cm !important;
+                margin-top: var(--page-gap-mobile) !important;
             }
             #app-wrapper {
                 padding-top: 0 !important;
