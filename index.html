@@ -7058,11 +7058,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             const reasonText = row.leaveReason || '-';
             return `
                 <tr>
-                    <td style="border:1px solid #9ca3af;padding:8px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;${weekendClass}">${formattedDate}</td>
-                    <td style="border:1px solid #9ca3af;padding:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${row.inTime || '-'}</td>
-                    <td style="border:1px solid #9ca3af;padding:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${row.outTime || '-'}</td>
-                    <td style="border:1px solid #9ca3af;padding:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${row.movementOut || '-'}</td>
-                    <td style="border:1px solid #9ca3af;padding:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${row.movementIn || '-'}</td>
+                    <td style="border:1px solid #9ca3af;padding:6px 4px;font-weight:700;white-space:nowrap;font-size:10px;${weekendClass}">${formattedDate}</td>
+                    <td style="border:1px solid #9ca3af;padding:6px 3px;white-space:nowrap;font-size:10px;">${row.inTime || '-'}</td>
+                    <td style="border:1px solid #9ca3af;padding:6px 3px;white-space:nowrap;font-size:10px;">${row.outTime || '-'}</td>
+                    <td style="border:1px solid #9ca3af;padding:6px 3px;white-space:nowrap;font-size:10px;">${row.movementOut || '-'}</td>
+                    <td style="border:1px solid #9ca3af;padding:6px 3px;white-space:nowrap;font-size:10px;">${row.movementIn || '-'}</td>
                     <td style="border:1px solid #9ca3af;padding:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${row.teamMembers || '-'}</td>
                     <td style="border:1px solid #9ca3af;padding:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${row.workLocation || '-'}</td>
                     <td style="border:1px solid #9ca3af;padding:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${row.vehicleNumber || '-'}</td>
@@ -7082,18 +7082,18 @@ document.addEventListener('DOMContentLoaded', async () => {
             </div>
             <table style="width:100%;table-layout:fixed;border-collapse:collapse;border:1px solid #9ca3af;font-size:11px;color:#1f2937;">
                 <colgroup>
+                    <col style="width:11%">
                     <col style="width:8%">
-                    <col style="width:6%">
-                    <col style="width:6%">
-                    <col style="width:9%">
-                    <col style="width:9%">
-                    <col style="width:10%">
+                    <col style="width:8%">
+                    <col style="width:8%">
                     <col style="width:8%">
                     <col style="width:10%">
+                    <col style="width:8%">
+                    <col style="width:9%">
                     <col style="width:5%">
-                    <col style="width:8%">
                     <col style="width:7%">
-                    <col style="width:14%">
+                    <col style="width:6%">
+                    <col style="width:12%">
                 </colgroup>
                 <thead style="background:#f3f4f6;color:#1f2937;">
                     <tr>
