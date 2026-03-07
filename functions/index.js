@@ -89,6 +89,12 @@ const buildPremiumTemplate = ({ title, subtitle, ctaText, ctaUrl, tip }) => `
 `;
 
 const sendViaResend = async ({ apiKey, from, to, subject, html }) => {
+  const text = String(html || "")
+    .replace(/<style[\s\S]*?<\/style>/gi, " ")
+    .replace(/<script[\s\S]*?<\/script>/gi, " ")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
   const response = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
@@ -100,6 +106,7 @@ const sendViaResend = async ({ apiKey, from, to, subject, html }) => {
       to: [to],
       subject,
       html,
+      text,
     }),
   });
 
@@ -174,6 +181,20 @@ exports.sendAuthEmail = onRequest(
       return json(res, 200, { ok: true });
     } catch (err) {
       logger.error("sendAuthEmail failed", err);
+      const infoCode = err?.errorInfo?.code || "";
+      const rawMessage = String(err?.message || "");
+      if (infoCode === "auth/unauthorized-continue-uri") {
+        return json(res, 400, { ok: false, error: "unauthorized-continue-uri" });
+      }
+      if (rawMessage.includes("TOO_MANY_ATTEMPTS_TRY_LATER")) {
+        return json(res, 429, { ok: false, error: "too-many-attempts" });
+      }
+      if (rawMessage.includes("RESEND_API_KEY")) {
+        return json(res, 500, { ok: false, error: "resend-key-missing" });
+      }
+      if (rawMessage.includes("Resend request failed")) {
+        return json(res, 502, { ok: false, error: "resend-send-failed" });
+      }
       return json(res, 500, { ok: false, error: "send-failed" });
     }
   }

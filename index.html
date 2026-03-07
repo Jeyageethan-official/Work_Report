@@ -5765,6 +5765,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // MODAL CONTENT AND LOGIC
     const mapAuthError = (err) => {
         const code = String(err?.code || '');
+        const msg = String(err?.message || '');
         const table = {
             'auth/invalid-email': 'Invalid email address.',
             'auth/user-not-found': 'No account found with this email.',
@@ -5783,9 +5784,17 @@ document.addEventListener('DOMContentLoaded', async () => {
             'auth/unauthorized-continue-uri': 'Password reset link config is invalid. Please try again.',
             'auth/web-storage-unsupported': 'Browser storage is blocked. Enable cookies/storage and retry.',
             'auth/invalid-action-code': 'This link is invalid or already used.',
-            'auth/expired-action-code': 'This link has expired. Please request a new one.'
+            'auth/expired-action-code': 'This link has expired. Please request a new one.',
+            'too-many-attempts': 'Too many attempts. Please wait a few minutes and try again.',
+            'unauthorized-continue-uri': 'Domain setup is pending. Please try again in a few minutes.',
+            'resend-key-missing': 'Email service key is missing. Contact admin.',
+            'resend-send-failed': 'Email delivery failed. Please retry after a moment.',
+            'send-failed': 'Unable to send email now. Please try again.'
         };
-        return table[code] || err?.message || 'Authentication failed. Please try again.';
+        if (table[code]) return table[code];
+        if (table[msg]) return table[msg];
+        if (msg.includes('TOO_MANY_ATTEMPTS_TRY_LATER')) return table['too-many-attempts'];
+        return err?.message || 'Authentication failed. Please try again.';
     };
 
     const setAuthError = (targetId, message = '') => {
@@ -6066,10 +6075,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('forgot-email-send-btn')?.addEventListener('click', async () => {
             const email = (document.getElementById('forgot-email-input')?.value || '').trim();
             const errEl = document.getElementById('forgot-email-error');
+            const sendBtn = document.getElementById('forgot-email-send-btn');
             if (errEl) errEl.textContent = '';
             if (!email) {
                 if (errEl) errEl.textContent = 'Enter your email address.';
                 return;
+            }
+            if (sendBtn) {
+                sendBtn.disabled = true;
+                sendBtn.textContent = 'Sending...';
             }
             try {
                 await performPasswordReset(email);
@@ -6078,6 +6092,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                 showToast('Reset email sent.', 'success');
             } catch (err) {
                 if (errEl) errEl.textContent = mapAuthError(err);
+                showToast(mapAuthError(err), 'warning');
+            } finally {
+                if (sendBtn) {
+                    sendBtn.disabled = false;
+                    sendBtn.textContent = 'Send Reset Link';
+                }
             }
         });
     };
