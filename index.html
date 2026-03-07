@@ -1546,6 +1546,46 @@
             background: rgba(17, 24, 39, 0.45);
             border-color: rgba(100, 116, 139, 0.35);
         }
+        #settings-page .widget-card {
+            overflow: hidden;
+        }
+        .settings-accordion-toggle {
+            width: 100%;
+            border: none;
+            background: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+            padding: 0;
+            margin: 0 0 0.8rem 0;
+            text-align: left;
+            cursor: pointer;
+        }
+        .settings-accordion-title {
+            font-size: 1.03rem;
+            font-weight: 760;
+            color: #1e293b;
+            letter-spacing: -0.01em;
+        }
+        .settings-accordion-chevron {
+            width: 1.15rem;
+            height: 1.15rem;
+            color: #64748b;
+            transition: transform 0.22s ease, color 0.22s ease;
+            flex-shrink: 0;
+        }
+        .settings-accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.28s ease;
+        }
+        #settings-page .widget-card.is-open .settings-accordion-chevron {
+            transform: rotate(180deg);
+            color: var(--ios-primary);
+        }
+        html.dark .settings-accordion-title { color: #e2e8f0; }
+        html.dark .settings-accordion-chevron { color: #94a3b8; }
         #settings-accent-color {
             -webkit-appearance: none;
             appearance: none;
@@ -7563,8 +7603,65 @@ document.addEventListener('DOMContentLoaded', async () => {
     //
     // ===================================================================================
     
+    const refreshSettingsAccordionHeights = () => {
+        document.querySelectorAll('#settings-page .widget-card.is-open .settings-accordion-content').forEach((contentEl) => {
+            contentEl.style.maxHeight = `${contentEl.scrollHeight + 12}px`;
+        });
+    };
+
+    const initSettingsAccordions = () => {
+        const page = document.getElementById('settings-page');
+        if (!page || page.dataset.accordionReady === '1') return;
+        const cards = Array.from(page.querySelectorAll('.widget-card'));
+        cards.forEach((card, idx) => {
+            const heading = card.querySelector(':scope > h3.section-heading');
+            if (!heading) return;
+
+            const title = (heading.textContent || '').trim() || `Section ${idx + 1}`;
+            heading.remove();
+
+            const toggle = document.createElement('button');
+            toggle.type = 'button';
+            toggle.className = 'settings-accordion-toggle';
+            toggle.innerHTML = `
+                <span class="settings-accordion-title">${title}</span>
+                <svg class="settings-accordion-chevron" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"></path>
+                </svg>
+            `;
+
+            const content = document.createElement('div');
+            content.className = 'settings-accordion-content';
+            while (card.firstChild) {
+                content.appendChild(card.firstChild);
+            }
+
+            card.appendChild(toggle);
+            card.appendChild(content);
+
+            const storageKey = `settingsAccordion:${title}`;
+            const storedState = localStorage.getItem(storageKey);
+            const shouldOpen = storedState !== null ? storedState === '1' : idx === 0;
+
+            const applyState = (open) => {
+                card.classList.toggle('is-open', open);
+                toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+                content.style.maxHeight = open ? `${content.scrollHeight + 12}px` : '0px';
+            };
+
+            applyState(shouldOpen);
+            toggle.addEventListener('click', () => {
+                const next = !card.classList.contains('is-open');
+                applyState(next);
+                localStorage.setItem(storageKey, next ? '1' : '0');
+            });
+        });
+        page.dataset.accordionReady = '1';
+    };
+
     const renderSettingsPage = () => {
         if (!user) return;
+        initSettingsAccordions();
 
         // Profile
         const initialEl = document.getElementById('settings-user-initial');
@@ -7598,6 +7695,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('auto-scroll-toggle').checked = localStorage.getItem('autoScrollToToday') !== 'false';
         document.documentElement.classList.toggle('reduce-motion', localStorage.getItem('reduceMotion') === 'true');
         updateBackupUi(0);
+        refreshSettingsAccordionHeights();
         
         addSettingsEventListeners();
     };
