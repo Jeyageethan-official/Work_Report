@@ -671,6 +671,66 @@
             font-weight: 700;
             padding: 0;
         }
+        #auth-action-page {
+            position: fixed;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 120;
+            padding: 1.4rem;
+            background:
+                radial-gradient(circle at 16% 12%, rgba(59, 130, 246, 0.25), transparent 36%),
+                radial-gradient(circle at 86% 8%, rgba(147, 197, 253, 0.22), transparent 34%),
+                linear-gradient(160deg, #eef4ff 0%, #ffffff 45%, #f5f9ff 100%);
+        }
+        html.dark #auth-action-page {
+            background:
+                radial-gradient(circle at 12% 10%, rgba(59, 130, 246, 0.2), transparent 36%),
+                linear-gradient(160deg, #0b1220 0%, #111827 55%, #0f172a 100%);
+        }
+        .auth-action-card {
+            width: 100%;
+            max-width: 560px;
+            border-radius: 18px;
+            border: 1px solid rgba(148, 163, 184, 0.28);
+            background: rgba(255, 255, 255, 0.96);
+            box-shadow: 0 20px 45px rgba(15, 23, 42, 0.18);
+            overflow: hidden;
+        }
+        html.dark .auth-action-card {
+            background: rgba(15, 23, 42, 0.94);
+            border-color: rgba(71, 85, 105, 0.72);
+            box-shadow: 0 24px 55px rgba(2, 6, 23, 0.56);
+        }
+        .auth-action-head {
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            padding: 0.95rem 1.05rem;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.24);
+        }
+        .auth-action-head .auth-logo-mark {
+            margin: 0;
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+        }
+        .auth-action-title {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: #0f172a;
+        }
+        html.dark .auth-action-title { color: #e2e8f0; }
+        .auth-action-subtitle {
+            font-size: 0.83rem;
+            color: #64748b;
+            margin-top: 0.12rem;
+        }
+        html.dark .auth-action-subtitle { color: #94a3b8; }
+        .auth-action-body {
+            padding: 1rem 1.05rem 1.2rem;
+        }
         html.dark .auth-logo-mark {
             background: linear-gradient(150deg, #1e3a8a 0%, #1d4ed8 100%);
             border-color: rgba(96, 165, 250, 0.35);
@@ -3260,6 +3320,23 @@
         </div>
     </div>
 
+    <div id="auth-action-page" class="fixed inset-0">
+        <div class="auth-action-card">
+            <div class="auth-action-head">
+                <div class="auth-logo-mark">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path d="M4 19h16"></path><path d="M7 16V8"></path><path d="M12 16V5"></path><path d="M17 16v-4"></path>
+                    </svg>
+                </div>
+                <div>
+                    <div id="auth-action-title" class="auth-action-title">Work Report</div>
+                    <div id="auth-action-subtitle" class="auth-action-subtitle">Secure account action</div>
+                </div>
+            </div>
+            <div id="auth-action-body" class="auth-action-body"></div>
+        </div>
+    </div>
+
     <div id="boot-splash" aria-live="polite" aria-label="App starting">
         <div class="boot-splash-shell">
             <div class="boot-logo-wrap">
@@ -4068,6 +4145,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // DOM Elements
     const signinPage = document.getElementById('signin-page');
     const signupPage = document.getElementById('signup-page');
+    const authActionPage = document.getElementById('auth-action-page');
     const appWrapper = document.getElementById('app-wrapper');
     const reportPage = document.getElementById('report-page');
     const dashboardPage = document.getElementById('dashboard-page');
@@ -4132,6 +4210,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const GOOGLE_AUTH_TS = 'wr_google_redirect_started_at';
     const GOOGLE_AUTH_MAX_WAIT_MS = 25000;
     const HOSTED_WEB_APP_URL = 'https://work-report-fe3da.web.app/';
+    const getAppBaseUrl = () => `${window.location.origin}${window.location.pathname}`;
     const updateHeaderMonthLabel = () => {
         if (!headerMonthLabel) return;
         headerMonthLabel.textContent = `${months[currentDate.getMonth()].slice(0, 3)} ${currentDate.getFullYear()}`;
@@ -4692,11 +4771,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     const showSigninPage = () => {
+        hideAuthActionPage();
         signupPage.style.display = 'none';
         signinPage.style.display = 'flex';
     };
 
     const showSignupPage = () => {
+        hideAuthActionPage();
         signinPage.style.display = 'none';
         signupPage.style.display = 'flex';
     };
@@ -5697,7 +5778,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             'auth/network-request-failed': 'Network issue. Check your connection and retry.',
             'auth/too-many-requests': 'Too many attempts. Please try again later.',
             'auth/operation-not-allowed': 'This sign-in method is not enabled.',
-            'auth/operation-not-supported-in-this-environment': 'Google Sign-In requires secure web app URL.'
+            'auth/operation-not-supported-in-this-environment': 'Google Sign-In requires secure web app URL.',
+            'auth/invalid-action-code': 'This link is invalid or already used.',
+            'auth/expired-action-code': 'This link has expired. Please request a new one.'
         };
         return table[code] || err?.message || 'Authentication failed. Please try again.';
     };
@@ -5705,6 +5788,161 @@ document.addEventListener('DOMContentLoaded', async () => {
     const setAuthError = (targetId, message = '') => {
         const el = document.getElementById(targetId);
         if (el) el.textContent = message;
+    };
+
+    const getActionCodeSettings = () => {
+        const protocol = window.location.protocol;
+        if (protocol !== 'http:' && protocol !== 'https:') return undefined;
+        return {
+            url: `${getAppBaseUrl()}?authAction=1`,
+            handleCodeInApp: false
+        };
+    };
+
+    const showAuthActionPage = (title, subtitle, bodyHtml) => {
+        const titleEl = document.getElementById('auth-action-title');
+        const subtitleEl = document.getElementById('auth-action-subtitle');
+        const bodyEl = document.getElementById('auth-action-body');
+        if (!authActionPage || !titleEl || !subtitleEl || !bodyEl) return;
+        titleEl.textContent = title || 'Work Report';
+        subtitleEl.textContent = subtitle || 'Secure account action';
+        bodyEl.innerHTML = bodyHtml || '';
+        signinPage.style.display = 'none';
+        signupPage.style.display = 'none';
+        appWrapper.style.display = 'none';
+        authActionPage.style.display = 'flex';
+        setAuthLoading(false);
+    };
+
+    const hideAuthActionPage = () => {
+        if (!authActionPage) return;
+        authActionPage.style.display = 'none';
+    };
+
+    const parseAuthActionParams = () => {
+        const params = new URLSearchParams(window.location.search);
+        const mode = params.get('mode');
+        const oobCode = params.get('oobCode');
+        if (!mode || !oobCode) return null;
+        return { mode, oobCode, continueUrl: params.get('continueUrl') || '' };
+    };
+
+    const clearAuthActionParams = () => {
+        const cleanUrl = new URL(window.location.href);
+        ['mode', 'oobCode', 'apiKey', 'lang', 'continueUrl', 'authAction'].forEach((k) => cleanUrl.searchParams.delete(k));
+        window.history.replaceState({}, '', cleanUrl.toString());
+    };
+
+    const handleAuthActionPage = async (action) => {
+        if (!action || !auth) return false;
+        const { mode, oobCode } = action;
+        if (mode === 'verifyEmail') {
+            showAuthActionPage(
+                'Verify Your Email',
+                'Work Report Account',
+                `<p class="text-sm text-slate-600 dark:text-slate-300 mb-3">Verifying your email address...</p>`
+            );
+            try {
+                await auth.applyActionCode(oobCode);
+                showAuthActionPage(
+                    'Email Verified',
+                    'Work Report Account',
+                    `<p class="text-sm text-slate-600 dark:text-slate-300 mb-4">Your email is verified. You can sign in now.</p>
+                     <button id="auth-action-go-signin" class="auth-primary-btn">Go to Sign In</button>`
+                );
+                document.getElementById('auth-action-go-signin')?.addEventListener('click', () => {
+                    hideAuthActionPage();
+                    clearAuthActionParams();
+                    showSigninPage();
+                });
+            } catch (err) {
+                showAuthActionPage(
+                    'Verification Failed',
+                    'Work Report Account',
+                    `<p class="text-sm text-red-500 mb-4">${escapeHtml(mapAuthError(err))}</p>
+                     <button id="auth-action-go-signin" class="auth-primary-btn">Back to Sign In</button>`
+                );
+                document.getElementById('auth-action-go-signin')?.addEventListener('click', () => {
+                    hideAuthActionPage();
+                    clearAuthActionParams();
+                    showSigninPage();
+                });
+            }
+            return true;
+        }
+
+        if (mode === 'resetPassword') {
+            showAuthActionPage(
+                'Reset Password',
+                'Work Report Account',
+                `<p class="text-sm text-slate-600 dark:text-slate-300 mb-3">Checking reset link...</p>`
+            );
+            try {
+                await auth.verifyPasswordResetCode(oobCode);
+                showAuthActionPage(
+                    'Set New Password',
+                    'Work Report Account',
+                    `<form id="auth-reset-form" class="space-y-3">
+                        <div>
+                            <label class="auth-field-label">New Password</label>
+                            <input id="auth-reset-password" type="password" class="signin-input" placeholder="New password" required />
+                        </div>
+                        <div>
+                            <label class="auth-field-label">Confirm Password</label>
+                            <input id="auth-reset-confirm" type="password" class="signin-input" placeholder="Confirm password" required />
+                        </div>
+                        <p id="auth-reset-error" class="text-red-500 text-sm min-h-[18px]"></p>
+                        <button type="submit" class="auth-primary-btn">Update Password</button>
+                     </form>`
+                );
+                document.getElementById('auth-reset-form')?.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const p1 = document.getElementById('auth-reset-password')?.value || '';
+                    const p2 = document.getElementById('auth-reset-confirm')?.value || '';
+                    const errEl = document.getElementById('auth-reset-error');
+                    if (errEl) errEl.textContent = '';
+                    if (p1.length < 6) {
+                        if (errEl) errEl.textContent = 'Password must be at least 6 characters.';
+                        return;
+                    }
+                    if (p1 !== p2) {
+                        if (errEl) errEl.textContent = 'Passwords do not match.';
+                        return;
+                    }
+                    try {
+                        await auth.confirmPasswordReset(oobCode, p1);
+                        showAuthActionPage(
+                            'Password Updated',
+                            'Work Report Account',
+                            `<p class="text-sm text-slate-600 dark:text-slate-300 mb-4">Password reset successful. Please sign in with your new password.</p>
+                             <button id="auth-action-go-signin" class="auth-primary-btn">Go to Sign In</button>`
+                        );
+                        document.getElementById('auth-action-go-signin')?.addEventListener('click', () => {
+                            hideAuthActionPage();
+                            clearAuthActionParams();
+                            showSigninPage();
+                        });
+                    } catch (err) {
+                        if (errEl) errEl.textContent = mapAuthError(err);
+                    }
+                });
+            } catch (err) {
+                showAuthActionPage(
+                    'Reset Link Invalid',
+                    'Work Report Account',
+                    `<p class="text-sm text-red-500 mb-4">${escapeHtml(mapAuthError(err))}</p>
+                     <button id="auth-action-go-signin" class="auth-primary-btn">Back to Sign In</button>`
+                );
+                document.getElementById('auth-action-go-signin')?.addEventListener('click', () => {
+                    hideAuthActionPage();
+                    clearAuthActionParams();
+                    showSigninPage();
+                });
+            }
+            return true;
+        }
+
+        return false;
     };
 
     const createUserProfileOnSignup = async (firebaseUser, explicitName = null) => {
@@ -5762,10 +6000,46 @@ document.addEventListener('DOMContentLoaded', async () => {
         const userCredential = await auth.createUserWithEmailAndPassword(email, password);
         if (fullName) await userCredential.user.updateProfile({ displayName: fullName });
         await createUserProfileOnSignup(userCredential.user, fullName);
+        try {
+            await userCredential.user.sendEmailVerification(getActionCodeSettings());
+        } catch (verifyErr) {
+            console.warn('Verification email send skipped:', verifyErr);
+        }
+        await auth.signOut();
     };
 
     const performPasswordReset = async (email) => {
-        await auth.sendPasswordResetEmail(email);
+        await auth.sendPasswordResetEmail(email, getActionCodeSettings());
+    };
+
+    const openForgotPasswordModal = () => {
+        const prefillEmail = (document.getElementById('auth-email')?.value || '').trim();
+        const content = `
+            <div class="space-y-3">
+                <p class="text-sm text-slate-600 dark:text-slate-300">Enter your account email. We will send a password reset link.</p>
+                <input id="forgot-email-input" type="email" class="signin-input" placeholder="Email address" value="${escapeHtml(prefillEmail).replace(/"/g, '&quot;')}" />
+                <p id="forgot-email-error" class="text-sm text-red-500 min-h-[18px]"></p>
+                <button id="forgot-email-send-btn" class="auth-primary-btn">Send Reset Link</button>
+            </div>
+        `;
+        openModal(createModal('Forgot Password', content, 'forgot-password-modal', 'max-w-md'));
+        document.getElementById('forgot-email-send-btn')?.addEventListener('click', async () => {
+            const email = (document.getElementById('forgot-email-input')?.value || '').trim();
+            const errEl = document.getElementById('forgot-email-error');
+            if (errEl) errEl.textContent = '';
+            if (!email) {
+                if (errEl) errEl.textContent = 'Enter your email address.';
+                return;
+            }
+            try {
+                await performPasswordReset(email);
+                closeModal();
+                setAuthError('signin-error', 'Password reset link sent. Check your inbox.');
+                showToast('Reset email sent.', 'success');
+            } catch (err) {
+                if (errEl) errEl.textContent = mapAuthError(err);
+            }
+        });
     };
 
     const startGoogleSignIn = async (errorTargetId) => {
@@ -5803,19 +6077,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('show-signup-btn').addEventListener('click', showSignupPage);
         document.getElementById('show-signup-btn-bottom')?.addEventListener('click', showSignupPage);
 
-        document.getElementById('forgot-password-btn')?.addEventListener('click', async () => {
-            const email = (document.getElementById('auth-email')?.value || '').trim();
-            if (!email) {
-                setAuthError('signin-error', 'Enter your email first.');
-                return;
-            }
-            try {
-                await performPasswordReset(email);
-                setAuthError('signin-error', 'Password reset link sent.');
-                showToast('Password reset email sent.', 'success');
-            } catch (err) {
-                setAuthError('signin-error', mapAuthError(err));
-            }
+        document.getElementById('forgot-password-btn')?.addEventListener('click', () => {
+            openForgotPasswordModal();
         });
 
         document.getElementById('signin-form').addEventListener('submit', async (e) => {
@@ -5875,6 +6138,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             setAuthLoading(true, 'Creating your account...');
             try {
                 await performSignUp(fullName, email, password);
+                showSigninPage();
+                setAuthError('signin-error', 'Verification email sent. Please verify and sign in.');
+                showToast('Verification email sent.', 'success');
+                setAuthLoading(false);
             } catch (err) {
                 setAuthError('signup-error', mapAuthError(err));
                 setAuthLoading(false);
@@ -9140,6 +9407,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
     const renderSignedOutAuthState = () => {
         user = null;
+        hideAuthActionPage();
         localStorage.removeItem(GOOGLE_AUTH_FLAG);
         localStorage.removeItem(GOOGLE_AUTH_TS);
         const localCache = loadLocalDataForUser(null);
@@ -9220,6 +9488,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             payload.createdAt = firebase.firestore.FieldValue.serverTimestamp();
         }
         await userDocRef.set(payload, { merge: true });
+    };
+
+    const isPasswordUserUnverified = (firebaseUser) => {
+        if (!firebaseUser) return false;
+        const providerIds = (firebaseUser.providerData || []).map((p) => p?.providerId).filter(Boolean);
+        const hasPasswordProvider = providerIds.includes('password');
+        const hasSocialProvider = providerIds.some((p) => p !== 'password');
+        return hasPasswordProvider && !hasSocialProvider && !firebaseUser.emailVerified;
     };
 
     const startSignedInDataSync = async (firebaseUser) => {
@@ -9306,6 +9582,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const enterAuthenticatedState = async (firebaseUser) => {
         user = firebaseUser;
+        hideAuthActionPage();
         localStorage.setItem(LAST_ACTIVE_UID_KEY, firebaseUser.uid);
         persistLastUserProfile(firebaseUser);
         signinPage.style.display = 'none';
@@ -9342,6 +9619,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             userRefUnsubscribe = null;
         }
 
+        const authActionParams = parseAuthActionParams();
+        if (authActionParams?.mode && authActionParams?.oobCode) {
+            await handleAuthActionPage(authActionParams);
+            hideBootSplash();
+            return;
+        }
+        hideAuthActionPage();
+
         if (initialShareId) {
             setAuthLoading(false);
             await openPublicShareView(initialShareId);
@@ -9373,6 +9658,22 @@ document.addEventListener('DOMContentLoaded', async () => {
                 await currentUser.reload();
             } catch (reloadErr) {
                 console.warn('User reload skipped:', reloadErr);
+            }
+            if (isPasswordUserUnverified(currentUser)) {
+                try {
+                    await currentUser.sendEmailVerification(getActionCodeSettings());
+                } catch (verifyErr) {
+                    console.warn('Email verification resend failed:', verifyErr);
+                }
+                await auth.signOut();
+                localStorage.removeItem(GOOGLE_AUTH_FLAG);
+                localStorage.removeItem(GOOGLE_AUTH_TS);
+                renderSignedOutAuthState();
+                setAuthError('signin-error', 'Please verify your email. New verification link sent.');
+                setGoogleAuthButtonsDisabled(false);
+                setAuthLoading(false);
+                hideBootSplash();
+                return;
             }
             localStorage.removeItem(GOOGLE_AUTH_FLAG);
             localStorage.removeItem(GOOGLE_AUTH_TS);
