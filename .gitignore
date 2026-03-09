@@ -1,0 +1,15 @@
+# macOS
+.DS_Store
+
+# Node
+node_modules/
+*/node_modules/
+
+# Env / secrets
+.env
+.env.*
+!.env.example
+backend/firebase-service-account.json
+
+# Firebase local cache
+.firebase/hosting..cache
