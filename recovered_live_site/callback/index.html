@@ -26,7 +26,19 @@
         if (candidate.origin === window.location.origin && candidate.pathname.startsWith('/app')) destination = candidate.pathname + candidate.search;
       } catch (_) {}
       try {
-        const session = await window.WRSupabase.consumeUrlSession();
+        // The Supabase client also detects OAuth URLs automatically.  On some
+        // browsers that asynchronous detection wins the race with an explicit
+        // code exchange, so accept either result and briefly wait for storage.
+        let session = null;
+        try {
+          session = await window.WRSupabase.consumeUrlSession();
+        } catch (_) {
+          // Auto-detection may already be completing the same exchange.
+        }
+        for (let attempt = 0; !session && attempt < 4; attempt += 1) {
+          await new Promise((resolve) => window.setTimeout(resolve, 450));
+          session = await window.WRSupabase.getSession();
+        }
         if (!session) throw new Error('No sign-in session was returned.');
         window.location.replace(destination);
       } catch (error) {
