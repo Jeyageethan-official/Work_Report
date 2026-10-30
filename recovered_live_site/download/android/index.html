@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Download WorkReport Android App</title>
+  <meta name="description" content="Download the latest WorkReport Android app package and start daily work reporting on mobile." />
+  <meta name="keywords" content="workreport apk download, android work report app, daily report mobile app" />
+  <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" />
+  <link rel="canonical" href="https://workreport.online/download/android" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Download WorkReport Android App" />
+  <meta property="og:description" content="Get the latest WorkReport Android app package for daily reporting." />
+  <meta property="og:url" content="https://workreport.online/download/android" />
+  <meta property="og:image" content="https://workreport.online/icons/logo.png?v=20260315j" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Download WorkReport Android App" />
+  <meta name="twitter:description" content="Get the latest WorkReport Android app package for daily reporting." />
+  <meta name="twitter:image" content="https://workreport.online/icons/logo.png?v=20260315j" />
+  <link rel="icon" href="/favicon.ico" sizes="any" />
+  <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+  <link rel="stylesheet" href="/frontend/auth/assets/css/legal.css?v=20260315c" />
+  <style>
+    :root {
+      --download-text-main: #0f172a;
+      --download-text-muted: #4b5b7a;
+      --download-accent: #2563eb;
+      --download-ring-bg: #dbeafe;
+    }
+
+    body.page-legal.page-download-android {
+      padding: 28px 18px 92px;
+      background:
+        radial-gradient(circle at 12% 8%, rgba(191, 219, 254, 0.34), transparent 28%),
+        linear-gradient(180deg, #f8fbff 0%, #edf3ff 100%);
+    }
+
+    .download-shell {
+      min-height: calc(100vh - 138px);
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .download-card {
+      width: min(760px, 100%);
+      margin: 2.5cm auto 0;
+      border-radius: 30px;
+      border: 1px solid rgba(191, 219, 254, 0.7);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 251, 255, 0.96));
+      box-shadow: 0 28px 60px rgba(37, 99, 235, 0.12);
+      padding: 34px 34px 30px;
+    }
+
+    .download-layout {
+      display: block;
+    }
+
+    .download-copy {
+      min-width: 0;
+      display: grid;
+      justify-items: center;
+      text-align: center;
+      gap: 16px;
+    }
+
+    .download-chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: fit-content;
+      min-height: 34px;
+      padding: 0 14px;
+      border-radius: 999px;
+      background: rgba(37, 99, 235, 0.1);
+      border: 1px solid rgba(37, 99, 235, 0.16);
+      color: #1d4ed8;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .download-title {
+      margin: 0;
+      font-size: clamp(32px, 4.6vw, 46px);
+      line-height: 1.06;
+      letter-spacing: -0.04em;
+      color: var(--download-text-main);
+      text-wrap: balance;
+    }
+
+    .download-message {
+      margin: 0;
+      max-width: 600px;
+      color: var(--download-text-muted);
+      font-size: 17px;
+      line-height: 1.55;
+    }
+
+    .download-meta-grid {
+      width: min(100%, 620px);
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 2px;
+    }
+
+    .download-meta-card {
+      display: grid;
+      gap: 7px;
+      padding: 14px 15px;
+      border-radius: 18px;
+      border: 1px solid rgba(191, 219, 254, 0.68);
+      background: rgba(255, 255, 255, 0.88);
+      box-shadow: 0 12px 24px rgba(37, 99, 235, 0.08);
+    }
+
+    .download-meta-card span {
+      color: #6b7c99;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .download-meta-card strong {
+      color: #0f172a;
+      font-size: 15px;
+      line-height: 1.35;
+      letter-spacing: -0.02em;
+    }
+
+    .download-release-note {
+      margin: 0;
+      max-width: 620px;
+      color: #4b5b7a;
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    .download-countdown-wrap {
+      margin-top: 2px;
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+    }
+
+    .download-countdown-ring {
+      --progress: 1;
+      width: 72px;
+      height: 72px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      background:
+        radial-gradient(circle closest-side, #fff 76%, transparent 78% 100%),
+        conic-gradient(var(--download-accent) calc(var(--progress) * 1turn), var(--download-ring-bg) 0);
+      box-shadow: 0 12px 22px rgba(37, 99, 235, 0.18);
+      transition: background 1s linear;
+    }
+
+    .download-countdown-number {
+      font-size: 1rem;
+      line-height: 1;
+      font-weight: 900;
+      color: #1e3a8a;
+      min-width: 1ch;
+    }
+
+    .download-countdown-text {
+      margin: 10px 0 0;
+      color: #1d4ed8;
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 1.2;
+      text-align: center;
+      min-height: 17px;
+    }
+
+    .download-actions {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .download-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 50px;
+      padding: 0 22px;
+      border-radius: 999px;
+      text-decoration: none;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      border: 1px solid rgba(37, 99, 235, 0.14);
+      box-shadow: 0 16px 30px rgba(37, 99, 235, 0.14);
+    }
+
+    .download-btn.primary {
+      color: #fff;
+      background: linear-gradient(135deg, #1d4ed8, #3b82f6 54%, #60a5fa);
+    }
+
+    .download-btn.secondary {
+      color: #0f172a;
+      background: rgba(255, 255, 255, 0.94);
+    }
+
+    .download-footer-bar {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 35;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 18px;
+      padding: 14px 28px;
+      border-top: 1px solid rgba(148, 163, 184, 0.3);
+      background: rgba(255, 255, 255, 0.96);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.72),
+        0 -8px 22px rgba(15, 23, 42, 0.08);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+
+    .download-footer-links {
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .download-footer-links a {
+      color: #0f172a;
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+    }
+
+    .download-footer-links a + a {
+      position: relative;
+      padding-left: 14px;
+    }
+
+    .download-footer-links a + a::before {
+      content: "";
+      width: 1px;
+      height: 14px;
+      background: rgba(15, 23, 42, 0.25);
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .download-footer-copy {
+      color: #0f172a;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      text-align: right;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    @media (max-width: 760px) {
+      .download-card {
+        margin-top: 56px;
+        padding: 28px 20px 24px;
+        border-radius: 24px;
+      }
+
+      .download-title {
+        font-size: 29px;
+      }
+
+      .download-message {
+        font-size: 15.5px;
+      }
+
+      .download-meta-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .download-actions {
+        width: 100%;
+        display: grid;
+      }
+
+      .download-btn {
+        width: 100%;
+      }
+
+      .download-footer-bar {
+        grid-template-columns: 1fr;
+        justify-items: center;
+        text-align: center;
+        gap: 8px;
+        padding: 11px 14px;
+      }
+
+      .download-footer-copy {
+        text-align: center;
+        white-space: normal;
+      }
+    }
+
+    @media (max-width: 430px) {
+      body.page-legal.page-download-android {
+        padding-left: 12px;
+        padding-right: 12px;
+      }
+
+      .download-shell .legal-topbar {
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: nowrap;
+      }
+
+      .download-shell .legal-actions {
+        width: auto;
+        margin-left: auto;
+      }
+
+      .download-shell .legal-link {
+        flex: 0 0 auto;
+      }
+
+      .download-shell .legal-actions .legal-link:not(.primary) {
+        display: none;
+      }
+
+      .download-card {
+        margin-top: 44px;
+      }
+
+      .download-countdown-ring {
+        width: 66px;
+        height: 66px;
+      }
+    }
+  </style>
+</head>
+<body class="page-legal page-download-android">
+  <main class="legal-shell download-shell">
+    <header class="legal-topbar">
+      <a class="legal-brand" href="/">
+        <span class="legal-brand-mark">
+          <img src="/icons/favicon.png?v=20260315j" alt="Work Report logo" />
+        </span>
+        <span class="legal-brand-copy">
+          <span class="legal-brand-name">Work Report</span>
+          <span class="legal-brand-note">Android download</span>
+        </span>
+      </a>
+      <div class="legal-actions">
+        <a class="legal-link" href="/privacy">Privacy Policy</a>
+        <a class="legal-link primary" href="/">Back to Home</a>
+      </div>
+    </header>
+
+    <section class="download-card">
+      <div class="download-layout">
+        <div class="download-copy">
+          <div class="download-chip">Android package</div>
+          <h1 id="downloadTitle" class="download-title">Download your app.</h1>
+          <p id="downloadMessage" class="download-message">
+            Your latest Android package is ready. If automatic download does not start, use the button below.
+          </p>
+          <div class="download-meta-grid">
+            <div class="download-meta-card">
+              <span>Version</span>
+              <strong id="downloadPackageVersion">Latest</strong>
+            </div>
+            <div class="download-meta-card">
+              <span>Build</span>
+              <strong id="downloadPackageBuild">Production</strong>
+            </div>
+            <div class="download-meta-card">
+              <span>Package size</span>
+              <strong id="downloadPackageSize">Checking...</strong>
+            </div>
+          </div>
+          <p id="downloadReleaseNote" class="download-release-note">Owner-published Android packages are served from the latest live storage release.</p>
+          <div class="download-countdown-wrap" aria-live="polite">
+            <div id="downloadTimerRing" class="download-countdown-ring" style="--progress:1;">
+              <span id="downloadCountdownNumber" class="download-countdown-number">6</span>
+            </div>
+            <p id="downloadCountdownText" class="download-countdown-text">Verifying package...</p>
+          </div>
+          <div class="download-actions">
+            <a id="downloadAction" class="download-btn primary" href="#">Start download</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="download-footer-bar" aria-label="Footer links and copyright">
+    <div class="download-footer-links">
+      <a href="/privacy">Privacy Policy</a>
+      <a href="/terms">Terms of Service</a>
+    </div>
+    <div></div>
+    <div class="download-footer-copy">© 2026 WorkReport. All rights reserved. Built by Jeyageethan.</div>
+  </div>
+
+  <script src="/frontend/auth/assets/js/config.js?v=20260312w"></script>
+  <script>
+    (function () {
+      const cfg = window.WR_APP_CONFIG || {};
+      const fallbackRelease = {
+        public_url: "https://lyactzctiscokmbuluci.supabase.co/storage/v1/object/public/downloads/workreport-android.apk",
+        file_name: "workreport-android.apk",
+        version_label: "Current live package",
+        build_label: "Fallback delivery",
+        release_notes: "This page automatically follows the latest owner-published Android package after the storage release catalog is active.",
+        file_size_bytes: 0,
+        updated_at: ""
+      };
+      const fallbackError = "/error?code=404&title=Download%20unavailable&message=The%20latest%20Android%20package%20could%20not%20be%20found.%20Upload%20the%20file%20again%20or%20retry%20later.&retry=%2Fdownload%2Fandroid&home=%2F&visual=Unavailable";
+
+      const downloadTitle = document.getElementById("downloadTitle");
+      const downloadMessage = document.getElementById("downloadMessage");
+      const downloadPackageVersion = document.getElementById("downloadPackageVersion");
+      const downloadPackageBuild = document.getElementById("downloadPackageBuild");
+      const downloadPackageSize = document.getElementById("downloadPackageSize");
+      const downloadReleaseNote = document.getElementById("downloadReleaseNote");
+      const downloadAction = document.getElementById("downloadAction");
+      const downloadTimerRing = document.getElementById("downloadTimerRing");
+      const downloadCountdownNumber = document.getElementById("downloadCountdownNumber");
+      const downloadCountdownText = document.getElementById("downloadCountdownText");
+      let redirectTimer = null;
+      const countdownSeconds = 6;
+
+      function formatFileSize(bytes) {
+        const value = Number(bytes || 0);
+        if (!Number.isFinite(value) || value <= 0) return "Ready";
+        if (value < 1024) return `${value} B`;
+        if (value < 1024 * 1024) return `${(value / 1024).toFixed(1)} KB`;
+        if (value < 1024 * 1024 * 1024) return `${(value / (1024 * 1024)).toFixed(1)} MB`;
+        return `${(value / (1024 * 1024 * 1024)).toFixed(1)} GB`;
+      }
+
+      async function fetchLatestRelease() {
+        const supabaseUrl = String(cfg.supabaseUrl || "").trim().replace(/\/$/, "");
+        const supabaseAnonKey = String(cfg.supabaseAnonKey || "").trim();
+        if (!supabaseUrl || !supabaseAnonKey) return fallbackRelease;
+
+        const endpoint = `${supabaseUrl}/rest/v1/app_release_assets?select=public_url,file_name,version_label,build_label,release_notes,file_size_bytes,updated_at&platform=eq.android&channel=eq.production&is_active=eq.true&limit=1`;
+        const response = await fetch(endpoint, {
+          headers: {
+            apikey: supabaseAnonKey,
+            Authorization: `Bearer ${supabaseAnonKey}`,
+            Accept: "application/json"
+          },
+          cache: "no-store"
+        });
+        if (!response.ok) throw new Error(`Release catalog request failed (${response.status})`);
+        const rows = await response.json();
+        return rows && rows[0] ? rows[0] : fallbackRelease;
+      }
+
+      function hydrateReleaseCopy(release) {
+        const activeRelease = release && typeof release === "object" ? release : fallbackRelease;
+        if (downloadPackageVersion) {
+          downloadPackageVersion.textContent = activeRelease.version_label || "Latest";
+        }
+        if (downloadPackageBuild) {
+          downloadPackageBuild.textContent = activeRelease.build_label || "Production";
+        }
+        if (downloadPackageSize) {
+          downloadPackageSize.textContent = formatFileSize(activeRelease.file_size_bytes);
+        }
+        if (downloadReleaseNote) {
+          downloadReleaseNote.textContent = activeRelease.release_notes || fallbackRelease.release_notes;
+        }
+      }
+
+      function updateCountdownRing(remaining, total) {
+        const safeRemaining = Math.max(0, Number(remaining) || 0);
+        const safeTotal = Math.max(1, Number(total) || 1);
+        const progress = Math.min(1, safeRemaining / safeTotal);
+        if (downloadTimerRing) {
+          downloadTimerRing.style.setProperty("--progress", String(progress));
+        }
+        if (downloadCountdownNumber) {
+          downloadCountdownNumber.textContent = safeRemaining > 0 ? String(safeRemaining) : "0";
+        }
+      }
+
+      function showError(message, code) {
+        const target = `/error?code=${encodeURIComponent(code || "Error")}&title=${encodeURIComponent("Download unavailable")}&message=${encodeURIComponent(message)}&retry=${encodeURIComponent("/download/android")}&home=${encodeURIComponent("/")}&visual=${encodeURIComponent("Unavailable")}`;
+        window.location.replace(target);
+      }
+
+      async function verifyAndDownload() {
+        try {
+          const latestRelease = await fetchLatestRelease().catch((error) => {
+            console.warn("Release catalog lookup failed, using fallback Android package:", error);
+            return fallbackRelease;
+          });
+          const apkUrl = String(latestRelease && latestRelease.public_url || fallbackRelease.public_url).trim() || fallbackRelease.public_url;
+
+          hydrateReleaseCopy(latestRelease);
+
+          const response = await fetch(apkUrl, {
+            method: "HEAD",
+            cache: "no-store",
+            mode: "cors"
+          });
+
+          if (!response.ok) {
+            showError("The latest Android package could not be found. Upload the file again or retry later.", response.status || 404);
+            return;
+          }
+
+          if (downloadTitle) downloadTitle.textContent = "Download your app.";
+          if (downloadMessage) downloadMessage.textContent = "Your latest Android package is ready. If automatic download does not start, use the button below.";
+          if (downloadAction) {
+            downloadAction.href = apkUrl;
+            downloadAction.removeAttribute("target");
+            downloadAction.removeAttribute("rel");
+          }
+          if (downloadCountdownText) {
+            downloadCountdownText.textContent = "Package verified. Starting download...";
+          }
+          let remaining = countdownSeconds;
+          updateCountdownRing(remaining, countdownSeconds);
+          if (redirectTimer) window.clearInterval(redirectTimer);
+          redirectTimer = window.setInterval(() => {
+            remaining -= 1;
+            updateCountdownRing(remaining, countdownSeconds);
+            if (remaining <= 0) {
+              window.clearInterval(redirectTimer);
+              window.location.href = apkUrl;
+              return;
+            }
+          }, 1000);
+        } catch (error) {
+          console.warn("Android package availability check failed:", error);
+          if (downloadCountdownText) {
+            downloadCountdownText.textContent = "Verification failed. Retrying...";
+          }
+          window.location.replace(fallbackError);
+        }
+      }
+
+      if (downloadAction) {
+        downloadAction.href = fallbackRelease.public_url;
+        downloadAction.removeAttribute("target");
+        downloadAction.removeAttribute("rel");
+      }
+      hydrateReleaseCopy(fallbackRelease);
+      updateCountdownRing(countdownSeconds, countdownSeconds);
+
+      verifyAndDownload();
+    })();
+  </script>
+</body>
+</html>
