@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <link rel="icon" href="/favicon.ico" sizes="any" />
+  <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+  <title>Reset Admin Password | Work Report</title>
+  <link rel="stylesheet" href="/frontend/owner/assets/css/owner-console.css?v=20260329ownerui28" />
+</head>
+<body class="owner-console-page owner-reset-page">
+  <main class="owner-shell">
+    <section class="owner-login-view" aria-label="Owner reset password">
+      <div class="owner-login-card">
+        <div class="owner-reset-head">
+          <h1>Reset owner password</h1>
+          <p class="owner-subcopy">Set a new password for the Work Report owner console.</p>
+          <p class="owner-reset-note">This owner-only reset will take you back to the owner console sign-in page.</p>
+        </div>
+
+        <form id="owner-reset-form" class="owner-login-form" novalidate>
+          <div class="field">
+            <label for="owner-reset-password">New password</label>
+            <div class="input-wrap">
+              <input id="owner-reset-password" name="password" type="password" autocomplete="new-password" required />
+              <button class="eye-toggle" id="toggle-owner-reset-password" type="button" aria-label="Show password">Show</button>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="owner-reset-confirm">Confirm new password</label>
+            <div class="input-wrap">
+              <input id="owner-reset-confirm" name="confirmPassword" type="password" autocomplete="new-password" required />
+              <button class="eye-toggle" id="toggle-owner-reset-confirm" type="button" aria-label="Show password">Show</button>
+            </div>
+          </div>
+
+          <div id="owner-reset-status" class="status-box" role="status" aria-live="polite"></div>
+
+          <button id="owner-reset-submit" class="owner-primary-btn" type="submit">Save Admin Password</button>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <script src="/frontend/auth/assets/js/vendor/supabase-js.min.js?v=20260312v"></script>
+  <script src="/frontend/auth/assets/js/config.js?v=20260312w"></script>
+  <script src="/frontend/auth/assets/js/supabase-client.js?v=20260312w"></script>
+  <script src="/frontend/auth/assets/js/ui.js?v=20260328f"></script>
+  <script src="/frontend/owner/assets/js/owner-reset.js?v=20260329ownerreset2"></script>
+</body>
+</html>

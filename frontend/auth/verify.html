@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <link rel="icon" href="/favicon.ico" sizes="any" />
+  <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+  <title>Verify Email | Work Report</title>
+  <link rel="stylesheet" href="/frontend/auth/assets/css/auth.css?v=20260520supportpanel" />
+</head>
+<body class="page-auth auth-premium auth-verify">
+  <script>
+    (function () {
+      const host = String(window.location.hostname || "").toLowerCase();
+      const protocol = String(window.location.protocol || "").toLowerCase();
+      const ua = String(navigator.userAgent || "");
+      const params = new URLSearchParams(window.location.search);
+      const nextHint = String(params.get("next") || "");
+      const nativeHint = params.get("native") === "1" || /^workreport:\/\//i.test(nextHint);
+      const isNativeRuntime = protocol === "app:" || protocol === "file:" || host === "appassets.androidplatform.net" || /WorkReportiOSApp/i.test(ua) || nativeHint;
+      const isMobileViewport = window.matchMedia("(max-width: 768px)").matches;
+      if (isNativeRuntime && (isMobileViewport || nativeHint)) {
+        document.body.classList.add("native-mobile-auth");
+      }
+    })();
+  </script>
+  <main class="auth-shell">
+    <section class="auth-panel">
+      <button type="button" class="auth-back-btn" data-auth-back-btn="true" aria-label="Go back">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15 18L9 12L15 6"/></svg>
+      </button>
+      <div class="mobile-hero" aria-hidden="true">
+        <div class="mobile-hero-top"></div>
+        <div class="mobile-hero-logo"><img src="/icons/logo.png?v=20260312u" alt="Work Report logo" /></div>
+      </div>
+
+      <div class="auth-head">
+        <h1>Verify email</h1>
+        <p>Account verification status is shown below.</p>
+      </div>
+
+      <div id="verify-status" class="status-box show" role="status" aria-live="polite">Preparing verification...</div>
+      <p class="form-footer"><a class="link" href="/signin">Go to sign in</a> · <a class="link" href="/resend-verification">Resend verification</a></p>
+    </section>
+
+    <section class="brand-panel" aria-hidden="true">
+      <div class="premium-brand-top">
+        <div class="premium-brand-id">
+          <div class="brand-logo"><img src="/icons/logo.png?v=20260312u" alt="Work Report logo" /></div>
+          <span class="premium-brand-name">Work Report</span>
+        </div>
+      </div>
+      <h2 class="brand-title">Verified access, trusted sessions.</h2>
+      <p class="brand-copy">Email confirmation protects your workspace and account security.</p>
+
+      <div class="premium-visual">
+        <svg viewBox="0 0 620 360" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="20" y="22" width="580" height="316" rx="20" fill="rgba(219,234,254,.4)" />
+          <path class="vector-wave" d="M36 276C120 214 202 290 292 244C388 196 476 274 584 230" stroke="#dbeafe" stroke-width="2.5" stroke-linecap="round"/>
+          <circle class="vector-dots" cx="108" cy="94" r="3" fill="#e2e8f0"/>
+          <circle class="vector-dots" cx="492" cy="126" r="3" fill="#e2e8f0"/>
+        </svg>
+        <div class="visual-card-main">
+          <div class="metric-chip">Email</div>
+          <div class="metric-value">Checking</div>
+          <div class="visual-bars">
+            <span style="--w:81%"></span>
+            <span style="--w:66%"></span>
+            <span style="--w:73%"></span>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="/frontend/auth/assets/js/vendor/supabase-js.min.js?v=20260312v"></script>
+  <script src="/frontend/auth/assets/js/config.js?v=20260312w"></script>
+  <script src="/frontend/auth/assets/js/supabase-client.js?v=20260330oauthstartupfix"></script>
+  <script src="/frontend/auth/assets/js/api.js?v=20260330supportcenter1"></script>
+  <script src="/frontend/auth/assets/js/ui.js?v=20260328f"></script>
+  <script src="/frontend/auth/assets/js/support-center.js?v=20260520supportcenter"></script>
+  <script src="/frontend/auth/assets/js/verify.js?v=20260312w"></script>
+</body>
+</html>

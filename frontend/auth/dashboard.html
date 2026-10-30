@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <link rel="icon" href="/favicon.ico" sizes="any" />
+  <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+  <title>Dashboard | Work Report</title>
+  <link rel="stylesheet" href="/frontend/auth/assets/css/auth.css?v=20260520supportpanel" />
+</head>
+<body>
+  <header class="auth-topbar">
+    <div class="dashboard-card" style="display:flex;justify-content:space-between;align-items:center;gap:12px;">
+      <strong style="font-size:20px;">Work Report Dashboard</strong>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <button id="logout-btn" class="btn btn-secondary" type="button">Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="dashboard-wrap">
+    <section class="dashboard-card stack">
+      <div class="user-chip">
+        <span id="user-avatar" class="user-avatar">U</span>
+        <span id="user-name">Loading...</span>
+      </div>
+      <div><strong>Email:</strong> <span id="user-email">-</span></div>
+      <div><strong>Provider:</strong> <span id="user-provider">-</span></div>
+      <p style="margin:0;color:var(--muted);">You are on a protected page restored from Supabase session auth.</p>
+    </section>
+  </main>
+
+  <script src="/frontend/auth/assets/js/vendor/supabase-js.min.js?v=20260312v"></script>
+  <script src="/frontend/auth/assets/js/config.js?v=20260312w"></script>
+  <script src="/frontend/auth/assets/js/supabase-client.js?v=20260330oauthstartupfix"></script>
+  <script src="/frontend/auth/assets/js/api.js?v=20260330supportcenter1"></script>
+  <script src="/frontend/auth/assets/js/ui.js?v=20260328f"></script>
+  <script src="/frontend/auth/assets/js/dashboard.js?v=20260313a"></script>
+</body>
+</html>

@@ -1,54 +1,54 @@
 {
-  "functions": {
-    "source": "functions"
-  },
-  "firestore": {
-    "rules": "firestore.rules"
-  },
   "hosting": {
-    "site": "work-report-fe3da",
     "public": ".",
-    "headers": [
-      {
-        "source": "**",
-        "headers": [
-          {
-            "key": "Cache-Control",
-            "value": "no-store, no-cache, must-revalidate, max-age=0"
-          },
-          {
-            "key": "Pragma",
-            "value": "no-cache"
-          },
-          {
-            "key": "Expires",
-            "value": "0"
-          }
-        ]
-      },
-      {
-        "source": "/index.html",
-        "headers": [
-          {
-            "key": "Cache-Control",
-            "value": "no-store, no-cache, must-revalidate, max-age=0"
-          }
-        ]
-      }
-    ],
     "ignore": [
       "firebase.json",
-      "**/.*",
-      "**/node_modules/**",
-      "*.rules",
-      "*.tmp.*",
-      "workreport.main.tmp.js"
+      ".firebaserc",
+      ".git/**",
+      ".gitignore"
+    ],
+    "headers": [
+      {
+        "glob": "**",
+        "headers": {
+          "Expires": "0",
+          "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
+          "Pragma": "no-cache"
+        }
+      },
+      {
+        "glob": "/index.html",
+        "headers": {
+          "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0"
+        }
+      }
     ],
     "rewrites": [
-      {
-        "source": "**",
-        "destination": "/index.html"
-      }
+      { "source": "/signin", "destination": "/frontend/auth/signin.html" },
+      { "source": "/signup", "destination": "/frontend/auth/signup.html" },
+      { "source": "/forgot", "destination": "/frontend/auth/forgot.html" },
+      { "source": "/reset", "destination": "/frontend/auth/reset.html" },
+      { "source": "/verify", "destination": "/frontend/auth/verify.html" },
+      { "source": "/resend-verification", "destination": "/frontend/auth/resend-verification.html" },
+      { "source": "/callback", "destination": "/frontend/auth/callback.html" },
+      { "source": "/auth-dashboard", "destination": "/frontend/auth/dashboard.html" },
+      { "source": "/frontend/auth/signin", "destination": "/frontend/auth/signin.html" },
+      { "source": "/frontend/auth/signup", "destination": "/frontend/auth/signup.html" },
+      { "source": "/frontend/auth/forgot", "destination": "/frontend/auth/forgot.html" },
+      { "source": "/frontend/auth/reset", "destination": "/frontend/auth/reset.html" },
+      { "source": "/frontend/auth/verify", "destination": "/frontend/auth/verify.html" },
+      { "source": "/frontend/auth/resend-verification", "destination": "/frontend/auth/resend-verification.html" },
+      { "source": "/frontend/auth/callback", "destination": "/frontend/auth/callback.html" },
+      { "source": "/frontend/auth/dashboard", "destination": "/frontend/auth/dashboard.html" },
+      { "source": "/app", "destination": "/app.html" },
+      { "source": "/privacy", "destination": "/privacy.html" },
+      { "source": "/terms", "destination": "/terms.html" },
+      { "source": "/error", "destination": "/error.html" },
+      { "source": "/download/android", "destination": "/download-android.html" },
+      { "source": "/admin-control_dashboard", "destination": "/admin-control_dashboard/index.html" },
+      { "source": "/admin-control_dashboard/reset", "destination": "/admin-control_dashboard/reset/index.html" },
+      { "source": "/s/**", "destination": "/app.html" },
+      { "source": "**", "destination": "/index.html" }
     ]
   }
 }

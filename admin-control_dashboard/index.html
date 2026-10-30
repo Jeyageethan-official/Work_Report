@@ -1,0 +1,777 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <link rel="icon" href="/favicon.ico" sizes="any" />
+  <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+  <title>Admin Dashboard | Work Report</title>
+  <link rel="stylesheet" href="/frontend/owner/assets/css/owner-console.css?v=20260331ownerui49" />
+</head>
+<body class="owner-console-page owner-login-simple-page">
+  <main class="owner-shell">
+    <section id="owner-login-view" class="owner-login-view" aria-label="Admin sign in">
+      <div class="owner-login-card">
+        <div class="owner-auth-head">
+          <h1>Admin Dashboard</h1>
+          <p class="owner-subcopy">Sign in to open the Work Report admin dashboard.</p>
+          <p class="owner-auth-note">Only the separate admin account can enter this dashboard.</p>
+        </div>
+
+        <form id="owner-login-form" class="owner-login-form" novalidate>
+          <div class="field">
+            <label for="owner-email">Email</label>
+            <input id="owner-email" name="email" type="email" autocomplete="username" placeholder="mailworkreport@gmail.com" required />
+          </div>
+
+          <div class="field">
+            <label for="owner-password">Password</label>
+            <div class="input-wrap">
+              <input id="owner-password" name="password" type="password" autocomplete="current-password" placeholder="Enter owner password" required />
+              <button class="eye-toggle" id="toggle-owner-password" type="button" aria-label="Show password">Show</button>
+            </div>
+          </div>
+
+          <div class="owner-login-tools">
+            <button id="owner-forgot-password" class="owner-inline-link" type="button">Forgot your password?</button>
+          </div>
+
+          <div id="owner-login-status" class="status-box" role="status" aria-live="polite"></div>
+          <div class="owner-login-progress" aria-hidden="true">
+            <span></span>
+          </div>
+
+          <button id="owner-login-submit" class="owner-primary-btn" type="submit">Open Admin Dashboard</button>
+        </form>
+      </div>
+    </section>
+
+    <section id="owner-dashboard-view" class="owner-dashboard-view" hidden aria-label="Admin dashboard">
+      <aside class="owner-sidebar">
+        <div class="owner-sidebar-top">
+          <div class="owner-sidebar-brand">
+            <div class="owner-sidebar-brand-icon">
+              <img src="/icons/logo.png?v=20260312u" alt="Work Report logo" />
+            </div>
+            <div>
+              <p>Work Report</p>
+              <h2>Admin Dashboard</h2>
+            </div>
+          </div>
+
+          <nav class="owner-sidebar-nav" aria-label="Admin modules">
+            <div class="owner-nav-group">
+              <p class="owner-nav-group-label">Core</p>
+              <button class="owner-nav-btn is-active" data-owner-tab="overview" type="button">Overview</button>
+              <button class="owner-nav-btn" data-owner-tab="users" type="button">Users</button>
+              <button class="owner-nav-btn" data-owner-tab="reports" type="button">Reports</button>
+              <button class="owner-nav-btn" data-owner-tab="analytics" type="button">Analytics</button>
+            </div>
+            <div class="owner-nav-group">
+              <p class="owner-nav-group-label">Operations</p>
+              <button class="owner-nav-btn" data-owner-tab="backup" type="button">Backups</button>
+              <button class="owner-nav-btn" data-owner-tab="trash" type="button">Trash</button>
+              <button class="owner-nav-btn" data-owner-tab="notifications" type="button">Notifications</button>
+            </div>
+            <div class="owner-nav-group">
+              <p class="owner-nav-group-label">System</p>
+              <button class="owner-nav-btn" data-owner-tab="files" type="button">Database</button>
+              <button class="owner-nav-btn" data-owner-tab="storage" type="button">Storage</button>
+              <button class="owner-nav-btn" data-owner-tab="support" type="button">Support</button>
+              <button class="owner-nav-btn" data-owner-tab="settings" type="button">Settings</button>
+            </div>
+          </nav>
+        </div>
+
+        <div class="owner-sidebar-foot">
+          <div class="owner-owner-card">
+            <p class="owner-owner-label">Signed in as</p>
+            <h3 id="owner-session-name">Owner</h3>
+            <p id="owner-session-email">owner@workreport.online</p>
+          </div>
+          <button id="owner-logout-btn" class="owner-ghost-btn" type="button">Sign out</button>
+        </div>
+      </aside>
+
+      <div class="owner-main">
+        <header class="owner-topbar">
+          <div class="owner-topbar-copy">
+            <p class="owner-page-kicker">Admin control</p>
+            <h1 id="owner-page-title">Overview</h1>
+            <p id="owner-page-subtitle" class="owner-topbar-subtitle">Get a complete snapshot of platform activity, user status, and recent operations from one place.</p>
+            <div class="owner-topbar-meta">
+              <span id="owner-topbar-mode" class="owner-topbar-pill">Read only</span>
+              <span id="owner-topbar-sync" class="owner-topbar-sync">Not synced</span>
+            </div>
+          </div>
+          <div class="owner-topbar-actions">
+            <button id="owner-refresh-btn" class="owner-ghost-btn" type="button">Refresh Data</button>
+            <button id="owner-overview-export-btn" class="owner-secondary-btn" type="button">Export Summary</button>
+            <label class="owner-overview-quick-select-wrap">
+              <span>Quick Actions</span>
+              <select id="owner-overview-quick-actions" class="owner-filter-select owner-overview-quick-select">
+                <option value="">Quick Actions</option>
+                <option value="users">Manage Users</option>
+                <option value="reports">Review Reports</option>
+                <option value="analytics">Open Analytics</option>
+                <option value="backup">Check Backups</option>
+                <option value="trash">View Trash</option>
+                <option value="support">Contact Support</option>
+              </select>
+            </label>
+          </div>
+        </header>
+
+        <div id="owner-dashboard-status" class="status-box" role="status" aria-live="polite"></div>
+
+        <section class="owner-tab-panel owner-overview-panel" data-owner-panel="overview">
+          <div class="owner-overview-shell">
+            <section class="owner-overview-kpi-grid">
+              <article class="owner-overview-kpi-card owner-overview-kpi-card-primary">
+                <div class="owner-overview-kpi-head">
+                  <span class="owner-overview-kpi-label">Total Users</span>
+                  <span id="owner-overview-kpi-total-trend" class="owner-overview-trend-badge">No change</span>
+                </div>
+                <strong id="owner-overview-kpi-total" class="owner-overview-kpi-value">0</strong>
+                <p class="owner-overview-kpi-helper">Total registered accounts on the platform</p>
+              </article>
+
+              <article class="owner-overview-kpi-card">
+                <div class="owner-overview-kpi-head">
+                  <span class="owner-overview-kpi-label">Active Users Today</span>
+                  <span id="owner-overview-kpi-active-trend" class="owner-overview-trend-badge">No change</span>
+                </div>
+                <strong id="owner-overview-kpi-active" class="owner-overview-kpi-value">0</strong>
+                <p class="owner-overview-kpi-helper">Users active within the last 24 hours</p>
+              </article>
+
+              <article class="owner-overview-kpi-card">
+                <div class="owner-overview-kpi-head">
+                  <span class="owner-overview-kpi-label">Reports Submitted Today</span>
+                  <span id="owner-overview-kpi-reports-trend" class="owner-overview-trend-badge">No change</span>
+                </div>
+                <strong id="owner-overview-kpi-reports" class="owner-overview-kpi-value">0</strong>
+                <p class="owner-overview-kpi-helper">Total work reports created today</p>
+              </article>
+
+              <article class="owner-overview-kpi-card owner-overview-kpi-card-attention">
+                <div class="owner-overview-kpi-head">
+                  <span class="owner-overview-kpi-label">Support Requests Today</span>
+                  <span id="owner-overview-kpi-attention-trend" class="owner-overview-trend-badge">Inbox clear</span>
+                </div>
+                <strong id="owner-overview-kpi-attention" class="owner-overview-kpi-value">0</strong>
+                <p class="owner-overview-kpi-helper">User access or issue requests submitted today</p>
+              </article>
+            </section>
+
+            <section class="owner-overview-section-card">
+              <div class="owner-overview-section-head">
+                <div>
+                  <p class="owner-surface-kicker">Snapshot</p>
+                  <h3>Platform Snapshot</h3>
+                  <p class="owner-overview-section-copy">A balanced operational view of account health, sign-in distribution, and current platform status.</p>
+                </div>
+                <span class="owner-overview-section-note">Live metrics</span>
+              </div>
+
+              <div class="owner-overview-snapshot-grid">
+                <article class="owner-overview-snapshot-card">
+                  <span class="owner-overview-snapshot-label">Active Accounts</span>
+                  <strong id="owner-overview-snapshot-active">0</strong>
+                  <span class="owner-overview-snapshot-helper">Healthy active user access</span>
+                </article>
+                <article class="owner-overview-snapshot-card">
+                  <span class="owner-overview-snapshot-label">Disabled Accounts</span>
+                  <strong id="owner-overview-snapshot-disabled">0</strong>
+                  <span class="owner-overview-snapshot-helper">Accounts blocked from access</span>
+                </article>
+                <article class="owner-overview-snapshot-card">
+                  <span class="owner-overview-snapshot-label">Archived Users</span>
+                  <strong id="owner-overview-snapshot-archived">0</strong>
+                  <span class="owner-overview-snapshot-helper">Users currently moved to trash</span>
+                </article>
+                <article class="owner-overview-snapshot-card">
+                  <span class="owner-overview-snapshot-label">Unverified Users</span>
+                  <strong id="owner-overview-snapshot-unverified">0</strong>
+                  <span class="owner-overview-snapshot-helper">Accounts waiting for email verification</span>
+                </article>
+                <article class="owner-overview-snapshot-card">
+                  <span class="owner-overview-snapshot-label">Google Sign-ins</span>
+                  <strong id="owner-overview-snapshot-google">0</strong>
+                  <span class="owner-overview-snapshot-helper">Accounts using Google authentication</span>
+                </article>
+                <article class="owner-overview-snapshot-card">
+                  <span class="owner-overview-snapshot-label">Email Sign-ins</span>
+                  <strong id="owner-overview-snapshot-email">0</strong>
+                  <span class="owner-overview-snapshot-helper">Accounts using email and password</span>
+                </article>
+              </div>
+            </section>
+
+            <section class="owner-overview-section-card owner-overview-users-card">
+              <div class="owner-overview-section-head">
+                <div>
+                  <p class="owner-surface-kicker">Users</p>
+                  <h3>Recent Users</h3>
+                  <p class="owner-overview-section-copy">Review the latest platform accounts and open either the user workspace or that user’s reports directly.</p>
+                </div>
+                <span class="owner-overview-section-note">Latest accounts</span>
+              </div>
+
+              <div class="owner-overview-table-wrap">
+                <table class="owner-overview-user-table">
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Email</th>
+                      <th>Status</th>
+                      <th>Last Login</th>
+                      <th>Reports</th>
+                      <th>Role</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody id="owner-overview-recent-users"></tbody>
+                </table>
+              </div>
+            </section>
+
+            <section class="owner-overview-section-card">
+              <div class="owner-overview-section-head">
+                <div>
+                  <p class="owner-surface-kicker">Operations</p>
+                  <h3>Quick Actions</h3>
+                  <p class="owner-overview-section-copy">Jump into the most common admin workflows without leaving the control center.</p>
+                </div>
+                <span class="owner-overview-section-note">Fast access</span>
+              </div>
+
+              <div class="owner-overview-actions-grid">
+                <button class="owner-overview-action-card" data-owner-jump-tab="users" type="button">
+                  <strong>Manage Users</strong>
+                  <span>Open user accounts, roles, status, and access controls.</span>
+                </button>
+                <button class="owner-overview-action-card" data-owner-jump-tab="reports" type="button">
+                  <strong>Review Reports</strong>
+                  <span>Check pending report submissions and decision queue.</span>
+                </button>
+                <button class="owner-overview-action-card" data-owner-jump-tab="analytics" type="button">
+                  <strong>Open Analytics</strong>
+                  <span>Inspect usage signals, activity trends, and performance.</span>
+                </button>
+                <button class="owner-overview-action-card" data-owner-jump-tab="backup" type="button">
+                  <strong>Check Backups</strong>
+                  <span>Review recovery snapshots and manual backup coverage.</span>
+                </button>
+                <button class="owner-overview-action-card" data-owner-jump-tab="trash" type="button">
+                  <strong>View Trash</strong>
+                  <span>Restore archived users and manage deletion workflow.</span>
+                </button>
+                <button class="owner-overview-action-card" data-owner-jump-tab="support" type="button">
+                  <strong>Contact Support</strong>
+                  <span>Open the support inbox and review user requests quickly.</span>
+                </button>
+              </div>
+            </section>
+          </div>
+        </section>
+
+        <section class="owner-tab-panel" data-owner-panel="users" hidden>
+          <div class="owner-users-layout owner-users-workspace">
+            <div class="owner-users-main">
+              <div class="owner-users-surface">
+                <div class="owner-users-toolbar owner-users-toolbar-shell owner-users-toolbar-supabase">
+                  <div class="owner-users-toolbar-left">
+                    <div class="owner-users-search-group">
+                      <select id="owner-user-search-scope" class="owner-filter-select owner-users-compact-select">
+                        <option value="email">Email address</option>
+                        <option value="name">Display name</option>
+                        <option value="uid">UID</option>
+                        <option value="all">All fields</option>
+                      </select>
+                      <input id="owner-user-search" class="owner-search-input owner-users-search-input" type="search" placeholder="Search email address" />
+                    </div>
+                    <select id="owner-status-filter" class="owner-filter-select owner-users-compact-select owner-users-status-select">
+                      <option value="all">All users</option>
+                      <option value="enabled">Active</option>
+                      <option value="disabled">Disabled</option>
+                      <option value="verified">Verified</option>
+                      <option value="unverified">Unverified</option>
+                    </select>
+                    <button id="owner-users-sort-btn" class="owner-ghost-btn owner-users-sort-btn" type="button">Sort: User ID</button>
+                  </div>
+                  <div class="owner-users-toolbar-right">
+                    <button id="owner-users-refresh" class="owner-icon-btn owner-users-refresh-btn" type="button" aria-label="Refresh users">↻</button>
+                    <button id="owner-add-user-open" class="owner-primary-btn owner-users-add-btn owner-users-add-solid" type="button">Add User</button>
+                  </div>
+                </div>
+
+                <div class="owner-table-wrap owner-users-table-wrap">
+                  <table class="owner-data-table owner-users-table">
+                    <thead>
+                      <tr>
+                        <th class="owner-check-col"></th>
+                        <th>UID</th>
+                        <th>Display Name</th>
+                        <th>Email</th>
+                        <th>Provider</th>
+                        <th>Last Sign In</th>
+                        <th>Access</th>
+                      </tr>
+                    </thead>
+                    <tbody id="owner-users-body"></tbody>
+                  </table>
+                </div>
+
+              </div>
+            </div>
+
+            <aside id="owner-detail-drawer" class="owner-detail-drawer owner-user-inspector" hidden>
+              <div class="owner-detail-head">
+                <div>
+                  <p class="owner-surface-kicker">User detail</p>
+                  <h3 id="owner-detail-name">Select a user</h3>
+                  <p id="owner-detail-email">Choose a row to inspect account status.</p>
+                </div>
+                <button id="owner-detail-close" class="owner-icon-btn" type="button" aria-label="Close detail">×</button>
+              </div>
+
+              <div class="owner-detail-tabs">
+                <button class="owner-detail-tab is-active" data-owner-detail-tab="overview" type="button">Overview</button>
+                <button class="owner-detail-tab" data-owner-detail-tab="logs" type="button">Logs</button>
+                <button class="owner-detail-tab" data-owner-detail-tab="json" type="button">Raw JSON</button>
+              </div>
+
+              <div class="owner-detail-panel" data-owner-detail-panel="overview">
+                <div class="owner-detail-overview-head">
+                  <strong id="owner-detail-name-inline">Select a user</strong>
+                  <span id="owner-detail-email-inline">Choose a row to inspect account status.</span>
+                </div>
+
+                <div class="owner-detail-section owner-detail-facts">
+                  <div class="owner-detail-fact-row">
+                    <span>User UID</span>
+                    <strong id="owner-detail-uid">-</strong>
+                  </div>
+                  <div class="owner-detail-fact-row">
+                    <span>Created at</span>
+                    <strong id="owner-detail-created">-</strong>
+                  </div>
+                  <div class="owner-detail-fact-row">
+                    <span>Updated at</span>
+                    <strong id="owner-detail-updated">-</strong>
+                  </div>
+                  <div class="owner-detail-fact-row">
+                    <span>Verification</span>
+                    <strong id="owner-detail-verified">-</strong>
+                  </div>
+                  <div class="owner-detail-fact-row">
+                    <span>Last signed in</span>
+                    <strong id="owner-detail-last-signin">-</strong>
+                  </div>
+                  <div class="owner-detail-fact-row">
+                    <span>Status</span>
+                    <strong id="owner-detail-status">-</strong>
+                  </div>
+                  <div class="owner-detail-fact-row">
+                    <span>Role</span>
+                    <strong id="owner-detail-role">-</strong>
+                  </div>
+                  <div class="owner-detail-fact-row">
+                    <span>Provider</span>
+                    <strong id="owner-detail-provider">-</strong>
+                  </div>
+                </div>
+
+                <div id="owner-detail-provider-card" class="owner-provider-card owner-detail-section"></div>
+                <div class="owner-detail-section owner-detail-action-card owner-detail-display-name-card">
+                  <div class="owner-detail-card-copy">
+                    <strong>Display name</strong>
+                    <span>Update how this user appears in the Work Report app and admin dashboard.</span>
+                  </div>
+                  <div class="owner-detail-display-name-form">
+                    <input id="owner-detail-display-name" class="owner-detail-display-name-input" type="text" maxlength="80" placeholder="Enter display name" />
+                    <button id="owner-detail-display-name-save" class="owner-secondary-btn" type="button">Save Name</button>
+                  </div>
+                </div>
+                <div class="owner-detail-section owner-detail-action-card">
+                  <div class="owner-detail-card-copy">
+                    <strong>Reset password</strong>
+                    <span>Send a password recovery email to the user.</span>
+                  </div>
+                  <button id="owner-detail-reset-btn" class="owner-secondary-btn" type="button">Send reset link</button>
+                </div>
+                <div class="owner-detail-section owner-detail-action-card">
+                  <div class="owner-detail-card-copy">
+                    <strong>Backup data</strong>
+                    <span>Create a quick snapshot for this user.</span>
+                  </div>
+                  <button id="owner-detail-backup-btn" class="owner-secondary-btn" type="button">Backup data</button>
+                </div>
+                <div class="owner-detail-section owner-detail-danger-card">
+                  <div class="owner-detail-card-copy">
+                    <strong>Danger zone</strong>
+                    <span>Disable access, change verification, or delete this user.</span>
+                  </div>
+                  <div class="owner-detail-danger-actions">
+                    <button id="owner-detail-verify-btn" class="owner-secondary-btn" type="button">Toggle Verification</button>
+                    <button id="owner-detail-disable-btn" class="owner-secondary-btn" type="button">Disable User</button>
+                    <button id="owner-detail-archive-btn" class="owner-secondary-btn owner-danger-btn" type="button">Delete User</button>
+                  </div>
+                </div>
+                <div id="owner-detail-summary" class="owner-mini-grid owner-summary-grid"></div>
+              </div>
+
+              <div class="owner-detail-panel" data-owner-detail-panel="logs" hidden>
+                <div class="owner-detail-section">
+                  <div id="owner-detail-log-list" class="owner-list-stack owner-detail-log-list"></div>
+                </div>
+                <div class="owner-detail-note-block owner-detail-section">
+                  <label for="owner-detail-note">Owner note</label>
+                  <textarea id="owner-detail-note" class="owner-note-input" rows="5" placeholder="Add a short private note for this user"></textarea>
+                  <div class="owner-inline-actions">
+                    <button id="owner-detail-note-save" class="owner-secondary-btn" type="button">Save Note</button>
+                    <button id="owner-detail-flag-btn" class="owner-secondary-btn" type="button">Mark Suspicious</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="owner-detail-panel" data-owner-detail-panel="json" hidden>
+                <pre id="owner-detail-raw-json" class="owner-raw-json"></pre>
+              </div>
+            </aside>
+          </div>
+        </section>
+
+        <section class="owner-tab-panel" data-owner-panel="reports" hidden>
+          <div class="owner-surface-card owner-reports-surface owner-reports-simple-surface">
+            <div class="owner-reports-hero owner-reports-simple-hero">
+              <div class="owner-reports-hero-copy">
+                <p class="owner-surface-kicker">Reports</p>
+                <h3>Work Data Sheet Access</h3>
+                <p class="owner-users-toolbar-note">Filter one user and one month to review clean monthly Work Data Sheet bundles from the admin side.</p>
+              </div>
+            </div>
+
+            <div class="owner-reports-toolbar">
+              <div class="owner-report-controls">
+                <select id="owner-report-user-filter" class="owner-filter-select">
+                  <option value="all">All users</option>
+                </select>
+                <label class="owner-report-month-field" for="owner-report-month">
+                  <span>Month</span>
+                  <input id="owner-report-month" class="owner-filter-select" type="month" />
+                </label>
+                <select id="owner-report-status-filter" class="owner-filter-select">
+                  <option value="all">All review states</option>
+                  <option value="pending">Pending</option>
+                  <option value="verified">Verified</option>
+                  <option value="rejected">Rejected</option>
+                </select>
+                <input id="owner-report-search" class="owner-search-input" type="search" placeholder="Search user, team, location, or note" />
+              </div>
+            </div>
+
+            <div id="owner-reports-summary" class="owner-mini-grid owner-summary-grid"></div>
+
+            <div class="owner-table-wrap owner-report-table-wrap">
+              <table class="owner-data-table owner-reports-table">
+                <thead>
+                  <tr>
+                    <th>User</th>
+                    <th>Month</th>
+                    <th>Reports</th>
+                    <th>Last Update</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="owner-reports-list"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section class="owner-tab-panel" data-owner-panel="analytics" hidden>
+          <div class="owner-surface-card">
+            <div class="owner-surface-head">
+              <div>
+                <p class="owner-surface-kicker">Analytics</p>
+                <h3>User activity analytics</h3>
+              </div>
+            </div>
+            <div id="owner-analytics-summary" class="owner-mini-grid owner-summary-grid"></div>
+            <div id="owner-analytics-grid" class="owner-mini-grid owner-analytics-grid"></div>
+            <div id="owner-analytics-users" class="owner-list-stack owner-analytics-users"></div>
+          </div>
+        </section>
+
+        <section class="owner-tab-panel owner-placeholder-panel" data-owner-panel="settings" hidden>
+          <div class="owner-surface-card">
+            <div class="owner-surface-head">
+              <div>
+                <p class="owner-surface-kicker">Settings</p>
+                <h3>Console settings</h3>
+              </div>
+            </div>
+            <div id="owner-settings-summary" class="owner-mini-grid owner-summary-grid"></div>
+            <form id="owner-settings-form" class="owner-settings-form">
+              <div class="field">
+                <label for="owner-retention-days">Backup retention days</label>
+                <input id="owner-retention-days" type="number" min="1" max="365" />
+              </div>
+              <div class="field">
+                <label for="owner-settings-email">Owner email</label>
+                <input id="owner-settings-email" type="text" readonly />
+              </div>
+              <div class="field">
+                <label for="owner-settings-reset-route">Owner reset route</label>
+                <input id="owner-settings-reset-route" type="text" readonly />
+              </div>
+              <label class="owner-check-row">
+                <input id="owner-auto-download-backup" type="checkbox" />
+                <span>Download snapshot automatically after manual backup</span>
+              </label>
+              <p class="owner-settings-note">Reset mail branding stays in Supabase Auth templates. This owner route is separate from the main app reset.</p>
+              <button id="owner-settings-save" class="owner-primary-btn" type="submit">Save Settings</button>
+            </form>
+          </div>
+        </section>
+
+        <section class="owner-tab-panel owner-placeholder-panel" data-owner-panel="notifications" hidden>
+          <div class="owner-surface-card">
+            <div class="owner-surface-head">
+              <div>
+                <p class="owner-surface-kicker">Notifications</p>
+                <h3>Notification Center</h3>
+                <p class="owner-users-toolbar-note">Current user support and access requests appear here.</p>
+              </div>
+            </div>
+            <div id="owner-notifications-list" class="owner-list-stack"></div>
+          </div>
+        </section>
+
+        <section class="owner-tab-panel owner-placeholder-panel" data-owner-panel="backup" hidden>
+          <div class="owner-backups-layout">
+            <aside class="owner-surface-card owner-backups-users-card">
+              <div class="owner-surface-head">
+                <div>
+                  <p class="owner-surface-kicker">Users</p>
+                  <h3>Backup users</h3>
+                </div>
+              </div>
+              <div id="owner-backups-users-list" class="owner-list-stack owner-backups-users-list"></div>
+            </aside>
+
+            <div class="owner-surface-card owner-backups-main-card">
+              <div class="owner-surface-head owner-backups-head">
+                <div>
+                  <p class="owner-surface-kicker">Backups</p>
+                  <h3>Snapshot center</h3>
+                  <p id="owner-backups-selected-copy" class="owner-users-toolbar-note">Select a user to create and manage backup snapshots.</p>
+                  <p id="owner-backups-notice" class="owner-users-toolbar-note owner-toolbar-callout" hidden></p>
+                </div>
+                <div class="owner-inline-actions owner-backups-head-actions">
+                  <button id="owner-backups-create-btn" class="owner-primary-btn" type="button">Backup User</button>
+                </div>
+              </div>
+              <div id="owner-backups-summary" class="owner-mini-grid owner-summary-grid"></div>
+              <div id="owner-backups-list" class="owner-list-stack owner-backups-records"></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="owner-tab-panel owner-placeholder-panel" data-owner-panel="trash" hidden>
+          <div class="owner-trash-layout">
+            <div class="owner-surface-card">
+              <div class="owner-surface-head">
+                <div>
+                  <p class="owner-surface-kicker">Trash</p>
+                  <h3>Deleted users</h3>
+                </div>
+              </div>
+              <div id="owner-deleted-summary" class="owner-mini-grid owner-summary-grid"></div>
+              <div id="owner-deleted-list" class="owner-list-stack"></div>
+            </div>
+          </div>
+        </section>
+        <section class="owner-tab-panel owner-database-panel" data-owner-panel="files" hidden>
+          <div class="owner-database-shell">
+            <div class="owner-database-page-head">
+              <div>
+                <p class="owner-surface-kicker">Database</p>
+                <h3>User report database</h3>
+                <p class="owner-database-page-copy">Select a user, open a day card, and edit the exact report data entered in the WorkReport app.</p>
+              </div>
+            </div>
+
+            <div class="owner-database-toolbar">
+              <label class="owner-storage-search owner-database-search" for="owner-storage-search">
+                <span>Search</span>
+                <input id="owner-storage-search" type="search" placeholder="Search user name or email" />
+              </label>
+              <button class="owner-primary-btn owner-storage-refresh-btn" type="button" data-storage-action="refresh">Refresh database</button>
+            </div>
+
+            <div class="owner-database-console">
+              <aside class="owner-database-pane owner-database-documents-pane owner-database-users-pane">
+                <div class="owner-database-pane-head">
+                  <div>
+                    <span class="owner-database-pane-kicker">Workspace users</span>
+                    <strong id="owner-database-documents-title">User list</strong>
+                  </div>
+                  <span id="owner-database-documents-meta" class="owner-database-pane-note">Select a user to inspect work data.</span>
+                </div>
+                <div id="owner-files-list" class="owner-database-document-list"></div>
+              </aside>
+
+              <aside class="owner-database-pane owner-database-documents-pane owner-database-records-pane">
+                <div class="owner-database-pane-head">
+                  <div>
+                    <span class="owner-database-pane-kicker">Day cards</span>
+                    <strong id="owner-database-records-title">Report records</strong>
+                  </div>
+                  <span id="owner-database-records-meta" class="owner-database-pane-note">Select a user first.</span>
+                </div>
+                <div id="owner-database-records-list" class="owner-database-document-list owner-database-records-list"></div>
+              </aside>
+
+              <section class="owner-database-pane owner-database-inspector-pane">
+                <div id="owner-data-manager" class="owner-database-manager"></div>
+              </section>
+            </div>
+          </div>
+        </section>
+
+        <section class="owner-tab-panel owner-storage-panel" data-owner-panel="storage" hidden>
+          <div class="owner-storage-shell">
+            <div class="owner-storage-page-head">
+              <div>
+                <p class="owner-surface-kicker">Storage</p>
+                <h3>Packages</h3>
+              </div>
+            </div>
+            <div id="owner-storage-manager" class="owner-storage-manager"></div>
+          </div>
+        </section>
+
+        <section class="owner-tab-panel owner-placeholder-panel" data-owner-panel="support" hidden>
+          <div class="owner-surface-card">
+            <div class="owner-surface-head">
+              <div>
+                <p class="owner-surface-kicker">Support</p>
+                <h3>User support inbox</h3>
+                <p class="owner-users-toolbar-note">See exactly who contacted support, their email, request type, and full message in one owner-ready inbox.</p>
+              </div>
+            </div>
+            <div id="owner-support-summary" class="owner-mini-grid owner-summary-grid"></div>
+            <div id="owner-support-list" class="owner-list-stack"></div>
+          </div>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <div id="owner-add-user-modal" class="owner-modal" hidden>
+    <div class="owner-modal-backdrop" data-owner-add-user-close></div>
+    <div class="owner-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="owner-add-user-title">
+      <div class="owner-modal-head">
+        <div>
+          <p class="owner-surface-kicker">Users</p>
+          <h3 id="owner-add-user-title">Add user</h3>
+          <p class="owner-modal-copy">Create a new email/password account in Supabase without affecting the owner session.</p>
+        </div>
+        <button id="owner-add-user-close" class="owner-icon-btn" type="button" aria-label="Close add user">×</button>
+      </div>
+
+      <form id="owner-add-user-form" class="owner-login-form owner-add-user-form" novalidate>
+        <div class="owner-modal-grid">
+          <div class="field">
+            <label for="owner-add-user-name">Full Name</label>
+            <input id="owner-add-user-name" name="full_name" type="text" autocomplete="name" placeholder="New team member" required />
+          </div>
+
+          <div class="field">
+            <label for="owner-add-user-email">Email</label>
+            <input id="owner-add-user-email" name="email" type="email" autocomplete="email" placeholder="user@company.com" required />
+          </div>
+
+          <div class="field owner-modal-grid-span">
+            <label for="owner-add-user-password">Temporary Password</label>
+            <div class="input-wrap">
+              <input id="owner-add-user-password" name="password" type="password" autocomplete="new-password" placeholder="Create a temporary password" required />
+              <button class="eye-toggle" id="toggle-owner-add-user-password" type="button" aria-label="Show password">Show</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="owner-modal-checks">
+          <label class="owner-check-line">
+            <input id="owner-add-user-verified" type="checkbox" checked />
+            <span>Mark email verified after create</span>
+          </label>
+          <label class="owner-check-line">
+            <input id="owner-add-user-disabled" type="checkbox" />
+            <span>Keep login disabled after create</span>
+          </label>
+        </div>
+
+        <div id="owner-add-user-status" class="status-box" role="status" aria-live="polite"></div>
+
+        <div class="owner-modal-actions">
+          <button id="owner-add-user-cancel" class="owner-secondary-btn" type="button">Cancel</button>
+          <button id="owner-add-user-submit" class="owner-primary-btn" type="submit">Create User</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="owner-report-preview-modal" class="owner-modal" hidden>
+    <div class="owner-modal-backdrop" data-owner-report-preview-close></div>
+    <div class="owner-modal-dialog owner-report-preview-dialog" role="dialog" aria-modal="true" aria-labelledby="owner-report-preview-title">
+      <div class="owner-modal-head">
+        <div>
+          <p class="owner-surface-kicker">Reports</p>
+          <h3 id="owner-report-preview-title">Monthly PDF preview</h3>
+          <p id="owner-report-preview-copy" class="owner-modal-copy">Preview the report sheet inside the admin dashboard.</p>
+        </div>
+        <button id="owner-report-preview-close" class="owner-icon-btn" type="button" aria-label="Close PDF preview">×</button>
+      </div>
+      <div class="owner-report-preview-actions">
+        <button id="owner-report-preview-download" class="owner-primary-btn" type="button">Download PDF</button>
+      </div>
+      <embed id="owner-report-preview-frame" class="owner-report-preview-frame" type="application/pdf" />
+    </div>
+  </div>
+
+  <div id="owner-confirm-modal" class="owner-modal owner-confirm-modal" hidden>
+    <div class="owner-modal-backdrop" data-owner-confirm-close></div>
+    <div class="owner-modal-dialog owner-confirm-dialog" role="dialog" aria-modal="true" aria-labelledby="owner-confirm-title">
+      <div class="owner-confirm-head">
+        <div class="owner-confirm-mark" aria-hidden="true">
+          <span>!</span>
+        </div>
+        <div class="owner-confirm-copy">
+          <p id="owner-confirm-kicker" class="owner-surface-kicker owner-confirm-kicker">Owner confirmation</p>
+          <h3 id="owner-confirm-title">Confirm action</h3>
+          <p id="owner-confirm-message" class="owner-modal-copy">Do you want to continue?</p>
+        </div>
+        <button id="owner-confirm-close" class="owner-icon-btn" type="button" aria-label="Close confirmation">×</button>
+      </div>
+      <div class="owner-modal-actions owner-confirm-actions">
+        <button id="owner-confirm-cancel" class="owner-secondary-btn" type="button">Cancel</button>
+        <button id="owner-confirm-submit" class="owner-primary-btn owner-confirm-submit" type="button">Continue</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/frontend/auth/assets/js/vendor/supabase-js.min.js?v=20260312v"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="/frontend/auth/assets/js/config.js?v=20260312w"></script>
+  <script src="/frontend/auth/assets/js/supabase-client.js?v=20260312w"></script>
+  <script src="/frontend/auth/assets/js/ui.js?v=20260328g"></script>
+  <script src="/frontend/owner/assets/js/owner-console.js?v=20260331ownerdashboard52"></script>
+</body>
+</html>
