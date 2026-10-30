@@ -7,7 +7,7 @@
   },
   "hosting": {
     "site": "work-report-fe3da",
-    "public": "recovered_live_site",
+    "public": ".",
     "headers": [
       {
         "source": "**",
@@ -44,6 +44,11 @@
       "*.tmp.*",
       "workreport.main.tmp.js"
     ],
-    "rewrites": []
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
   }
 }
