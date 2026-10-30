@@ -44,11 +44,6 @@
       "*.tmp.*",
       "workreport.main.tmp.js"
     ],
-    "rewrites": [
-      {
-        "source": "/callback",
-        "destination": "/app/index.html"
-      }
-    ]
+    "rewrites": []
   }
 }
